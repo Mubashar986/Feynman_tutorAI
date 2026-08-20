@@ -8,6 +8,8 @@ This is an ENHANCED version of the development lifecycle. When the user types `/
 
 ## Core Execution Sequence
 
+0. **Git Kickstart (Rule 06 & Quickstart):** Check Git status. Ensure branch is rooted on latest `main` (`git checkout main && git pull --rebase origin main`) and switch to the task-isolated feature branch (`feat/be-task-X.Y-<slug>` for backend or `feat/fe-task-A.B-<slug>` for frontend). Enforce strict directory isolation (`backend/` vs `frontend/`).
+
 1. **Load Constraints:** Load `AGENTS.md` in full. Restate the active constraints from §1.2 (decision-first execution) and §1.3 (non-negotiable product constraints) before doing anything else.
 
 2. **WBS Check:** Check `.agents/state/current_task.md`. If no active WBS leaf task matches the `<task or idea>`, execute the `roadmap-wbs-planner` skill (Stage 0). **STOP** and wait for explicit user approval of the WBS before continuing.
@@ -33,4 +35,8 @@ This is an ENHANCED version of the development lifecycle. When the user types `/
 
 8. **QA & Verification (Stage 5):** Execute the `testing-verification` and `qa-audit` workflows.
 
-9. **Completion:** Update `.agents/state/current_task.md`, `current_stage.md`, `decisions.md`, and `docs/adr/ADR-INDEX.md`. Report completion using the Agent Response Contract format.
+9. **Contract Export:** If backend endpoints/schemas were added or modified, export `docs/contracts/schemas/openapi.json` so the frontend track can run `npm run typegen` with zero blocking.
+
+10. **Git Staging & Commit:** Stage only track-specific files (`backend/` or `frontend/`) and state files. Commit with task ID format: `<type>(<scope>): [Task-X.Y] <summary>`. Provide copy-pasteable `git push -u origin <branch>` command.
+
+11. **Completion:** Update `.agents/state/current_task.md`, `current_stage.md`, `decisions.md`, and `docs/adr/ADR-INDEX.md`. Report completion using the Agent Response Contract format.
