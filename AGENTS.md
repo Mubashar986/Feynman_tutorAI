@@ -557,3 +557,27 @@ PASS / FAIL / BLOCKED
 - Maintained in `docs/ai_design/` for prompt versioning, RAG pipeline architecture, LLM gateways, structured output validation, and agentic orchestration.
 - Every AI component must have explicit evaluation criteria and benchmarks.
 - Prompt changes require regression evaluation before deployment.
+
+---
+
+## 26. Automated Two-Developer Git Kickstart & Handover Protocol
+
+Every AI agent operating in this workspace (Backend or Frontend track) MUST automatically execute this lifecycle around every WBS task:
+
+### 26.1 Pre-Task Kickstart (Before Stage 1 / Implementation)
+1. **Branch Hygiene:** Inspect Git status. Ensure work is rooted on the latest `main` branch (`git checkout main && git pull --rebase origin main`) before starting a new task card.
+2. **Branch Creation:** Create and switch to the task-isolated feature branch following the naming standards in `docs/team/COLLABORATION-QUICKSTART.md` and Rule 06:
+   - Backend track: `feat/be-task-X.Y-<slug>`
+   - Frontend track: `feat/fe-task-A.B-<slug>`
+3. **Track Isolation Enforcement:**
+   - Backend agents are **STRICTLY FORBIDDEN** from modifying any files in `frontend/`.
+   - Frontend agents are **STRICTLY FORBIDDEN** from modifying any files in `backend/`.
+
+### 26.2 Post-Task Completion (After Stage 4 Verification)
+1. **Selective Staging:** Stage ONLY track-specific files (`backend/` or `frontend/`), test files, and `.agents/state/` files. Never use blind `git add .`.
+2. **Task-Based Conventional Commit:** Commit using format:
+   ```text
+   <type>(<scope>): [Task-X.Y] <imperative short summary>
+   ```
+3. **Push & Handover Command:** Provide copy-pasteable `git push -u origin <branch>` command for the developer.
+4. **Contract-First Export:** If any backend endpoint or schema was modified, the backend agent MUST export `docs/contracts/schemas/openapi.json` to allow the frontend track to run `npm run typegen` with zero blocking.

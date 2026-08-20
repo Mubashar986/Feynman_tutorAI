@@ -47,3 +47,18 @@ These are permanent, drawn directly from the PRD, and apply regardless of which 
 
 ## 7. Operating Contract
 - Reference `AGENTS.md` for complete operating contract details.
+
+## 8. Automated Two-Developer Git Kickstart & Handover Protocol
+- **Pre-Task Kickstart (MANDATORY BEFORE STAGE 1 / IMPLEMENTATION):**
+  - The agent MUST automatically check Git branch status before starting work on any task card.
+  - If on `main`, or before branching, run `git pull --rebase origin main` to sync with teammate's latest merged work.
+  - Create/switch to the designated track branch:
+    - Backend: `feat/be-task-X.Y-<slug>` (Strictly isolated to `backend/`)
+    - Frontend: `feat/fe-task-A.B-<slug>` (Strictly isolated to `frontend/`)
+  - Cross-track file contamination is strictly forbidden: Backend tasks must NEVER touch `frontend/`, and Frontend tasks must NEVER touch `backend/`.
+- **Post-Task Completion (MANDATORY AFTER STAGE 4 VERIFICATION):**
+  - Stage ONLY track-specific files (`backend/` or `frontend/`) and state updates (`.agents/state/`).
+  - Commit using Conventional Commits with Task ID: `<type>(<scope>): [Task-X.Y] <summary>`.
+  - Provide copy-pasteable `git push -u origin <branch>` command.
+  - If backend endpoints/schemas changed, export `docs/contracts/schemas/openapi.json` so the frontend developer can run `npm run typegen` with zero blocking.
+  - Consult `docs/team/COLLABORATION-QUICKSTART.md` as the definitive cheat sheet.
