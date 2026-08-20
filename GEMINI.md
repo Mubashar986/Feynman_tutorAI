@@ -62,3 +62,13 @@ These are permanent, drawn directly from the PRD, and apply regardless of which 
   - Provide copy-pasteable `git push -u origin <branch>` command.
   - If backend endpoints/schemas changed, export `docs/contracts/schemas/openapi.json` so the frontend developer can run `npm run typegen` with zero blocking.
   - Consult `docs/team/COLLABORATION-QUICKSTART.md` as the definitive cheat sheet.
+
+## 9. Generic Developer Environment & Prerequisite Gating Protocol
+- **Pre-Flight Environment Audit:** Before executing any task that requires external credentials (LLM keys, cloud databases, S3 buckets, Redis, OAuth), the agent MUST check if `.env` exists and contains the required variable.
+- **Developer Action Card:** If an external key/service is missing, the agent MUST NOT crash or silently fake data. It MUST halt and present the standardized **Developer Action Card** providing:
+  1. What is needed & why
+  2. Direct portal URLs with free/fast alternatives (e.g. OpenRouter, Groq, local Ollama)
+  3. Exact `.env` variable name and file path
+  4. Zero-Setup local fallback (SQLite, local Qdrant disk, mock mode)
+- **Living `.env.example` Sync:** Whenever a new config or key is introduced, the agent MUST immediately update `.env.example` with clear comments, defaults, and registration URLs.
+- Reference `docs/team/DEVELOPER_PREREQUISITES.md` for complete details.

@@ -581,3 +581,40 @@ Every AI agent operating in this workspace (Backend or Frontend track) MUST auto
    ```
 3. **Push & Handover Command:** Provide copy-pasteable `git push -u origin <branch>` command for the developer.
 4. **Contract-First Export:** If any backend endpoint or schema was modified, the backend agent MUST export `docs/contracts/schemas/openapi.json` to allow the frontend track to run `npm run typegen` with zero blocking.
+
+---
+
+## 27. Generic Developer Environment & Prerequisite Gating Protocol
+
+Every AI agent operating in this repository MUST follow this universal prerequisite protocol before planning or executing any task:
+
+### 27.1 Pre-Flight Environment & Credential Audit
+Before entering Stage 1 or writing code for any task requiring external services (LLMs, databases, vector indices, storage buckets, message queues, OAuth):
+1. **Inspect `.env` & Environment:** Check if the required environment variables are defined.
+2. **Zero-Setup Guarantee:** If external services are not configured, verify if the task can run on zero-setup local defaults (e.g. SQLite, local Qdrant disk, in-memory cache, local mocks).
+3. **Halt on Missing Required Credentials:** If a real external service or API key is strictly required for the task and missing from `.env`, the agent MUST NOT crash or hallucinate dummy data. It MUST halt and output the standardized **Developer Action Card**.
+
+### 27.2 Universal Developer Action Card Standard
+The agent must present this card directly to the developer:
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🔑 DEVELOPER PREREQUISITE ACTION REQUIRED                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 1. WHAT IS NEEDED:        [Component name, e.g. LLM API / S3 Storage / DB]  │
+│ 2. WHY IT IS NEEDED:      [Which WBS task / feature requires this]          │
+│ 3. WHERE TO GET IT (URLs):                                                  │
+│    • Free / Fastest Option: [Portal URL + 1-minute signup instructions]     │
+│    • Aggregator / Multi:    [Portal URL, e.g. OpenRouter]                   │
+│    • 100% Free / Offline:   [Download URL for local tool, e.g. Ollama]      │
+│    • Standard / Enterprise: [Official vendor portal URL]                    │
+│ 4. WHERE TO PUT IT:       [Exact file: .env]                                │
+│    • Exact Variable Name:   KEY_NAME=your_value_here                        │
+│ 5. ZERO-SETUP FALLBACK:   [Explain how to run with local mock if skipped]   │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 27.3 Living `.env.example` Synchronization
+Whenever any task introduces a new configuration parameter, secret, or third-party service:
+- The agent MUST immediately update `.env.example` (both in root and `backend/`).
+- Every entry MUST include a 1-line description, safe local default, and direct registration URL.
+- Consult `docs/team/DEVELOPER_PREREQUISITES.md` as the definitive guide.

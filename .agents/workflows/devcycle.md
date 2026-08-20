@@ -8,9 +8,11 @@ This is an ENHANCED version of the development lifecycle. When the user types `/
 
 ## Core Execution Sequence
 
-0. **Git Kickstart (Rule 06 & Quickstart):** Check Git status. Ensure branch is rooted on latest `main` (`git checkout main && git pull --rebase origin main`) and switch to the task-isolated feature branch (`feat/be-task-X.Y-<slug>` for backend or `feat/fe-task-A.B-<slug>` for frontend). Enforce strict directory isolation (`backend/` vs `frontend/`).
+0. **Git Kickstart & Environment Pre-Flight Audit:**
+   - Check Git status, ensure work is rooted on latest `main` (`git checkout main && git pull --rebase origin main`), and switch to the task-isolated feature branch (`feat/be-task-X.Y-<slug>` or `feat/fe-task-A.B-<slug>`).
+   - Run Pre-Flight Environment Audit (Section 27): Check `.env` for task prerequisites. If external credentials (LLM, DB, S3, OAuth) are missing, present the **Developer Action Card** or fallback to local zero-setup defaults (SQLite, local Qdrant disk, mocks).
 
-1. **Load Constraints:** Load `AGENTS.md` in full. Restate the active constraints from §1.2 (decision-first execution) and §1.3 (non-negotiable product constraints) before doing anything else.
+1. **Load Constraints:** Load `AGENTS.md` in full. Restate the active constraints from §1.2 (decision-first execution), §1.3 (non-negotiable product constraints), and §27 (prerequisite gating) before doing anything else.
 
 2. **WBS Check:** Check `.agents/state/current_task.md`. If no active WBS leaf task matches the `<task or idea>`, execute the `roadmap-wbs-planner` skill (Stage 0). **STOP** and wait for explicit user approval of the WBS before continuing.
 
