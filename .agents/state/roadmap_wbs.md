@@ -1,0 +1,46 @@
+# Master Roadmap & WBS Tracking
+## AI Adaptive Exam Learning Platform
+
+**Master WBS Location:** [.agents/artifacts/project_foundation/roadmap_wbs.md](file:///c:/Users/Mubashar/Desktop/Curious_Feynman/.agents/artifacts/project_foundation/roadmap_wbs.md)
+
+---
+
+## Active Task Matrix
+
+### Shared Track
+* [x] **Task 0.1:** Formal Decision Records Codification (ADR-000 to ADR-008, FDR-001 to FDR-005) `[COMPLETED]`
+* [ ] **Task 0.5:** OpenAPI Contract Generation & TypeScript Sync Protocol Setup
+
+### Backend Track (FastAPI / Python)
+* [x] **Task 0.2:** FastAPI Modular Monolith Scaffold & Async Database Engine (SQLModel + AsyncPG/SQLite) `[COMPLETED]`
+* [ ] **Task 0.4:** Multi-Provider LLM Gateway & Pydantic Validation Engine `[READY]`
+* [ ] **Task 1.1:** Server-Side RBAC, User Models & JWT Authentication Service
+* [ ] **Task 1.2:** Student Learning State Machine & Auditable Event Log
+* [ ] **Task 2.1:** Exam Template Data Models & Syllabus Parser
+* [ ] **Task 2.2:** Topic DAG & Prerequisite Validation Engine
+* [ ] **Task 3.1:** Document Ingestion Pipeline & Text Chunking Engine
+* [ ] **Task 3.2:** Qdrant Vector Store Adapter & Hybrid Indexer
+* [ ] **Task 3.3:** Grounded Retrieval & Source Provenance Formatter
+* [ ] **Task 4.1:** Question Bank Schema & Multi-Type Data Models
+* [ ] **Task 4.2:** LLM Question & Distractor Generator with Pydantic Validation
+* [ ] **Task 4.3:** Question Quality, Solvability & Duplication Validator
+* [ ] **Task 5.1:** Mastery Probability & Difficulty Calibration Engine
+* [ ] **Task 5.2:** Error Bank & Misconception Diagnosis Engine
+* [ ] **Task 6.1:** Socratic Tutor Orchestrator with Retrieval Augmentation
+* [ ] **Task 6.2:** Server-Sent Events (SSE) Streaming Tutor Endpoint
+* [ ] **Task 7.1:** Spaced Repetition Scheduling Engine (SM-2 / FSRS)
+* [ ] **Task 7.2:** Teach-Back Mode & Rubric Evaluator Engine
+* [ ] **Task 7.3:** Adversarial Tutor & Why-You-Are-Wrong Modes
+* [ ] **Task 8.1:** Full Exam Simulation & Blueprint Weighting Engine
+* [ ] **Task 8.2:** Calibrated Exam Readiness Score Engine
+
+### Frontend Track (React / TypeScript / Vite)
+* [ ] **Task 0.3:** React + Vite + TypeScript + Tailwind + Shadcn Workspace Scaffold `[READY]`
+* [ ] **Task 1.3:** Auth Flow, Route Guards & User Profile State
+* [ ] **Task 2.3:** Exam Template Catalog & Syllabus Tree Explorer
+* [ ] **Task 3.4:** Resource Manager & Document Viewer
+* [ ] **Task 4.4:** Interactive Exam Taking Player with KaTeX & Timed Session
+* [ ] **Task 5.3:** Student Analytics Dashboard, Mastery Radar & Error Bank UI
+* [ ] **Task 6.3:** Socratic Tutor Slide-over Drawer with Live Math & Streaming
+* [ ] **Task 7.4:** Interactive Misconception DAG Visualizer (React Flow)
+* [ ] **Task 8.3:** Exam Readiness Simulation & Score Report UI
