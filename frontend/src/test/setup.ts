@@ -21,3 +21,20 @@ global.ResizeObserver = class ResizeObserver {
   unobserve() {}
   disconnect() {}
 };
+
+// Safe getComputedStyle wrapper for JSDOM
+const originalGetComputedStyle = window.getComputedStyle;
+window.getComputedStyle = (element, pseudoElt) => {
+  try {
+    const res = originalGetComputedStyle(element, pseudoElt);
+    if (!res) throw new Error("Null style");
+    return res;
+  } catch {
+    return {
+      getPropertyValue: () => "",
+      display: "block",
+      visibility: "visible",
+      opacity: "1",
+    } as unknown as CSSStyleDeclaration;
+  }
+};

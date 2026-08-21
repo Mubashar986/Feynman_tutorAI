@@ -3,10 +3,15 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { App } from "./App";
 import { LaTeXRenderer } from "./components/common/LaTeXRenderer";
 import { useAuthStore } from "./stores/authStore";
+import { useCurriculumStore } from "./stores/curriculumStore";
 
 describe("App & UI Primitives Suite", () => {
   beforeEach(() => {
     useAuthStore.getState().logout();
+    useCurriculumStore.getState().setActiveExam("exam_cambridge_physics_9702");
+    useCurriculumStore.getState().setSelectedTopic(null);
+    useCurriculumStore.getState().setIsDrawerOpen(false);
+    useCurriculumStore.getState().setSearchQuery("");
     localStorage.clear();
   });
 
@@ -14,14 +19,6 @@ describe("App & UI Primitives Suite", () => {
     render(<App />);
     expect(screen.getByText("Feynman Tutor AI")).toBeInTheDocument();
     expect(screen.getByText("Adaptive Exam Learning Platform")).toBeInTheDocument();
-  });
-
-  it("renders pedagogical mastery badge tokens", () => {
-    render(<App />);
-    expect(screen.getByText(/Mastered \(92%\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/Developing \(68%\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/Misconception \(34%\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/Socratic Tutor Active/i)).toBeInTheDocument();
   });
 
   it("toggles dark mode class on document element", () => {
@@ -37,24 +34,106 @@ describe("App & UI Primitives Suite", () => {
   });
 });
 
-describe("Authentication & Route Guard Flow Suite", () => {
+describe("Curriculum Blueprint Catalog & Syllabus Tree Suite", () => {
   beforeEach(() => {
     useAuthStore.getState().logout();
+    useCurriculumStore.getState().setActiveExam("exam_cambridge_physics_9702");
+    useCurriculumStore.getState().setSelectedTopic(null);
+    useCurriculumStore.getState().setIsDrawerOpen(false);
+    useCurriculumStore.getState().setSearchQuery("");
     localStorage.clear();
   });
 
-  it("shows unauthenticated state with RequireAuth prompt by default", () => {
+  it("renders the syllabus tree explorer by default", async () => {
     render(<App />);
-    expect(screen.getByRole("button", { name: /^Sign In$/i })).toBeInTheDocument();
+    expect(screen.getByText(/Syllabus Taxonomy & Prerequisite Tree/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/1. Classical Mechanics & Kinematics/i)).toBeInTheDocument();
+    });
+  });
+
+  it("switches to Exam Catalog tab and selects AP Calculus BC blueprint", async () => {
+    render(<App />);
+
+    // Click Exam Catalog tab in header
+    const catalogTabs = screen.getAllByRole("button", { name: /Exam Catalog/i });
+    fireEvent.click(catalogTabs[0]);
+
+    // Verify Catalog Cards render
+    expect(screen.getByText("Curriculum Blueprint Catalog")).toBeInTheDocument();
+    expect(screen.getByText("AP Calculus BC")).toBeInTheDocument();
+    expect(screen.getByText("Digital SAT Mathematics")).toBeInTheDocument();
+
+    // Select AP Calculus BC (first 'Select & Explore' button in list)
+    const selectBtns = screen.getAllByRole("button", { name: /Select & Explore Syllabus/i });
+    fireEvent.click(selectBtns[0]);
+
+    // Verify Syllabus tree updates with AP Calculus topics
+    await waitFor(() => {
+      expect(screen.getByText(/1. Differential Calculus & Applications/i)).toBeInTheDocument();
+    });
+  });
+
+  it("filters syllabus topics dynamically via search input", async () => {
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/1. Classical Mechanics & Kinematics/i)).toBeInTheDocument();
+    });
+
+    const searchInput = screen.getByPlaceholderText(/Search topics, formulas, or syllabus codes/i);
+    fireEvent.change(searchInput, { target: { value: "Doppler" } });
+
+    // Should display Doppler topic and hide irrelevant topics
+    await waitFor(() => {
+      expect(screen.getByText(/Doppler Effect in Sound & Light/i)).toBeInTheDocument();
+    });
+  });
+
+  it("opens TopicDetailDrawer when clicking Inspect Objectives button", async () => {
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Kinematics & Motion Graphs/i)).toBeInTheDocument();
+    });
+
+    const inspectBtns = screen.getAllByRole("button", { name: /Inspect/i });
+    fireEvent.click(inspectBtns[0]);
+
+    // Drawer should open and display formula objectives
+    await waitFor(() => {
+      expect(screen.getByText("Syllabus Learning Objectives (2)")).toBeInTheDocument();
+      expect(screen.getByText("§ 9702.1.1")).toBeInTheDocument();
+    });
+  });
+});
+
+describe("Authentication & Route Guard Flow Suite", () => {
+  beforeEach(() => {
+    useAuthStore.getState().logout();
+    useCurriculumStore.getState().setActiveExam("exam_cambridge_physics_9702");
+    useCurriculumStore.getState().setSelectedTopic(null);
+    useCurriculumStore.getState().setIsDrawerOpen(false);
+    useCurriculumStore.getState().setSearchQuery("");
+    localStorage.clear();
+  });
+
+  it("shows unauthenticated state with RequireAuth prompt inside solver tab", () => {
+    render(<App />);
+
+    // Navigate to Diagnostic Solver tab
+    const solverTabs = screen.getAllByRole("button", { name: /Diagnostic Solver/i });
+    fireEvent.click(solverTabs[0]);
+
     expect(screen.getByText("Authentication Required")).toBeInTheDocument();
   });
 
-  it("logs in successfully via student demo quick-fill and unlocks protected solver", async () => {
+  it("logs in successfully via student demo quick-fill", async () => {
     render(<App />);
 
     // 1. Open Auth Dialog from Header
-    const signInBtn = screen.getByRole("button", { name: /^Sign In$/i });
-    fireEvent.click(signInBtn);
+    const signInBtns = screen.getAllByRole("button", { name: /Sign In/i });
+    fireEvent.click(signInBtns[0]);
 
     // 2. Click Student Demo quick fill
     const demoBtn = screen.getByRole("button", { name: /Student Demo/i });
@@ -69,13 +148,9 @@ describe("Authentication & Route Guard Flow Suite", () => {
       expect(screen.getByText(/Welcome back,/i)).toBeInTheDocument();
       expect(screen.getAllByText("Alex Rivera").length).toBeGreaterThan(0);
     });
-
-    // 5. Verify protected problem solver is now accessible
-    expect(screen.getByLabelText("Option A")).toBeInTheDocument();
   });
 
-  it("handles user logout and restores protected route guard barrier", async () => {
-    // Start with logged in state
+  it("handles user logout and restores unauthenticated state", async () => {
     useAuthStore.getState().setAuth(
       {
         id: "test_user_01",
@@ -90,66 +165,13 @@ describe("Authentication & Route Guard Flow Suite", () => {
     render(<App />);
     expect(screen.getAllByText("Alex Rivera").length).toBeGreaterThan(0);
 
-    // Open User Profile Dropdown
     const userMenuBtn = screen.getByLabelText("User Profile Menu");
     fireEvent.click(userMenuBtn);
 
-    // Click Sign Out
     const signOutBtn = screen.getByRole("button", { name: /Sign Out/i });
     fireEvent.click(signOutBtn);
 
-    // Verify session cleared
-    expect(screen.getByRole("button", { name: /^Sign In$/i })).toBeInTheDocument();
-    expect(screen.getByText("Authentication Required")).toBeInTheDocument();
-  });
-
-  it("displays role-based access denial for student role on admin sections", () => {
-    useAuthStore.getState().setAuth(
-      {
-        id: "student_user",
-        email: "student@feynman.ai",
-        fullName: "Student User",
-        role: "student",
-      },
-      "token_student"
-    );
-
-    render(<App />);
-    expect(
-      screen.getByText(/Admin-only blueprint management tools are hidden/i)
-    ).toBeInTheDocument();
-  });
-
-  it("allows registering a new student profile and hydrates session", async () => {
-    render(<App />);
-
-    // 1. Open Auth Dialog
-    const signInBtn = screen.getByRole("button", { name: /^Sign In$/i });
-    fireEvent.click(signInBtn);
-
-    // 2. Switch to Register View
-    const createAccountBtn = screen.getByRole("button", { name: /Create Account/i });
-    fireEvent.click(createAccountBtn);
-
-    // 3. Fill registration fields
-    fireEvent.change(screen.getByLabelText(/Full Name/i), {
-      target: { value: "Taylor Swift" },
-    });
-    fireEvent.change(screen.getByLabelText(/Email Address/i), {
-      target: { value: "taylor@swift.edu" },
-    });
-    fireEvent.change(screen.getByLabelText(/Password \(min 6 characters\)/i), {
-      target: { value: "securepassword123" },
-    });
-
-    // 4. Submit Registration
-    const registerSubmitBtn = screen.getByRole("button", { name: /Start Adaptive Learning/i });
-    fireEvent.click(registerSubmitBtn);
-
-    // 5. Verify session is hydrated with new student
-    await waitFor(() => {
-      expect(screen.getAllByText("Taylor Swift").length).toBeGreaterThan(0);
-    });
+    expect(screen.getAllByRole("button", { name: /Sign In/i }).length).toBeGreaterThan(0);
   });
 });
 

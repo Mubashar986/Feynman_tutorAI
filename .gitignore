@@ -68,6 +68,10 @@ yarn-error.log*
 frontend/dist/
 frontend/.next/
 frontend/out/
+frontend/.vite/
+*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
 
 # Agent scratch
 .agents/scratch/
