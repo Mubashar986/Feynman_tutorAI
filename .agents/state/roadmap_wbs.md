@@ -35,7 +35,7 @@
 * [ ] **Task 8.2:** Calibrated Exam Readiness Score Engine
 
 ### Frontend Track (React / TypeScript / Vite)
-* [ ] **Task 0.3:** React + Vite + TypeScript + Tailwind + Shadcn Workspace Scaffold `[READY]`
+* [x] **Task 0.3:** React + Vite + TypeScript + Tailwind + Shadcn Workspace Scaffold `[COMPLETED]`
 * [ ] **Task 1.3:** Auth Flow, Route Guards & User Profile State
 * [ ] **Task 2.3:** Exam Template Catalog & Syllabus Tree Explorer
 * [ ] **Task 3.4:** Resource Manager & Document Viewer

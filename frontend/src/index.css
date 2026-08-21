@@ -1,0 +1,99 @@
+@import "katex/dist/katex.min.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 243 75% 59%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 243 75% 59%;
+
+    --radius: 0.5rem;
+
+    /* Pedagogical Mastery Semantic Tokens */
+    --mastery-high: 158 64% 42%;     /* Emerald 600 */
+    --mastery-medium: 38 92% 50%;    /* Amber 500 */
+    --mastery-low: 347 89% 51%;      /* Rose 600 */
+    --tutor-accent: 243 75% 59%;     /* Indigo 600 */
+    --tutor-subtle: 243 100% 97%;    /* Indigo 50 */
+    --surface-canvas: 210 40% 98%;   /* Slate 50 */
+    --surface-card: 0 0% 100%;       /* White */
+    --surface-elevated: 210 40% 95%; /* Slate 100 */
+  }
+
+  .dark {
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 243 75% 65%;
+    --primary-foreground: 222 47% 6%;
+
+    --secondary: 217 33% 15%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 15%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 217 33% 15%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 243 75% 65%;
+
+    /* Pedagogical Mastery Semantic Tokens (Dark) */
+    --mastery-high: 158 64% 52%;     /* Emerald 400 */
+    --mastery-medium: 38 92% 56%;    /* Amber 400 */
+    --mastery-low: 347 89% 65%;      /* Rose 400 */
+    --tutor-accent: 243 75% 70%;     /* Indigo 400 */
+    --tutor-subtle: 243 50% 14%;     /* Deep Indigo tint */
+    --surface-canvas: 222 47% 6%;    /* Deep Navy */
+    --surface-card: 222 47% 9%;      /* Elevated Navy */
+    --surface-elevated: 222 47% 13%; /* Highlighted Navy */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
