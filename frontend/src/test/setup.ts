@@ -22,6 +22,11 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
 };
 
+// Mock scrollIntoView for JSDOM
+if (typeof window !== "undefined") {
+  window.HTMLElement.prototype.scrollIntoView = function () {};
+}
+
 // Safe getComputedStyle wrapper for JSDOM
 const originalGetComputedStyle = window.getComputedStyle;
 window.getComputedStyle = (element, pseudoElt) => {

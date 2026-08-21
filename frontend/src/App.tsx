@@ -21,6 +21,9 @@ import { ExamCatalogGrid } from "@/components/curriculum/ExamCatalogGrid";
 import { SyllabusTreeExplorer } from "@/components/curriculum/SyllabusTreeExplorer";
 import { ExamPlayer } from "@/components/exam/ExamPlayer";
 import { useCurriculumStore } from "@/stores/curriculumStore";
+import { SocraticTutorDrawer } from "@/components/tutor/SocraticTutorDrawer";
+import { FloatingTutorButton } from "@/components/tutor/FloatingTutorButton";
+import { useSocraticTutorStore } from "@/stores/socraticTutorStore";
 
 export function App() {
   const [isDark, setIsDark] = React.useState<boolean>(false);
@@ -30,6 +33,7 @@ export function App() {
 
   const { user, isAuthenticated } = useAuthStore();
   const { activeExamId } = useCurriculumStore();
+  const { openDrawer: openSocraticDrawer } = useSocraticTutorStore();
 
   const toggleDarkMode = () => {
     setIsDark((prev) => {
@@ -172,7 +176,7 @@ export function App() {
                   <UserCheck className="h-3.5 w-3.5" /> Authenticated Session Active
                 </span>
               ) : (
-                "Task 4.4: Interactive Exam Taking Player & KaTeX"
+                "Task 6.3: Socratic AI Tutor & Live Math"
               )}
             </div>
 
@@ -185,7 +189,7 @@ export function App() {
             </h2>
 
             <p className="max-w-3xl text-muted-foreground leading-relaxed text-sm sm:text-base">
-              Take proctored diagnostic exams with live countdown timers, question palette navigation, and instant mathematical derivations.
+              Take proctored diagnostic exams, inspect formulas with LaTeX KaTeX rendering, and ask our Socratic AI Tutor for step-by-step guidance.
             </p>
           </section>
 
@@ -220,7 +224,9 @@ export function App() {
               </div>
 
               <SyllabusTreeExplorer
-                onStartTopicPractice={() => setActiveTab("solver")}
+                onStartTopicPractice={(topic) => {
+                  openSocraticDrawer({ topicTitle: topic.title, topicId: topic.id });
+                }}
               />
             </section>
           )}
@@ -237,12 +243,21 @@ export function App() {
               >
                 <ExamPlayer
                   onReturnToSyllabus={() => setActiveTab("syllabus")}
-                  onOpenSocraticTutor={() => setActiveTab("syllabus")}
+                  onOpenSocraticTutor={() => {
+                    openSocraticDrawer({
+                      topicTitle: "Cambridge Physics Mechanics",
+                      questionStem: "Conservative potential energy force derivation",
+                    });
+                  }}
                 />
               </RequireAuth>
             </section>
           )}
         </main>
+
+        {/* Global Socratic Tutor Floating Button & Slide-over Drawer */}
+        <FloatingTutorButton />
+        <SocraticTutorDrawer />
       </div>
     </TooltipProvider>
   );

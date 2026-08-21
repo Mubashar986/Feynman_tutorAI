@@ -41,6 +41,6 @@
 * [ ] **Task 3.4:** Resource Manager & Document Viewer
 * [x] **Task 4.4:** Interactive Exam Taking Player with KaTeX & Timed Session `[COMPLETED]`
 * [ ] **Task 5.3:** Student Analytics Dashboard, Mastery Radar & Error Bank UI
-* [ ] **Task 6.3:** Socratic Tutor Slide-over Drawer with Live Math & Streaming
+* [x] **Task 6.3:** Socratic Tutor Slide-over Drawer with Live Math & Streaming `[COMPLETED]`
 * [ ] **Task 7.4:** Interactive Misconception DAG Visualizer (React Flow)
 * [ ] **Task 8.3:** Exam Readiness Simulation & Score Report UI

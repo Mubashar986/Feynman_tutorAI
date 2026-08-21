@@ -5,6 +5,7 @@ import { LaTeXRenderer } from "./components/common/LaTeXRenderer";
 import { useAuthStore } from "./stores/authStore";
 import { useCurriculumStore } from "./stores/curriculumStore";
 import { useExamPlayerStore } from "./stores/examPlayerStore";
+import { useSocraticTutorStore } from "./stores/socraticTutorStore";
 
 describe("App & UI Primitives Suite", () => {
   beforeEach(() => {
@@ -14,6 +15,8 @@ describe("App & UI Primitives Suite", () => {
     useCurriculumStore.getState().setIsDrawerOpen(false);
     useCurriculumStore.getState().setSearchQuery("");
     useExamPlayerStore.getState().resetSession();
+    useSocraticTutorStore.getState().closeDrawer();
+    useSocraticTutorStore.getState().clearHistory();
     localStorage.clear();
   });
 
@@ -44,6 +47,7 @@ describe("Curriculum Blueprint Catalog & Syllabus Tree Suite", () => {
     useCurriculumStore.getState().setIsDrawerOpen(false);
     useCurriculumStore.getState().setSearchQuery("");
     useExamPlayerStore.getState().resetSession();
+    useSocraticTutorStore.getState().closeDrawer();
     localStorage.clear();
   });
 
@@ -107,7 +111,6 @@ describe("Curriculum Blueprint Catalog & Syllabus Tree Suite", () => {
 
 describe("Interactive Exam Taking Player Suite", () => {
   beforeEach(() => {
-    // Authenticate student session
     useAuthStore.getState().setAuth(
       {
         id: "student_alex",
@@ -121,17 +124,16 @@ describe("Interactive Exam Taking Player Suite", () => {
     useCurriculumStore.getState().setSelectedTopic(null);
     useCurriculumStore.getState().setIsDrawerOpen(false);
     useExamPlayerStore.getState().resetSession();
+    useSocraticTutorStore.getState().closeDrawer();
     localStorage.clear();
   });
 
   it("renders live exam player, countdown timer, and question palette", () => {
     render(<App />);
 
-    // Switch to Exam Player tab
     const playerTabs = screen.getAllByRole("button", { name: /Interactive Exam Player/i });
     fireEvent.click(playerTabs[0]);
 
-    // Verify Exam Header & Timer
     expect(screen.getByText("Cambridge A-Level Physics Diagnostic Exam")).toBeInTheDocument();
     expect(screen.getByLabelText("Exam Time Remaining")).toBeInTheDocument();
     expect(screen.getByText("Question 1 of 5")).toBeInTheDocument();
@@ -144,18 +146,14 @@ describe("Interactive Exam Taking Player Suite", () => {
     const playerTabs = screen.getAllByRole("button", { name: /Interactive Exam Player/i });
     fireEvent.click(playerTabs[0]);
 
-    // Select Option A on Question 1
     const optionA = screen.getByLabelText("Option A");
     fireEvent.click(optionA);
 
-    // Flag Question 1
     const flagBtn = screen.getByRole("button", { name: /Flag/i });
     fireEvent.click(flagBtn);
 
-    // Question 1 should be flagged
     expect(screen.getByRole("button", { name: /Flagged/i })).toBeInTheDocument();
 
-    // Jump to Question 3 via Question Palette
     const q3Btn = screen.getByRole("button", { name: "Jump to Question 3" });
     fireEvent.click(q3Btn);
 
@@ -169,21 +167,16 @@ describe("Interactive Exam Taking Player Suite", () => {
     const playerTabs = screen.getAllByRole("button", { name: /Interactive Exam Player/i });
     fireEvent.click(playerTabs[0]);
 
-    // Answer Question 1 correctly
     fireEvent.click(screen.getByLabelText("Option A"));
 
-    // Click Finish Test
     const finishBtn = screen.getByRole("button", { name: /Finish Test/i });
     fireEvent.click(finishBtn);
 
-    // Review Modal opens
     expect(screen.getByText("Submit Exam For Scoring?")).toBeInTheDocument();
 
-    // Confirm Submission
     const confirmBtn = screen.getByRole("button", { name: /Confirm & Grade Answers/i });
     fireEvent.click(confirmBtn);
 
-    // Diagnostic Score Report renders
     await waitFor(() => {
       expect(screen.getByText(/Completed diagnostic assessment/i)).toBeInTheDocument();
       expect(screen.getByText("Syllabus Topic Mastery Breakdown")).toBeInTheDocument();
@@ -193,12 +186,82 @@ describe("Interactive Exam Taking Player Suite", () => {
   });
 });
 
+describe("Socratic AI Tutor Drawer Suite", () => {
+  beforeEach(() => {
+    useAuthStore.getState().logout();
+    useCurriculumStore.getState().setSelectedTopic(null);
+    useCurriculumStore.getState().setIsDrawerOpen(false);
+    useExamPlayerStore.getState().resetSession();
+    useSocraticTutorStore.getState().closeDrawer();
+    useSocraticTutorStore.getState().clearHistory();
+    localStorage.clear();
+  });
+
+  it("opens Socratic AI Tutor drawer when clicking floating action button", async () => {
+    render(<App />);
+
+    const floatBtn = screen.getByLabelText("Open Socratic AI Tutor");
+    fireEvent.click(floatBtn);
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Socratic AI Tutor" })).toBeInTheDocument();
+      expect(screen.getByText(/Grounded interactive STEM guidance/i)).toBeInTheDocument();
+    });
+  });
+
+  it("escalates progressive hints from Hint 1 to Hint 2", async () => {
+    render(<App />);
+
+    const floatBtn = screen.getByLabelText("Open Socratic AI Tutor");
+    fireEvent.click(floatBtn);
+
+    // Request Hint 1
+    const hintBtn = screen.getByRole("button", { name: /Get Hint #1/i });
+    fireEvent.click(hintBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Hint Level 1\/3:/i)).toBeInTheDocument();
+      expect(screen.getByText(/governing physical principles/i)).toBeInTheDocument();
+    });
+
+    // Request Hint 2
+    const hint2Btn = screen.getByRole("button", { name: /Get Hint #2/i });
+    fireEvent.click(hint2Btn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Hint Level 2\/3:/i)).toBeInTheDocument();
+    });
+  });
+
+  it("sends student prompt and receives Socratic guidance with citation", async () => {
+    render(<App />);
+
+    const floatBtn = screen.getByLabelText("Open Socratic AI Tutor");
+    fireEvent.click(floatBtn);
+
+    const input = screen.getByPlaceholderText(/Ask a question or explain your reasoning/i);
+    fireEvent.change(input, { target: { value: "How does the Doppler effect work?" } });
+
+    const sendBtn = screen.getByLabelText("Send Message");
+    fireEvent.click(sendBtn);
+
+    await waitFor(
+      () => {
+        expect(screen.getByText("How does the Doppler effect work?")).toBeInTheDocument();
+        expect(screen.getByText(/Cambridge 9702 §4.3/i)).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+  });
+});
+
 describe("Authentication & Route Guard Flow Suite", () => {
   beforeEach(() => {
     useAuthStore.getState().logout();
     useCurriculumStore.getState().setSelectedTopic(null);
     useCurriculumStore.getState().setIsDrawerOpen(false);
     useExamPlayerStore.getState().resetSession();
+    useSocraticTutorStore.getState().closeDrawer();
     localStorage.clear();
   });
 
