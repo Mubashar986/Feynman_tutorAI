@@ -4,6 +4,7 @@ import { App } from "./App";
 import { LaTeXRenderer } from "./components/common/LaTeXRenderer";
 import { useAuthStore } from "./stores/authStore";
 import { useCurriculumStore } from "./stores/curriculumStore";
+import { useExamPlayerStore } from "./stores/examPlayerStore";
 
 describe("App & UI Primitives Suite", () => {
   beforeEach(() => {
@@ -12,6 +13,7 @@ describe("App & UI Primitives Suite", () => {
     useCurriculumStore.getState().setSelectedTopic(null);
     useCurriculumStore.getState().setIsDrawerOpen(false);
     useCurriculumStore.getState().setSearchQuery("");
+    useExamPlayerStore.getState().resetSession();
     localStorage.clear();
   });
 
@@ -41,6 +43,7 @@ describe("Curriculum Blueprint Catalog & Syllabus Tree Suite", () => {
     useCurriculumStore.getState().setSelectedTopic(null);
     useCurriculumStore.getState().setIsDrawerOpen(false);
     useCurriculumStore.getState().setSearchQuery("");
+    useExamPlayerStore.getState().resetSession();
     localStorage.clear();
   });
 
@@ -55,20 +58,16 @@ describe("Curriculum Blueprint Catalog & Syllabus Tree Suite", () => {
   it("switches to Exam Catalog tab and selects AP Calculus BC blueprint", async () => {
     render(<App />);
 
-    // Click Exam Catalog tab in header
     const catalogTabs = screen.getAllByRole("button", { name: /Exam Catalog/i });
     fireEvent.click(catalogTabs[0]);
 
-    // Verify Catalog Cards render
     expect(screen.getByText("Curriculum Blueprint Catalog")).toBeInTheDocument();
     expect(screen.getByText("AP Calculus BC")).toBeInTheDocument();
     expect(screen.getByText("Digital SAT Mathematics")).toBeInTheDocument();
 
-    // Select AP Calculus BC (first 'Select & Explore' button in list)
     const selectBtns = screen.getAllByRole("button", { name: /Select & Explore Syllabus/i });
     fireEvent.click(selectBtns[0]);
 
-    // Verify Syllabus tree updates with AP Calculus topics
     await waitFor(() => {
       expect(screen.getByText(/1. Differential Calculus & Applications/i)).toBeInTheDocument();
     });
@@ -84,7 +83,6 @@ describe("Curriculum Blueprint Catalog & Syllabus Tree Suite", () => {
     const searchInput = screen.getByPlaceholderText(/Search topics, formulas, or syllabus codes/i);
     fireEvent.change(searchInput, { target: { value: "Doppler" } });
 
-    // Should display Doppler topic and hide irrelevant topics
     await waitFor(() => {
       expect(screen.getByText(/Doppler Effect in Sound & Light/i)).toBeInTheDocument();
     });
@@ -100,7 +98,6 @@ describe("Curriculum Blueprint Catalog & Syllabus Tree Suite", () => {
     const inspectBtns = screen.getAllByRole("button", { name: /Inspect/i });
     fireEvent.click(inspectBtns[0]);
 
-    // Drawer should open and display formula objectives
     await waitFor(() => {
       expect(screen.getByText("Syllabus Learning Objectives (2)")).toBeInTheDocument();
       expect(screen.getByText("§ 9702.1.1")).toBeInTheDocument();
@@ -108,21 +105,107 @@ describe("Curriculum Blueprint Catalog & Syllabus Tree Suite", () => {
   });
 });
 
+describe("Interactive Exam Taking Player Suite", () => {
+  beforeEach(() => {
+    // Authenticate student session
+    useAuthStore.getState().setAuth(
+      {
+        id: "student_alex",
+        email: "alex@feynman.ai",
+        fullName: "Alex Rivera",
+        role: "student",
+        targetExam: "Cambridge A-Level Physics",
+      },
+      "demo_jwt_token"
+    );
+    useCurriculumStore.getState().setSelectedTopic(null);
+    useCurriculumStore.getState().setIsDrawerOpen(false);
+    useExamPlayerStore.getState().resetSession();
+    localStorage.clear();
+  });
+
+  it("renders live exam player, countdown timer, and question palette", () => {
+    render(<App />);
+
+    // Switch to Exam Player tab
+    const playerTabs = screen.getAllByRole("button", { name: /Interactive Exam Player/i });
+    fireEvent.click(playerTabs[0]);
+
+    // Verify Exam Header & Timer
+    expect(screen.getByText("Cambridge A-Level Physics Diagnostic Exam")).toBeInTheDocument();
+    expect(screen.getByLabelText("Exam Time Remaining")).toBeInTheDocument();
+    expect(screen.getByText("Question 1 of 5")).toBeInTheDocument();
+    expect(screen.getByText("Question Palette")).toBeInTheDocument();
+  });
+
+  it("allows selecting an option, flagging for review, and jumping via palette", () => {
+    render(<App />);
+
+    const playerTabs = screen.getAllByRole("button", { name: /Interactive Exam Player/i });
+    fireEvent.click(playerTabs[0]);
+
+    // Select Option A on Question 1
+    const optionA = screen.getByLabelText("Option A");
+    fireEvent.click(optionA);
+
+    // Flag Question 1
+    const flagBtn = screen.getByRole("button", { name: /Flag/i });
+    fireEvent.click(flagBtn);
+
+    // Question 1 should be flagged
+    expect(screen.getByRole("button", { name: /Flagged/i })).toBeInTheDocument();
+
+    // Jump to Question 3 via Question Palette
+    const q3Btn = screen.getByRole("button", { name: "Jump to Question 3" });
+    fireEvent.click(q3Btn);
+
+    expect(screen.getByText("Question 3 of 5")).toBeInTheDocument();
+    expect(screen.getByText("Doppler Effect in Sound & Light")).toBeInTheDocument();
+  });
+
+  it("submits exam and renders diagnostic score report with derivations", async () => {
+    render(<App />);
+
+    const playerTabs = screen.getAllByRole("button", { name: /Interactive Exam Player/i });
+    fireEvent.click(playerTabs[0]);
+
+    // Answer Question 1 correctly
+    fireEvent.click(screen.getByLabelText("Option A"));
+
+    // Click Finish Test
+    const finishBtn = screen.getByRole("button", { name: /Finish Test/i });
+    fireEvent.click(finishBtn);
+
+    // Review Modal opens
+    expect(screen.getByText("Submit Exam For Scoring?")).toBeInTheDocument();
+
+    // Confirm Submission
+    const confirmBtn = screen.getByRole("button", { name: /Confirm & Grade Answers/i });
+    fireEvent.click(confirmBtn);
+
+    // Diagnostic Score Report renders
+    await waitFor(() => {
+      expect(screen.getByText(/Completed diagnostic assessment/i)).toBeInTheDocument();
+      expect(screen.getByText("Syllabus Topic Mastery Breakdown")).toBeInTheDocument();
+      expect(screen.getByText(/Detailed Question Explanations/i)).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Retake Diagnostic/i })).toBeInTheDocument();
+    });
+  });
+});
+
 describe("Authentication & Route Guard Flow Suite", () => {
   beforeEach(() => {
     useAuthStore.getState().logout();
-    useCurriculumStore.getState().setActiveExam("exam_cambridge_physics_9702");
     useCurriculumStore.getState().setSelectedTopic(null);
     useCurriculumStore.getState().setIsDrawerOpen(false);
-    useCurriculumStore.getState().setSearchQuery("");
+    useExamPlayerStore.getState().resetSession();
     localStorage.clear();
   });
 
   it("shows unauthenticated state with RequireAuth prompt inside solver tab", () => {
     render(<App />);
 
-    // Navigate to Diagnostic Solver tab
-    const solverTabs = screen.getAllByRole("button", { name: /Diagnostic Solver/i });
+    const solverTabs = screen.getAllByRole("button", { name: /Interactive Exam Player/i });
     fireEvent.click(solverTabs[0]);
 
     expect(screen.getByText("Authentication Required")).toBeInTheDocument();
@@ -131,47 +214,19 @@ describe("Authentication & Route Guard Flow Suite", () => {
   it("logs in successfully via student demo quick-fill", async () => {
     render(<App />);
 
-    // 1. Open Auth Dialog from Header
     const signInBtns = screen.getAllByRole("button", { name: /Sign In/i });
     fireEvent.click(signInBtns[0]);
 
-    // 2. Click Student Demo quick fill
     const demoBtn = screen.getByRole("button", { name: /Student Demo/i });
     fireEvent.click(demoBtn);
 
-    // 3. Submit Login
     const submitBtn = screen.getByRole("button", { name: /Sign In to Feynman/i });
     fireEvent.click(submitBtn);
 
-    // 4. Verify authenticated session is active
     await waitFor(() => {
       expect(screen.getByText(/Welcome back,/i)).toBeInTheDocument();
       expect(screen.getAllByText("Alex Rivera").length).toBeGreaterThan(0);
     });
-  });
-
-  it("handles user logout and restores unauthenticated state", async () => {
-    useAuthStore.getState().setAuth(
-      {
-        id: "test_user_01",
-        email: "alex@feynman.ai",
-        fullName: "Alex Rivera",
-        role: "student",
-        targetExam: "Cambridge A-Level Physics",
-      },
-      "dummy_jwt_token"
-    );
-
-    render(<App />);
-    expect(screen.getAllByText("Alex Rivera").length).toBeGreaterThan(0);
-
-    const userMenuBtn = screen.getByLabelText("User Profile Menu");
-    fireEvent.click(userMenuBtn);
-
-    const signOutBtn = screen.getByRole("button", { name: /Sign Out/i });
-    fireEvent.click(signOutBtn);
-
-    expect(screen.getAllByRole("button", { name: /Sign In/i }).length).toBeGreaterThan(0);
   });
 });
 

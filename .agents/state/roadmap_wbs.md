@@ -39,7 +39,7 @@
 * [x] **Task 1.3:** Auth Flow, Route Guards & User Profile State `[COMPLETED]`
 * [x] **Task 2.3:** Exam Template Catalog & Syllabus Tree Explorer `[COMPLETED]`
 * [ ] **Task 3.4:** Resource Manager & Document Viewer
-* [ ] **Task 4.4:** Interactive Exam Taking Player with KaTeX & Timed Session
+* [x] **Task 4.4:** Interactive Exam Taking Player with KaTeX & Timed Session `[COMPLETED]`
 * [ ] **Task 5.3:** Student Analytics Dashboard, Mastery Radar & Error Bank UI
 * [ ] **Task 6.3:** Socratic Tutor Slide-over Drawer with Live Math & Streaming
 * [ ] **Task 7.4:** Interactive Misconception DAG Visualizer (React Flow)
