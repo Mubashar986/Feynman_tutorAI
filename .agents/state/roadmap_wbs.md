@@ -36,7 +36,7 @@
 
 ### Frontend Track (React / TypeScript / Vite)
 * [x] **Task 0.3:** React + Vite + TypeScript + Tailwind + Shadcn Workspace Scaffold `[COMPLETED]`
-* [ ] **Task 1.3:** Auth Flow, Route Guards & User Profile State
+* [x] **Task 1.3:** Auth Flow, Route Guards & User Profile State `[COMPLETED]`
 * [ ] **Task 2.3:** Exam Template Catalog & Syllabus Tree Explorer
 * [ ] **Task 3.4:** Resource Manager & Document Viewer
 * [ ] **Task 4.4:** Interactive Exam Taking Player with KaTeX & Timed Session
