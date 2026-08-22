@@ -50,3 +50,17 @@ This file records all formally accepted architectural and technical decisions go
 * **Status:** ACCEPTED (2026-08-20)
 * **Record:** [docs/adr/ADR-008-frontend-framework-and-ui-stack.md](file:///c:/Users/Mubashar/Desktop/Curious_Feynman/docs/adr/ADR-008-frontend-framework-and-ui-stack.md)
 * **Summary:** Frontend is built with React 18+, Vite, TypeScript (Strict Mode), Tailwind CSS, and Shadcn UI (Radix primitives). Specialized packages include `react-katex` for LaTeX mathematical formulas, `@xyflow/react` (React Flow) for knowledge maps, `TanStack Query v5` for API caching, and `Zustand` for client UI state. Design specifications codified in `docs/frontend_design/DESIGN_SYSTEM_TYPOGRAPHY.md`.
+
+---
+
+## DECISION-011: Server-Side Authentication & Role-Based Access Control (RBAC)
+* **Status:** ACCEPTED (2026-08-21)
+* **Record:** [docs/adr/ADR-011-auth-and-rbac.md](file:///c:/Users/Abdul%20Jabbar%20Metlo/Feynman_tutorAI/docs/adr/ADR-011-auth-and-rbac.md)
+* **Summary:** Pure Python/FastAPI server-side authentication using SQLModel `User` / `Role` entities, bcrypt password hashing with `passlib`, OAuth2 Password Bearer with signed JWT tokens (`pyjwt`), and server-side RBAC dependencies (`require_roles`).
+
+---
+
+## DECISION-016: Student Learning State Machine & Auditable Event Log Implementation
+* **Status:** ACCEPTED (2026-08-23)
+* **Record:** [docs/adr/ADR-016-learning-state-machine.md](file:///c:/Users/Abdul%20Jabbar%20Metlo/Feynman_tutorAI/docs/adr/ADR-016-learning-state-machine.md)
+* **Summary:** Decoupled, pure-Python domain service with explicit Pydantic/Enum states (`NOT_STARTED`, `CALIBRATION`, `FOUNDATION`, `PRACTICING`, `ASSESSMENT`, `DIAGNOSIS`, `REPAIR`, `MASTERY`, `REVISION`), deterministic transition matrix (`VALID_TRANSITIONS`), precondition guard predicates, and atomic async SQLModel database transactions persisting current `StudentLearningState` and an append-only `StateTransitionLog` with structured JSON evidence.

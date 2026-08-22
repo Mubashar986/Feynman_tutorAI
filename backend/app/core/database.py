@@ -55,5 +55,9 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 async def init_db() -> None:
     """Initialize database tables."""
+    # Ensure all domain models are imported so SQLModel metadata registers all tables
+    import backend.app.auth.models  # noqa: F401
+    import backend.app.learning_state.models  # noqa: F401
+
     async with async_engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)

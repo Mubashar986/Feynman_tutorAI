@@ -9,14 +9,14 @@
 
 ### Shared Track
 * [x] **Task 0.1:** Formal Decision Records Codification (ADR-000 to ADR-008, FDR-001 to FDR-005) `[COMPLETED]`
-* [ ] **Task 0.5:** OpenAPI Contract Generation & TypeScript Sync Protocol Setup
+* [x] **Task 0.5:** OpenAPI Contract Generation & TypeScript Sync Protocol Setup `[COMPLETED]`
 
 ### Backend Track (FastAPI / Python)
 * [x] **Task 0.2:** FastAPI Modular Monolith Scaffold & Async Database Engine (SQLModel + AsyncPG/SQLite) `[COMPLETED]`
-* [ ] **Task 0.4:** Multi-Provider LLM Gateway & Pydantic Validation Engine `[READY]`
-* [ ] **Task 1.1:** Server-Side RBAC, User Models & JWT Authentication Service
-* [ ] **Task 1.2:** Student Learning State Machine & Auditable Event Log
-* [ ] **Task 2.1:** Exam Template Data Models & Syllabus Parser
+* [x] **Task 0.4:** Multi-Provider LLM Gateway & Pydantic Validation Engine `[COMPLETED]`
+* [x] **Task 1.1:** Server-Side RBAC, User Models & JWT Authentication Service `[COMPLETED]`
+* [x] **Task 1.2:** Student Learning State Machine & Auditable Event Log `[COMPLETED]`
+* [ ] **Task 2.1:** Exam Template Data Models & Syllabus Parser `[READY]`
 * [ ] **Task 2.2:** Topic DAG & Prerequisite Validation Engine
 * [ ] **Task 3.1:** Document Ingestion Pipeline & Text Chunking Engine
 * [ ] **Task 3.2:** Qdrant Vector Store Adapter & Hybrid Indexer

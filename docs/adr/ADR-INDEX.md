@@ -35,7 +35,7 @@ Generate each using [ADR-PROMPT-TEMPLATE.md](./ADR-PROMPT-TEMPLATE.md) in this f
 | ID | Decision | PRD Reference | Status | Record File |
 |---|---|---|---|---|
 | ADR-015 | Repository/service boundary — modular monolith | §28 | PENDING | To be resolved in Epic 0.2 |
-| ADR-016 | Learning-state machine implementation | §13, FR-001 | PENDING | To be resolved in Epic 1.2 |
+| **ADR-016** | Learning-state machine implementation | §13, FR-001 | **ACCEPTED** | [ADR-016-learning-state-machine.md](./ADR-016-learning-state-machine.md) |
 | ADR-017 | Structured-output validation framework for LLM outputs | FR-010 | **ACCEPTED** | [ADR-006-llm-provider-abstraction.md](./ADR-006-llm-provider-abstraction.md) |
 | ADR-018 | RAG chunking/embedding parameters | FR-005, FR-008 | PENDING | To be resolved in Epic 3 |
 | ADR-019 | Frontend HTTP & Data Fetching Strategy (TanStack Query v5) | Frontend Track | **ACCEPTED** | [ADR-008-frontend-framework-and-ui-stack.md](./ADR-008-frontend-framework-and-ui-stack.md) |

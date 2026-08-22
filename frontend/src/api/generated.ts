@@ -125,6 +125,87 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/learning-state/transition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Execute a verified learning state transition
+         * @description Validates and executes an atomic state transition in the Student Learning State Machine.
+         *     Records an immutable audit log entry with structured evidence (PRD §13, FR-001, FR-025).
+         */
+        post: operations["transition_learning_state_api_v1_learning_state_transition_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learning-state/topic/{topic_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get current student state for a topic
+         * @description Fetches the current learning state for a specific student, exam, and topic.
+         */
+        get: operations["get_topic_state_api_v1_learning_state_topic__topic_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learning-state/topic/{topic_id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get audit log history for a topic
+         * @description Retrieves the complete immutable audit trail for a topic (PRD FR-025, NFR-008).
+         */
+        get: operations["get_topic_history_api_v1_learning_state_topic__topic_id__history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learning-state/exam/{exam_template_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get student exam learning progress summary
+         * @description Fetches aggregate progress metrics and all topic states for an exam.
+         */
+        get: operations["get_exam_summary_api_v1_learning_state_exam__exam_template_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/": {
         parameters: {
             query?: never;
@@ -146,10 +227,140 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * ExamLearningSummaryResponse
+         * @description Overview of all topic states for a student in a specific exam.
+         */
+        ExamLearningSummaryResponse: {
+            /** Student Id */
+            student_id: string;
+            /** Exam Template Id */
+            exam_template_id: string;
+            /** Total Topics */
+            total_topics: number;
+            /** Mastered Count */
+            mastered_count: number;
+            /** In Progress Count */
+            in_progress_count: number;
+            /** Topic States */
+            topic_states: components["schemas"]["StudentLearningStateResponse"][];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /**
+         * LearningState
+         * @description Formal Student Learning States conforming to PRD §13 & FR-001.
+         *     Controls the pedagogical progression lifecycle.
+         * @enum {string}
+         */
+        LearningState: "not_started" | "calibration" | "foundation" | "practicing" | "assessment" | "diagnosis" | "repair" | "mastery" | "revision";
+        /**
+         * StateTransitionLogResponse
+         * @description Public response schema for immutable audit log records.
+         */
+        StateTransitionLogResponse: {
+            /** Id */
+            id: string;
+            /** Student Id */
+            student_id: string;
+            /** Exam Template Id */
+            exam_template_id: string;
+            /** Topic Id */
+            topic_id: string;
+            from_state: components["schemas"]["LearningState"];
+            to_state: components["schemas"]["LearningState"];
+            /** Trigger */
+            trigger: string;
+            /** Evidence Payload */
+            evidence_payload: {
+                [key: string]: unknown;
+            };
+            /** Actor Id */
+            actor_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * StateTransitionRequest
+         * @description Request payload for executing a verified learning state transition.
+         */
+        StateTransitionRequest: {
+            /**
+             * Exam Template Id
+             * @description Target exam template UUID
+             */
+            exam_template_id: string;
+            /**
+             * Topic Id
+             * @description Target syllabus topic UUID
+             */
+            topic_id: string;
+            /** @description Desired target state in the FSM */
+            target_state: components["schemas"]["LearningState"];
+            /**
+             * Trigger
+             * @description Event reason (e.g. ASSESSMENT_PASSED, SOCRATIC_REPAIR_COMPLETE)
+             */
+            trigger: string;
+            /**
+             * Evidence Payload
+             * @description Structured verification data (scores, failed items, misconception tags)
+             */
+            evidence_payload?: {
+                [key: string]: unknown;
+            };
+            /**
+             * Mastery Score
+             * @description Optional updated mastery probability score
+             */
+            mastery_score?: number | null;
+            /**
+             * Student Id
+             * @description Target student UUID (restricted to admin roles; defaults to current authenticated student)
+             */
+            student_id?: string | null;
+        };
+        /**
+         * StudentLearningStateResponse
+         * @description Public response schema for student topic learning state.
+         */
+        StudentLearningStateResponse: {
+            /** Id */
+            id: string;
+            /** Student Id */
+            student_id: string;
+            /** Exam Template Id */
+            exam_template_id: string;
+            /** Topic Id */
+            topic_id: string;
+            current_state: components["schemas"]["LearningState"];
+            /** Mastery Score */
+            mastery_score: number;
+            /** Consecutive Successes */
+            consecutive_successes: number;
+            /** Consecutive Failures */
+            consecutive_failures: number;
+            /**
+             * Last Transition At
+             * Format: date-time
+             */
+            last_transition_at: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /**
          * TokenResponse
@@ -399,6 +610,145 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    transition_learning_state_api_v1_learning_state_transition_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StateTransitionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentLearningStateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_topic_state_api_v1_learning_state_topic__topic_id__get: {
+        parameters: {
+            query: {
+                /** @description Exam template UUID */
+                exam_template_id: string;
+                /** @description Optional student ID for instructor/admin lookup */
+                student_id?: string | null;
+            };
+            header?: never;
+            path: {
+                topic_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentLearningStateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_topic_history_api_v1_learning_state_topic__topic_id__history_get: {
+        parameters: {
+            query: {
+                /** @description Exam template UUID */
+                exam_template_id: string;
+                /** @description Optional student ID for instructor/admin lookup */
+                student_id?: string | null;
+            };
+            header?: never;
+            path: {
+                topic_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StateTransitionLogResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_exam_summary_api_v1_learning_state_exam__exam_template_id__get: {
+        parameters: {
+            query?: {
+                /** @description Optional student ID for instructor/admin lookup */
+                student_id?: string | null;
+            };
+            header?: never;
+            path: {
+                exam_template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamLearningSummaryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

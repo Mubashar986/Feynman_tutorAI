@@ -201,6 +201,281 @@
         ]
       }
     },
+    "/api/v1/learning-state/transition": {
+      "post": {
+        "tags": [
+          "Learning State Machine",
+          "Learning State Machine"
+        ],
+        "summary": "Execute a verified learning state transition",
+        "description": "Validates and executes an atomic state transition in the Student Learning State Machine.\nRecords an immutable audit log entry with structured evidence (PRD §13, FR-001, FR-025).",
+        "operationId": "transition_learning_state_api_v1_learning_state_transition_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StateTransitionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentLearningStateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/learning-state/topic/{topic_id}": {
+      "get": {
+        "tags": [
+          "Learning State Machine",
+          "Learning State Machine"
+        ],
+        "summary": "Get current student state for a topic",
+        "description": "Fetches the current learning state for a specific student, exam, and topic.",
+        "operationId": "get_topic_state_api_v1_learning_state_topic__topic_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "topic_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Topic Id"
+            }
+          },
+          {
+            "name": "exam_template_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Exam template UUID",
+              "title": "Exam Template Id"
+            },
+            "description": "Exam template UUID"
+          },
+          {
+            "name": "student_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional student ID for instructor/admin lookup",
+              "title": "Student Id"
+            },
+            "description": "Optional student ID for instructor/admin lookup"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentLearningStateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/learning-state/topic/{topic_id}/history": {
+      "get": {
+        "tags": [
+          "Learning State Machine",
+          "Learning State Machine"
+        ],
+        "summary": "Get audit log history for a topic",
+        "description": "Retrieves the complete immutable audit trail for a topic (PRD FR-025, NFR-008).",
+        "operationId": "get_topic_history_api_v1_learning_state_topic__topic_id__history_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "topic_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Topic Id"
+            }
+          },
+          {
+            "name": "exam_template_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Exam template UUID",
+              "title": "Exam Template Id"
+            },
+            "description": "Exam template UUID"
+          },
+          {
+            "name": "student_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional student ID for instructor/admin lookup",
+              "title": "Student Id"
+            },
+            "description": "Optional student ID for instructor/admin lookup"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StateTransitionLogResponse"
+                  },
+                  "title": "Response Get Topic History Api V1 Learning State Topic  Topic Id  History Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/learning-state/exam/{exam_template_id}": {
+      "get": {
+        "tags": [
+          "Learning State Machine",
+          "Learning State Machine"
+        ],
+        "summary": "Get student exam learning progress summary",
+        "description": "Fetches aggregate progress metrics and all topic states for an exam.",
+        "operationId": "get_exam_summary_api_v1_learning_state_exam__exam_template_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "exam_template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Exam Template Id"
+            }
+          },
+          {
+            "name": "student_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional student ID for instructor/admin lookup",
+              "title": "Student Id"
+            },
+            "description": "Optional student ID for instructor/admin lookup"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamLearningSummaryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -223,6 +498,48 @@
   },
   "components": {
     "schemas": {
+      "ExamLearningSummaryResponse": {
+        "properties": {
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "total_topics": {
+            "type": "integer",
+            "title": "Total Topics"
+          },
+          "mastered_count": {
+            "type": "integer",
+            "title": "Mastered Count"
+          },
+          "in_progress_count": {
+            "type": "integer",
+            "title": "In Progress Count"
+          },
+          "topic_states": {
+            "items": {
+              "$ref": "#/components/schemas/StudentLearningStateResponse"
+            },
+            "type": "array",
+            "title": "Topic States"
+          }
+        },
+        "type": "object",
+        "required": [
+          "student_id",
+          "exam_template_id",
+          "total_topics",
+          "mastered_count",
+          "in_progress_count",
+          "topic_states"
+        ],
+        "title": "ExamLearningSummaryResponse",
+        "description": "Overview of all topic states for a student in a specific exam."
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -235,6 +552,213 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "LearningState": {
+        "type": "string",
+        "enum": [
+          "not_started",
+          "calibration",
+          "foundation",
+          "practicing",
+          "assessment",
+          "diagnosis",
+          "repair",
+          "mastery",
+          "revision"
+        ],
+        "title": "LearningState",
+        "description": "Formal Student Learning States conforming to PRD §13 & FR-001.\nControls the pedagogical progression lifecycle."
+      },
+      "StateTransitionLogResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "from_state": {
+            "$ref": "#/components/schemas/LearningState"
+          },
+          "to_state": {
+            "$ref": "#/components/schemas/LearningState"
+          },
+          "trigger": {
+            "type": "string",
+            "title": "Trigger"
+          },
+          "evidence_payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Evidence Payload"
+          },
+          "actor_id": {
+            "type": "string",
+            "title": "Actor Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "student_id",
+          "exam_template_id",
+          "topic_id",
+          "from_state",
+          "to_state",
+          "trigger",
+          "evidence_payload",
+          "actor_id",
+          "created_at"
+        ],
+        "title": "StateTransitionLogResponse",
+        "description": "Public response schema for immutable audit log records."
+      },
+      "StateTransitionRequest": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id",
+            "description": "Target exam template UUID"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id",
+            "description": "Target syllabus topic UUID"
+          },
+          "target_state": {
+            "$ref": "#/components/schemas/LearningState",
+            "description": "Desired target state in the FSM"
+          },
+          "trigger": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 3,
+            "title": "Trigger",
+            "description": "Event reason (e.g. ASSESSMENT_PASSED, SOCRATIC_REPAIR_COMPLETE)"
+          },
+          "evidence_payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Evidence Payload",
+            "description": "Structured verification data (scores, failed items, misconception tags)"
+          },
+          "mastery_score": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mastery Score",
+            "description": "Optional updated mastery probability score"
+          },
+          "student_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Id",
+            "description": "Target student UUID (restricted to admin roles; defaults to current authenticated student)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id",
+          "topic_id",
+          "target_state",
+          "trigger"
+        ],
+        "title": "StateTransitionRequest",
+        "description": "Request payload for executing a verified learning state transition."
+      },
+      "StudentLearningStateResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "current_state": {
+            "$ref": "#/components/schemas/LearningState"
+          },
+          "mastery_score": {
+            "type": "number",
+            "title": "Mastery Score"
+          },
+          "consecutive_successes": {
+            "type": "integer",
+            "title": "Consecutive Successes"
+          },
+          "consecutive_failures": {
+            "type": "integer",
+            "title": "Consecutive Failures"
+          },
+          "last_transition_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Transition At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "student_id",
+          "exam_template_id",
+          "topic_id",
+          "current_state",
+          "mastery_score",
+          "consecutive_successes",
+          "consecutive_failures",
+          "last_transition_at",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "StudentLearningStateResponse",
+        "description": "Public response schema for student topic learning state."
       },
       "TokenResponse": {
         "properties": {
