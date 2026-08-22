@@ -121,3 +121,43 @@ async def delete_document(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Document '{document_id}' not found",
         )
+
+
+@router.post(
+    "/{document_id}/index",
+    status_code=status.HTTP_200_OK,
+    summary="Generate embeddings and index document into Qdrant (Instructor/Admin only)",
+    dependencies=[Depends(require_role([UserRole.INSTRUCTOR, UserRole.ADMIN]))],
+)
+async def index_document(
+    document_id: str,
+    session: AsyncSession = Depends(get_db),
+):
+    """
+    Generates dense embeddings for all document chunks and upserts them into the Qdrant vector index.
+    """
+    from backend.app.rag.indexer import VectorIndexerService
+    chunks_indexed = await VectorIndexerService.index_document(session, document_id)
+    return {
+        "document_id": document_id,
+        "status": "indexed",
+        "chunks_indexed": chunks_indexed,
+    }
+
+
+@router.post(
+    "/exam-templates/{exam_template_id}/index-all",
+    status_code=status.HTTP_200_OK,
+    summary="Batch index all documents for an exam template (Instructor/Admin only)",
+    dependencies=[Depends(require_role([UserRole.INSTRUCTOR, UserRole.ADMIN]))],
+)
+async def index_all_exam_documents(
+    exam_template_id: str,
+    session: AsyncSession = Depends(get_db),
+):
+    """
+    Batch indexes all curriculum documents associated with a specific exam template.
+    """
+    from backend.app.rag.indexer import VectorIndexerService
+    return await VectorIndexerService.index_exam_template(session, exam_template_id)
+

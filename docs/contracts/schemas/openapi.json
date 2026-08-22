@@ -1258,6 +1258,100 @@
         ]
       }
     },
+    "/api/v1/documents/{document_id}/index": {
+      "post": {
+        "tags": [
+          "Vector RAG & Resource Ingestion",
+          "Vector RAG & Resource Ingestion"
+        ],
+        "summary": "Generate embeddings and index document into Qdrant (Instructor/Admin only)",
+        "description": "Generates dense embeddings for all document chunks and upserts them into the Qdrant vector index.",
+        "operationId": "index_document_api_v1_documents__document_id__index_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/documents/exam-templates/{exam_template_id}/index-all": {
+      "post": {
+        "tags": [
+          "Vector RAG & Resource Ingestion",
+          "Vector RAG & Resource Ingestion"
+        ],
+        "summary": "Batch index all documents for an exam template (Instructor/Admin only)",
+        "description": "Batch indexes all curriculum documents associated with a specific exam template.",
+        "operationId": "index_all_exam_documents_api_v1_documents_exam_templates__exam_template_id__index_all_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "exam_template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Exam Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [

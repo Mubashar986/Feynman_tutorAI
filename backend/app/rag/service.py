@@ -274,7 +274,15 @@ class DocumentService:
         storage = get_storage_provider()
         await storage.delete_file(doc.storage_path)
 
-        # 3. Delete document row
+        # 3. Delete indexed vectors from Qdrant (Task 3.2)
+        try:
+            from backend.app.rag.indexer import VectorIndexerService
+            await VectorIndexerService.delete_document_vectors(doc.id)
+        except Exception:
+            pass
+
+        # 4. Delete document row
         await session.delete(doc)
         await session.flush()
         return True
+

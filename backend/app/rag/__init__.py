@@ -16,6 +16,7 @@ from backend.app.rag.schemas import (
     DocumentChunkListResponse,
 )
 from backend.app.rag.service import DocumentService
+from backend.app.rag.indexer import VectorIndexerService
 from backend.app.rag.router import router as documents_router
 
 __all__ = [
@@ -31,5 +32,7 @@ __all__ = [
     "DocumentChunkResponse",
     "DocumentChunkListResponse",
     "DocumentService",
+    "VectorIndexerService",
     "documents_router",
 ]
+
