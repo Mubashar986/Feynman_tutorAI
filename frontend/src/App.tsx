@@ -8,6 +8,7 @@ import {
   LogIn,
   UserCheck,
   FolderTree,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -20,6 +21,7 @@ import { RequireAuth } from "@/components/auth/RequireAuth";
 import { ExamCatalogGrid } from "@/components/curriculum/ExamCatalogGrid";
 import { SyllabusTreeExplorer } from "@/components/curriculum/SyllabusTreeExplorer";
 import { ExamPlayer } from "@/components/exam/ExamPlayer";
+import { AnalyticsDashboard } from "@/components/analytics/AnalyticsDashboard";
 import { useCurriculumStore } from "@/stores/curriculumStore";
 import { SocraticTutorDrawer } from "@/components/tutor/SocraticTutorDrawer";
 import { FloatingTutorButton } from "@/components/tutor/FloatingTutorButton";
@@ -29,7 +31,7 @@ export function App() {
   const [isDark, setIsDark] = React.useState<boolean>(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = React.useState<boolean>(false);
   const [authView, setAuthView] = React.useState<"login" | "register">("login");
-  const [activeTab, setActiveTab] = React.useState<"catalog" | "syllabus" | "solver">("syllabus");
+  const [activeTab, setActiveTab] = React.useState<"catalog" | "syllabus" | "solver" | "analytics">("syllabus");
 
   const { user, isAuthenticated } = useAuthStore();
   const { activeExamId } = useCurriculumStore();
@@ -95,6 +97,16 @@ export function App() {
               >
                 <Sparkles className="h-3.5 w-3.5 text-indigo-500" /> Interactive Exam Player
               </button>
+              <button
+                onClick={() => setActiveTab("analytics")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+                  activeTab === "analytics"
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <BarChart3 className="h-3.5 w-3.5 text-emerald-500" /> Analytics & Errors
+              </button>
             </div>
 
             <div className="flex items-center gap-3">
@@ -127,24 +139,30 @@ export function App() {
         </header>
 
         {/* Mobile Navigation Tabs */}
-        <div className="flex md:hidden border-b bg-muted/20 px-4 py-2 justify-center gap-2 text-xs">
+        <div className="flex md:hidden border-b bg-muted/20 px-2 py-2 justify-center gap-1 text-[11px] overflow-x-auto">
           <button
             onClick={() => setActiveTab("catalog")}
-            className={`px-3 py-1 rounded-md ${activeTab === "catalog" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "catalog" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
           >
             Catalog
           </button>
           <button
             onClick={() => setActiveTab("syllabus")}
-            className={`px-3 py-1 rounded-md ${activeTab === "syllabus" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "syllabus" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
           >
             Syllabus
           </button>
           <button
             onClick={() => setActiveTab("solver")}
-            className={`px-3 py-1 rounded-md ${activeTab === "solver" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "solver" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
           >
             Exam Player
+          </button>
+          <button
+            onClick={() => setActiveTab("analytics")}
+            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "analytics" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+          >
+            Analytics
           </button>
         </div>
 
@@ -176,7 +194,7 @@ export function App() {
                   <UserCheck className="h-3.5 w-3.5" /> Authenticated Session Active
                 </span>
               ) : (
-                "Task 6.3: Socratic AI Tutor & Live Math"
+                "Task 5.3: Adaptive Mastery Engine & Knowledge Tracing"
               )}
             </div>
 
@@ -189,7 +207,7 @@ export function App() {
             </h2>
 
             <p className="max-w-3xl text-muted-foreground leading-relaxed text-sm sm:text-base">
-              Take proctored diagnostic exams, inspect formulas with LaTeX KaTeX rendering, and ask our Socratic AI Tutor for step-by-step guidance.
+              Inspect multi-axis mastery radar profiles, review diagnosed misconceptions in your Error Bank, and simulate real proctored exams.
             </p>
           </section>
 
@@ -250,6 +268,21 @@ export function App() {
                     });
                   }}
                 />
+              </RequireAuth>
+            </section>
+          )}
+
+          {/* TAB 4: Analytics & Error Bank (Protected by RequireAuth) */}
+          {activeTab === "analytics" && (
+            <section className="space-y-6">
+              <RequireAuth
+                allowedRoles={["student", "content_admin", "sys_admin"]}
+                onPromptLogin={() => {
+                  setAuthView("login");
+                  setIsAuthModalOpen(true);
+                }}
+              >
+                <AnalyticsDashboard />
               </RequireAuth>
             </section>
           )}

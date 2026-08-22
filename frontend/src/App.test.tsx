@@ -6,6 +6,7 @@ import { useAuthStore } from "./stores/authStore";
 import { useCurriculumStore } from "./stores/curriculumStore";
 import { useExamPlayerStore } from "./stores/examPlayerStore";
 import { useSocraticTutorStore } from "./stores/socraticTutorStore";
+import { useAnalyticsStore } from "./stores/analyticsStore";
 
 describe("App & UI Primitives Suite", () => {
   beforeEach(() => {
@@ -17,6 +18,7 @@ describe("App & UI Primitives Suite", () => {
     useExamPlayerStore.getState().resetSession();
     useSocraticTutorStore.getState().closeDrawer();
     useSocraticTutorStore.getState().clearHistory();
+    useAnalyticsStore.getState().resetAnalytics();
     localStorage.clear();
   });
 
@@ -48,6 +50,7 @@ describe("Curriculum Blueprint Catalog & Syllabus Tree Suite", () => {
     useCurriculumStore.getState().setSearchQuery("");
     useExamPlayerStore.getState().resetSession();
     useSocraticTutorStore.getState().closeDrawer();
+    useAnalyticsStore.getState().resetAnalytics();
     localStorage.clear();
   });
 
@@ -125,6 +128,7 @@ describe("Interactive Exam Taking Player Suite", () => {
     useCurriculumStore.getState().setIsDrawerOpen(false);
     useExamPlayerStore.getState().resetSession();
     useSocraticTutorStore.getState().closeDrawer();
+    useAnalyticsStore.getState().resetAnalytics();
     localStorage.clear();
   });
 
@@ -186,6 +190,73 @@ describe("Interactive Exam Taking Player Suite", () => {
   });
 });
 
+describe("Student Analytics & Error Bank Suite", () => {
+  beforeEach(() => {
+    useAuthStore.getState().setAuth(
+      {
+        id: "student_alex",
+        email: "alex@feynman.ai",
+        fullName: "Alex Rivera",
+        role: "student",
+        targetExam: "Cambridge A-Level Physics",
+      },
+      "demo_jwt_token"
+    );
+    useCurriculumStore.getState().setSelectedTopic(null);
+    useCurriculumStore.getState().setIsDrawerOpen(false);
+    useExamPlayerStore.getState().resetSession();
+    useSocraticTutorStore.getState().closeDrawer();
+    useAnalyticsStore.getState().resetAnalytics();
+    localStorage.clear();
+  });
+
+  it("renders the analytics dashboard, telemetry cards, and SVG radar chart", () => {
+    render(<App />);
+
+    const analyticsTabs = screen.getAllByRole("button", { name: /Analytics & Errors/i });
+    fireEvent.click(analyticsTabs[0]);
+
+    // Check readiness and telemetry cards
+    expect(screen.getByText(/88% Probability of Mastery/i)).toBeInTheDocument();
+    expect(screen.getByText(/Solved Problems/i)).toBeInTheDocument();
+    expect(screen.getByText(/Active Streak/i)).toBeInTheDocument();
+
+    // Check SVG Radar Chart
+    expect(screen.getByLabelText("Student Mastery Radar Chart")).toBeInTheDocument();
+
+    // Check Knowledge Tracing list
+    expect(screen.getByText(/Bayesian Knowledge Tracing by Topic/i)).toBeInTheDocument();
+    expect(screen.getByText(/Kinematics & Motion Graphs/i)).toBeInTheDocument();
+  });
+
+  it("filters error bank items by category and marks an error as resolved", () => {
+    render(<App />);
+
+    const analyticsTabs = screen.getAllByRole("button", { name: /Analytics & Errors/i });
+    fireEvent.click(analyticsTabs[0]);
+
+    // Check Error Bank header
+    expect(screen.getByText(/Diagnostic Error Bank & Misconception Log/i)).toBeInTheDocument();
+
+    // Filter by Formula Inversions
+    const formulaBtn = screen.getByRole("button", { name: /Formula Inversions/i });
+    fireEvent.click(formulaBtn);
+
+    expect(screen.getAllByText(/Superposition & Interference/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Fringe Width Geometric Inversion/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Approaching Source Frequency Dilation/i)).not.toBeInTheDocument();
+
+    // Click card to expand details
+    fireEvent.click(screen.getByText(/Fringe Width Geometric Inversion/i));
+
+    // Mark as Mastered
+    const resolveBtn = screen.getByRole("button", { name: /Mark as Mastered/i });
+    fireEvent.click(resolveBtn);
+
+    expect(screen.getByRole("button", { name: /Resolved/i })).toBeInTheDocument();
+  });
+});
+
 describe("Socratic AI Tutor Drawer Suite", () => {
   beforeEach(() => {
     useAuthStore.getState().logout();
@@ -194,6 +265,7 @@ describe("Socratic AI Tutor Drawer Suite", () => {
     useExamPlayerStore.getState().resetSession();
     useSocraticTutorStore.getState().closeDrawer();
     useSocraticTutorStore.getState().clearHistory();
+    useAnalyticsStore.getState().resetAnalytics();
     localStorage.clear();
   });
 
@@ -262,6 +334,7 @@ describe("Authentication & Route Guard Flow Suite", () => {
     useCurriculumStore.getState().setIsDrawerOpen(false);
     useExamPlayerStore.getState().resetSession();
     useSocraticTutorStore.getState().closeDrawer();
+    useAnalyticsStore.getState().resetAnalytics();
     localStorage.clear();
   });
 
