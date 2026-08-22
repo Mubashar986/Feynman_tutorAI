@@ -72,5 +72,50 @@ Resolution: Added explicit aria labels and synchronized testing library queries.
 Remaining Risk: None.
 Resolved On: 2026-08-21
 
+## ISSUE-0004 — RequireAuth Fallback Handling on Role Mismatch & Duplicate DOM Text in App.test.tsx
 
+Status: RESOLVED
+Severity: LOW
+Detected: 2026-08-21
+Detected During: Task 1.3 Implementation Verification (npm run test)
+Architectural Domain: Frontend Component Logic & Test Suite
+Component: `frontend/src/components/auth/RequireAuth.tsx` & `frontend/src/App.test.tsx`
+Symptom: 1) `RequireAuth` ignored `fallback` prop when user was authenticated but role mismatched. 2) `App.test.tsx` failed with `getMultipleElementsFoundError` on user's name because it appeared in both header and hero.
+Reproduction: `npm run test` inside `frontend/`
+Evidence: Vitest runner output on task-261.
+Root Cause: In `RequireAuth.tsx`, the `if (fallback) return <>{fallback}</>;` was placed only in the unauthenticated block, not in the role-authorization block. In `App.test.tsx`, `screen.getByText("Alex Rivera")` was ambiguous because "Alex Rivera" rendered in both `UserProfileMenu` and the welcome banner.
+Contributing Factors: Overlooked fallback prop check on role mismatch.
+Affected Scope: `RequireAuth` fallback behavior and `App.test.tsx` assertions.
+Regression Risk: LOW
+Related WBS: Task 1.3
+Related Artifacts: `task_1_3_design.md`
+Fix: 1) Updated `RequireAuth.tsx` to return `<>{fallback}</>` on role mismatch if fallback prop exists. 2) Updated `App.test.tsx` to use exact button matchers and `getAllByText`.
+Verification: `npm run test` passed 100% across all 10 test cases in 2.49s.
+Regression Verification: Zero regression on button rendering, dialogs, or KaTeX STEM math equations.
+Resolution: Aligned fallback handling and synchronized testing library queries.
+Remaining Risk: None.
+Resolved On: 2026-08-21
 
+## ISSUE-0005 — LLMGateway Fallback Chain Precedence Bug and Dynamic Registration Ordering
+
+Status: RESOLVED
+Severity: MEDIUM
+Detected: 2026-08-22
+Detected During: Task 0.4 Implementation Verification (py -m pytest backend/tests/test_llm_gateway.py)
+Architectural Domain: Backend Core LLM Gateway & Fallback Router
+Component: `backend/app/core/llm/gateway.py` & `backend/tests/test_llm_gateway.py`
+Symptom: `test_llm_gateway_generate_text_success` and `test_llm_gateway_dynamic_fallback_on_rate_limit` failed with assertion errors expecting custom mock responses but receiving generic fallback mock responses.
+Reproduction: `py -m pytest backend/tests/test_llm_gateway.py -v`
+Evidence: Pytest output on task-177 showing `AssertionError: assert 'Success response' in response.content` and `AssertionError: assert 'mock' == 'healthy_secondary'`.
+Root Cause: In `LLMGateway`, `register_provider(provider, is_default=True)` updated `self._default_provider_name` but appended the provider at the end of the static `self._fallback_order` list. When building the fallback chain, `_build_provider_chain()` iterated through `self._fallback_order` where `ollama` and `mock` preceded the newly registered default provider. Because `ollama.is_configured()` returned `True` (due to default `base_url`), the gateway attempted `ollama` $\to$ connection failed $\to$ fell back to `mock` before ever reaching the registered default provider.
+Contributing Factors: Static fallback array initialized in `__init__` without dynamic promotion of default providers to index `0`, and absence of an explicit `set_fallback_chain()` override method.
+Affected Scope: `backend/app/core/llm/gateway.py` routing behavior.
+Regression Risk: LOW
+Related WBS: Task 0.4
+Related Artifacts: `task_0_4_architect_analysis.md`, `task_0_4_design.md`
+Fix: 1) Updated `register_provider(provider, is_default=True)` to dynamically promote default providers to index `0` of `self._fallback_order`. 2) Updated `_build_provider_chain()` to prioritize `preferred_provider` $\to$ `self._default_provider_name` $\to$ remaining configured providers. 3) Added `set_fallback_chain(list)` method for explicit priority overrides.
+Verification: Executed `py -m pytest backend/tests/test_llm_gateway.py -v`. All 14 tests passed in 3.08s with 100% success rate. Full backend suite (`py -m pytest backend/tests/ -v`) passed 19/19 tests in 3.36s.
+Regression Verification: Zero side effects on FastAPI application runtime or health endpoints.
+Resolution: Aligned dynamic provider promotion and explicit fallback chain overrides.
+Remaining Risk: None.
+Resolved On: 2026-08-22
