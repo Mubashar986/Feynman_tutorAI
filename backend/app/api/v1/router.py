@@ -4,6 +4,7 @@ from backend.app.auth import auth_router
 from backend.app.learning_state import learning_state_router
 from backend.app.curriculum import curriculum_router
 from backend.app.rag import documents_router
+from backend.app.questions import questions_router
 
 api_router = APIRouter()
 
@@ -21,5 +22,9 @@ api_router.include_router(curriculum_router, prefix="", tags=["Exam Templates & 
 
 # Vector RAG & Resource Ingestion routes
 api_router.include_router(documents_router, prefix="", tags=["Vector RAG & Resource Ingestion"])
+
+# Question Bank & Item Lab routes
+api_router.include_router(questions_router, prefix="", tags=["Question Bank & Item Lab"])
+
 
 

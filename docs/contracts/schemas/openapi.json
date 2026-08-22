@@ -1442,6 +1442,341 @@
         }
       }
     },
+    "/api/v1/questions": {
+      "get": {
+        "tags": [
+          "Question Bank & Item Lab",
+          "Question Bank & Item Lab"
+        ],
+        "summary": "List question items with curriculum and psychometric filters",
+        "description": "Returns a paginated list of question items with child options and rubric details.",
+        "operationId": "list_questions_api_v1_questions_get",
+        "parameters": [
+          {
+            "name": "exam_template_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by exam template ID",
+              "title": "Exam Template Id"
+            },
+            "description": "Filter by exam template ID"
+          },
+          {
+            "name": "topic_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by topic ID",
+              "title": "Topic Id"
+            },
+            "description": "Filter by topic ID"
+          },
+          {
+            "name": "question_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/QuestionType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by question format",
+              "title": "Question Type"
+            },
+            "description": "Filter by question format"
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/DifficultyLevel"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by difficulty level",
+              "title": "Difficulty"
+            },
+            "description": "Filter by difficulty level"
+          },
+          {
+            "name": "validation_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ValidationStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by validation status",
+              "title": "Validation Status"
+            },
+            "description": "Filter by validation status"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Question Bank & Item Lab",
+          "Question Bank & Item Lab"
+        ],
+        "summary": "Create a new question item with options and rubric (Instructor/Admin only)",
+        "description": "Creates a new multi-type question item in the question bank.",
+        "operationId": "create_question_api_v1_questions_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/questions/{question_id}": {
+      "get": {
+        "tags": [
+          "Question Bank & Item Lab",
+          "Question Bank & Item Lab"
+        ],
+        "summary": "Get question detail with options and rubric items",
+        "description": "Retrieves full question metadata, choices with distractor rationales, and analytical scoring rubric.",
+        "operationId": "get_question_api_v1_questions__question_id__get",
+        "parameters": [
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Question Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Question Bank & Item Lab",
+          "Question Bank & Item Lab"
+        ],
+        "summary": "Update question metadata or validation status (Instructor/Admin only)",
+        "description": "Updates prompt, difficulty, Bloom level, or validation status of a question.",
+        "operationId": "update_question_api_v1_questions__question_id__put",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Question Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Question Bank & Item Lab",
+          "Question Bank & Item Lab"
+        ],
+        "summary": "Delete a question item and cascade delete its options (Instructor/Admin only)",
+        "description": "Permanently deletes a question from the question bank.",
+        "operationId": "delete_question_api_v1_questions__question_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Question Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -1513,6 +1848,18 @@
           "Create"
         ],
         "title": "BloomLevel"
+      },
+      "BloomTaxonomy": {
+        "type": "string",
+        "enum": [
+          "remember",
+          "understand",
+          "apply",
+          "analyze",
+          "evaluate",
+          "create"
+        ],
+        "title": "BloomTaxonomy"
       },
       "Body_upload_document_api_v1_documents_upload_post": {
         "properties": {
@@ -1809,6 +2156,16 @@
           "total_prerequisite_edges"
         ],
         "title": "DAGValidationResponse"
+      },
+      "DifficultyLevel": {
+        "type": "string",
+        "enum": [
+          "easy",
+          "medium",
+          "hard",
+          "challenge"
+        ],
+        "title": "DifficultyLevel"
       },
       "DocumentChunkResponse": {
         "properties": {
@@ -2456,6 +2813,566 @@
         ],
         "title": "LearningState",
         "description": "Formal Student Learning States conforming to PRD §13 & FR-001.\nControls the pedagogical progression lifecycle."
+      },
+      "QuestionCreate": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "learning_objective_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learning Objective Id"
+          },
+          "question_type": {
+            "$ref": "#/components/schemas/QuestionType",
+            "default": "mcq_single"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/DifficultyLevel",
+            "default": "medium"
+          },
+          "bloom_level": {
+            "$ref": "#/components/schemas/BloomTaxonomy",
+            "default": "apply"
+          },
+          "validation_status": {
+            "$ref": "#/components/schemas/ValidationStatus",
+            "default": "pending_validation"
+          },
+          "prompt": {
+            "type": "string",
+            "minLength": 5,
+            "title": "Prompt",
+            "description": "Markdown & KaTeX prompt"
+          },
+          "hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hint"
+          },
+          "explanation": {
+            "type": "string",
+            "minLength": 5,
+            "title": "Explanation",
+            "description": "Step-by-step solution derivation"
+          },
+          "estimated_time_seconds": {
+            "type": "integer",
+            "maximum": 3600.0,
+            "minimum": 10.0,
+            "title": "Estimated Time Seconds",
+            "default": 120
+          },
+          "points": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.5,
+            "title": "Points",
+            "default": 1.0
+          },
+          "is_generated_by_ai": {
+            "type": "boolean",
+            "title": "Is Generated By Ai",
+            "default": false
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionOptionCreate"
+            },
+            "type": "array",
+            "title": "Options",
+            "default": []
+          },
+          "rubric_items": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionRubricItemCreate"
+            },
+            "type": "array",
+            "title": "Rubric Items",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id",
+          "topic_id",
+          "prompt",
+          "explanation"
+        ],
+        "title": "QuestionCreate"
+      },
+      "QuestionDetailResponse": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "learning_objective_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learning Objective Id"
+          },
+          "question_type": {
+            "$ref": "#/components/schemas/QuestionType",
+            "default": "mcq_single"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/DifficultyLevel",
+            "default": "medium"
+          },
+          "bloom_level": {
+            "$ref": "#/components/schemas/BloomTaxonomy",
+            "default": "apply"
+          },
+          "validation_status": {
+            "$ref": "#/components/schemas/ValidationStatus",
+            "default": "pending_validation"
+          },
+          "prompt": {
+            "type": "string",
+            "minLength": 5,
+            "title": "Prompt",
+            "description": "Markdown & KaTeX prompt"
+          },
+          "hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hint"
+          },
+          "explanation": {
+            "type": "string",
+            "minLength": 5,
+            "title": "Explanation",
+            "description": "Step-by-step solution derivation"
+          },
+          "estimated_time_seconds": {
+            "type": "integer",
+            "maximum": 3600.0,
+            "minimum": 10.0,
+            "title": "Estimated Time Seconds",
+            "default": 120
+          },
+          "points": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.5,
+            "title": "Points",
+            "default": 1.0
+          },
+          "is_generated_by_ai": {
+            "type": "boolean",
+            "title": "Is Generated By Ai",
+            "default": false
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "created_by_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By User Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionOptionResponse"
+            },
+            "type": "array",
+            "title": "Options",
+            "default": []
+          },
+          "rubric_items": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionRubricItemResponse"
+            },
+            "type": "array",
+            "title": "Rubric Items",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id",
+          "topic_id",
+          "prompt",
+          "explanation",
+          "id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "QuestionDetailResponse"
+      },
+      "QuestionListResponse": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionDetailResponse"
+            },
+            "type": "array",
+            "title": "Questions",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "total"
+        ],
+        "title": "QuestionListResponse"
+      },
+      "QuestionOptionCreate": {
+        "properties": {
+          "option_key": {
+            "type": "string",
+            "maxLength": 10,
+            "minLength": 1,
+            "title": "Option Key",
+            "description": "Option identifier e.g. A, B, C, D"
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Content",
+            "description": "Option text with KaTeX support"
+          },
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct",
+            "default": false
+          },
+          "distractor_rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distractor Rationale",
+            "description": "Diagnostic misconception rationale"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "option_key",
+          "content"
+        ],
+        "title": "QuestionOptionCreate"
+      },
+      "QuestionOptionResponse": {
+        "properties": {
+          "option_key": {
+            "type": "string",
+            "maxLength": 10,
+            "minLength": 1,
+            "title": "Option Key",
+            "description": "Option identifier e.g. A, B, C, D"
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Content",
+            "description": "Option text with KaTeX support"
+          },
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct",
+            "default": false
+          },
+          "distractor_rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distractor Rationale",
+            "description": "Diagnostic misconception rationale"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order",
+            "default": 0
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "option_key",
+          "content",
+          "id",
+          "question_id",
+          "created_at"
+        ],
+        "title": "QuestionOptionResponse"
+      },
+      "QuestionRubricItemCreate": {
+        "properties": {
+          "criterion": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Criterion",
+            "description": "Scoring criterion step"
+          },
+          "points": {
+            "type": "number",
+            "maximum": 50.0,
+            "minimum": 0.25,
+            "title": "Points",
+            "default": 1.0
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "criterion"
+        ],
+        "title": "QuestionRubricItemCreate"
+      },
+      "QuestionRubricItemResponse": {
+        "properties": {
+          "criterion": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Criterion",
+            "description": "Scoring criterion step"
+          },
+          "points": {
+            "type": "number",
+            "maximum": 50.0,
+            "minimum": 0.25,
+            "title": "Points",
+            "default": 1.0
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order",
+            "default": 0
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "criterion",
+          "id",
+          "question_id",
+          "created_at"
+        ],
+        "title": "QuestionRubricItemResponse"
+      },
+      "QuestionType": {
+        "type": "string",
+        "enum": [
+          "mcq_single",
+          "mcq_multi",
+          "numerical",
+          "free_response",
+          "derivation_step",
+          "matching"
+        ],
+        "title": "QuestionType"
+      },
+      "QuestionUpdate": {
+        "properties": {
+          "prompt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt"
+          },
+          "hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hint"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DifficultyLevel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bloom_level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BloomTaxonomy"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "validation_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ValidationStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimated_time_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Time Seconds"
+          },
+          "points": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points"
+          },
+          "topic_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Id"
+          },
+          "learning_objective_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learning Objective Id"
+          }
+        },
+        "type": "object",
+        "title": "QuestionUpdate"
       },
       "RetrievalQueryRequest": {
         "properties": {
@@ -3463,6 +4380,17 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "ValidationStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "pending_validation",
+          "validated",
+          "rejected",
+          "flagged"
+        ],
+        "title": "ValidationStatus"
       }
     },
     "securitySchemes": {
