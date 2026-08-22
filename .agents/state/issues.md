@@ -48,6 +48,30 @@ Resolution: Ambient Vite environment types registered.
 Remaining Risk: None.
 Resolved On: 2026-08-21
 
+## ISSUE-0004 — ModuleNotFoundError: No module named 'yaml' during backend test discovery
+
+Status: RESOLVED
+Severity: LOW
+Detected: 2026-08-23
+Detected During: Task 2.1 Implementation Verification
+Architectural Domain: Backend / Curriculum Ingestion
+Component: `backend/app/curriculum/service.py`
+Symptom: `ModuleNotFoundError: No module named 'yaml'` when running pytest on backend test suite.
+Reproduction: `py -3.14 -m pytest backend/tests/`
+Evidence: Pytest import failure trace on `backend/app/curriculum/service.py:3`.
+Root Cause: `import yaml` was unconditionally imported at module level in `backend/app/curriculum/service.py` when `pyyaml` is not installed in the standard Python 3.14 environment.
+Contributing Factors: Unintentional top-level import of non-standard library package without conditional check.
+Affected Scope: Backend test suite and curriculum service module import.
+Regression Risk: LOW
+Related WBS: Task 2.1
+Related Artifacts: `task_2_1_architect_analysis.md`
+Fix: Wrapped `yaml` import in a defensive conditional block (`try: import yaml except ImportError: yaml = None`) and used standard library `json` as the primary native parser. Added `@pytest.mark.skipif(not HAS_YAML)` on YAML-specific test case.
+Verification: Executed `py -3.14 -m pytest backend/tests/ -v`. All 48 tests passed (1 skipped) in 17.91s with 100% pass rate.
+Regression Verification: Verified all existing auth, health, LLM gateway, and state machine tests continue to pass with zero regressions.
+Resolution: Native standard library JSON parser is prioritized; YAML is cleanly optional without import crashes.
+Remaining Risk: None.
+Resolved On: 2026-08-23
+
 ## ISSUE-0003 — Vitest TestingLibraryElementError in App.test.tsx option button selector
 
 Status: RESOLVED

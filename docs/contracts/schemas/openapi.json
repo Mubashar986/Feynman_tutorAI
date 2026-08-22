@@ -476,6 +476,257 @@
         }
       }
     },
+    "/api/v1/exam-templates": {
+      "get": {
+        "tags": [
+          "Exam Templates & Curriculum",
+          "Exam Templates & Curriculum"
+        ],
+        "summary": "List all active exam templates",
+        "description": "Returns the catalog of all available examination templates with subject and topic counts (PRD §5.1, FR-002).",
+        "operationId": "list_exam_templates_api_v1_exam_templates_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExamTemplateResponse"
+                  },
+                  "type": "array",
+                  "title": "Response List Exam Templates Api V1 Exam Templates Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/exam-templates/{template_id}": {
+      "get": {
+        "tags": [
+          "Exam Templates & Curriculum",
+          "Exam Templates & Curriculum"
+        ],
+        "summary": "Get exam template by ID or code",
+        "description": "Retrieves metadata and configuration for a specific examination template.",
+        "operationId": "get_exam_template_api_v1_exam_templates__template_id__get",
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamTemplateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Exam Templates & Curriculum",
+          "Exam Templates & Curriculum"
+        ],
+        "summary": "Delete an exam template and its syllabus (Admin only)",
+        "description": "Permanently removes an exam template and cascades deletions to all associated subjects, topics, and objectives.",
+        "operationId": "delete_exam_template_api_v1_exam_templates__template_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/exam-templates/{template_id}/syllabus": {
+      "get": {
+        "tags": [
+          "Exam Templates & Curriculum",
+          "Exam Templates & Curriculum"
+        ],
+        "summary": "Get complete hierarchical syllabus tree for an exam",
+        "description": "Returns the nested syllabus tree (Subjects -> Topics -> Subtopics & Learning Objectives & Prerequisites)\nfor rendering in the syllabus explorer UI.",
+        "operationId": "get_syllabus_tree_api_v1_exam_templates__template_id__syllabus_get",
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubjectDetailResponse"
+                  },
+                  "title": "Response Get Syllabus Tree Api V1 Exam Templates  Template Id  Syllabus Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/exam-templates/topics/{topic_id}": {
+      "get": {
+        "tags": [
+          "Exam Templates & Curriculum",
+          "Exam Templates & Curriculum"
+        ],
+        "summary": "Get topic details with objectives and prerequisites",
+        "description": "Retrieves topic information including subtopics, LaTeX formulas, Bloom levels, and prerequisite links.",
+        "operationId": "get_topic_detail_api_v1_exam_templates_topics__topic_id__get",
+        "parameters": [
+          {
+            "name": "topic_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Topic Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/exam-templates/import": {
+      "post": {
+        "tags": [
+          "Exam Templates & Curriculum",
+          "Exam Templates & Curriculum"
+        ],
+        "summary": "Import complete nested curriculum blueprint (Admin/Instructor only)",
+        "description": "Parses and persists a full nested curriculum blueprint (Exam -> Subjects -> Topics -> Objectives & Prerequisites)\nin a single atomic database transaction.",
+        "operationId": "import_exam_blueprint_api_v1_exam_templates_import_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExamTemplateImportSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamTemplateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -498,6 +749,29 @@
   },
   "components": {
     "schemas": {
+      "BloomLevel": {
+        "type": "string",
+        "enum": [
+          "Remember",
+          "Understand",
+          "Apply",
+          "Analyze",
+          "Evaluate",
+          "Create"
+        ],
+        "title": "BloomLevel"
+      },
+      "ExamBoard": {
+        "type": "string",
+        "enum": [
+          "Cambridge International",
+          "College Board",
+          "AQA",
+          "IB",
+          "AAMC"
+        ],
+        "title": "ExamBoard"
+      },
       "ExamLearningSummaryResponse": {
         "properties": {
           "student_id": {
@@ -540,6 +814,145 @@
         "title": "ExamLearningSummaryResponse",
         "description": "Overview of all topic states for a student in a specific exam."
       },
+      "ExamTemplateImportSchema": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "board": {
+            "$ref": "#/components/schemas/ExamBoard",
+            "default": "Cambridge International"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "difficulty_level": {
+            "type": "string",
+            "title": "Difficulty Level",
+            "default": "Advanced Placement / A-Level"
+          },
+          "icon_name": {
+            "type": "string",
+            "title": "Icon Name",
+            "default": "BookOpen"
+          },
+          "total_duration_minutes": {
+            "type": "integer",
+            "title": "Total Duration Minutes",
+            "default": 180
+          },
+          "passing_score_percentage": {
+            "type": "number",
+            "title": "Passing Score Percentage",
+            "default": 70.0
+          },
+          "subjects": {
+            "items": {
+              "$ref": "#/components/schemas/SubjectImportSchema"
+            },
+            "type": "array",
+            "title": "Subjects",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "code"
+        ],
+        "title": "ExamTemplateImportSchema"
+      },
+      "ExamTemplateResponse": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "board": {
+            "$ref": "#/components/schemas/ExamBoard",
+            "default": "Cambridge International"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "difficulty_level": {
+            "type": "string",
+            "title": "Difficulty Level",
+            "default": "Advanced Placement / A-Level"
+          },
+          "icon_name": {
+            "type": "string",
+            "title": "Icon Name",
+            "default": "BookOpen"
+          },
+          "total_duration_minutes": {
+            "type": "integer",
+            "title": "Total Duration Minutes",
+            "default": 180
+          },
+          "passing_score_percentage": {
+            "type": "number",
+            "title": "Passing Score Percentage",
+            "default": 70.0
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "subject_count": {
+            "type": "integer",
+            "title": "Subject Count",
+            "default": 0
+          },
+          "topic_count": {
+            "type": "integer",
+            "title": "Topic Count",
+            "default": 0
+          },
+          "objective_count": {
+            "type": "integer",
+            "title": "Objective Count",
+            "default": 0
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "code",
+          "id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ExamTemplateResponse"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -552,6 +965,111 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "LearningObjectiveImportSchema": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "description": "Unique syllabus code, e.g., '9702.4.1'"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Competency statement"
+          },
+          "formula_latex": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Formula Latex",
+            "description": "LaTeX formula if applicable"
+          },
+          "bloom_level": {
+            "$ref": "#/components/schemas/BloomLevel",
+            "default": "Understand"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "description"
+        ],
+        "title": "LearningObjectiveImportSchema"
+      },
+      "LearningObjectiveResponse": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "description": "Unique syllabus code, e.g., '9702.4.1'"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Competency statement"
+          },
+          "formula_latex": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Formula Latex",
+            "description": "LaTeX formula if applicable"
+          },
+          "bloom_level": {
+            "$ref": "#/components/schemas/BloomLevel",
+            "default": "Understand"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "subtopic_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtopic Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "description",
+          "id",
+          "topic_id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "LearningObjectiveResponse"
       },
       "LearningState": {
         "type": "string",
@@ -568,6 +1086,29 @@
         ],
         "title": "LearningState",
         "description": "Formal Student Learning States conforming to PRD §13 & FR-001.\nControls the pedagogical progression lifecycle."
+      },
+      "SectionImportSchema": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order",
+            "default": 0
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "SectionImportSchema"
       },
       "StateTransitionLogResponse": {
         "properties": {
@@ -760,6 +1301,154 @@
         "title": "StudentLearningStateResponse",
         "description": "Public response schema for student topic learning state."
       },
+      "SubjectDetailResponse": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order",
+            "default": 0
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topics": {
+            "items": {
+              "$ref": "#/components/schemas/TopicDetailResponse"
+            },
+            "type": "array",
+            "title": "Topics",
+            "default": []
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "id",
+          "exam_template_id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "SubjectDetailResponse"
+      },
+      "SubjectImportSchema": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order",
+            "default": 0
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/SectionImportSchema"
+            },
+            "type": "array",
+            "title": "Sections",
+            "default": []
+          },
+          "topics": {
+            "items": {
+              "$ref": "#/components/schemas/TopicImportSchema"
+            },
+            "type": "array",
+            "title": "Topics",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "SubjectImportSchema"
+      },
+      "SubtopicImportSchema": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order",
+            "default": 0
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "SubtopicImportSchema"
+      },
+      "SubtopicResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "topic_id",
+          "title",
+          "order",
+          "description"
+        ],
+        "title": "SubtopicResponse"
+      },
       "TokenResponse": {
         "properties": {
           "access_token": {
@@ -782,6 +1471,238 @@
         ],
         "title": "TokenResponse",
         "description": "OAuth2 Bearer token response."
+      },
+      "TopicDetailResponse": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order",
+            "default": 0
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/TopicDifficulty",
+            "default": "intermediate"
+          },
+          "estimated_hours": {
+            "type": "number",
+            "title": "Estimated Hours",
+            "default": 4.0
+          },
+          "importance_weight": {
+            "type": "number",
+            "title": "Importance Weight",
+            "default": 1.0
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "subject_id": {
+            "type": "string",
+            "title": "Subject Id"
+          },
+          "section_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section Id"
+          },
+          "subtopics": {
+            "items": {
+              "$ref": "#/components/schemas/SubtopicResponse"
+            },
+            "type": "array",
+            "title": "Subtopics",
+            "default": []
+          },
+          "objectives": {
+            "items": {
+              "$ref": "#/components/schemas/LearningObjectiveResponse"
+            },
+            "type": "array",
+            "title": "Objectives",
+            "default": []
+          },
+          "prerequisites": {
+            "items": {
+              "$ref": "#/components/schemas/TopicPrerequisiteResponse"
+            },
+            "type": "array",
+            "title": "Prerequisites",
+            "default": []
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "id",
+          "subject_id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "TopicDetailResponse"
+      },
+      "TopicDifficulty": {
+        "type": "string",
+        "enum": [
+          "foundational",
+          "intermediate",
+          "advanced"
+        ],
+        "title": "TopicDifficulty"
+      },
+      "TopicImportSchema": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order",
+            "default": 0
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/TopicDifficulty",
+            "default": "intermediate"
+          },
+          "estimated_hours": {
+            "type": "number",
+            "title": "Estimated Hours",
+            "default": 4.0
+          },
+          "importance_weight": {
+            "type": "number",
+            "title": "Importance Weight",
+            "default": 1.0
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "subtopics": {
+            "items": {
+              "$ref": "#/components/schemas/SubtopicImportSchema"
+            },
+            "type": "array",
+            "title": "Subtopics",
+            "default": []
+          },
+          "objectives": {
+            "items": {
+              "$ref": "#/components/schemas/LearningObjectiveImportSchema"
+            },
+            "type": "array",
+            "title": "Objectives",
+            "default": []
+          },
+          "prerequisites": {
+            "items": {
+              "$ref": "#/components/schemas/TopicPrerequisiteImportSchema"
+            },
+            "type": "array",
+            "title": "Prerequisites",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "TopicImportSchema"
+      },
+      "TopicPrerequisiteImportSchema": {
+        "properties": {
+          "prerequisite_topic_code_or_title": {
+            "type": "string",
+            "title": "Prerequisite Topic Code Or Title"
+          },
+          "is_mandatory": {
+            "type": "boolean",
+            "title": "Is Mandatory",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "prerequisite_topic_code_or_title"
+        ],
+        "title": "TopicPrerequisiteImportSchema"
+      },
+      "TopicPrerequisiteResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "prerequisite_topic_id": {
+            "type": "string",
+            "title": "Prerequisite Topic Id"
+          },
+          "prerequisite_topic_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prerequisite Topic Title"
+          },
+          "is_mandatory": {
+            "type": "boolean",
+            "title": "Is Mandatory",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "topic_id",
+          "prerequisite_topic_id"
+        ],
+        "title": "TopicPrerequisiteResponse"
       },
       "UserCreate": {
         "properties": {

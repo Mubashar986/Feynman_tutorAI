@@ -206,6 +206,112 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/exam-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all active exam templates
+         * @description Returns the catalog of all available examination templates with subject and topic counts (PRD §5.1, FR-002).
+         */
+        get: operations["list_exam_templates_api_v1_exam_templates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-templates/{template_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get exam template by ID or code
+         * @description Retrieves metadata and configuration for a specific examination template.
+         */
+        get: operations["get_exam_template_api_v1_exam_templates__template_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete an exam template and its syllabus (Admin only)
+         * @description Permanently removes an exam template and cascades deletions to all associated subjects, topics, and objectives.
+         */
+        delete: operations["delete_exam_template_api_v1_exam_templates__template_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-templates/{template_id}/syllabus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get complete hierarchical syllabus tree for an exam
+         * @description Returns the nested syllabus tree (Subjects -> Topics -> Subtopics & Learning Objectives & Prerequisites)
+         *     for rendering in the syllabus explorer UI.
+         */
+        get: operations["get_syllabus_tree_api_v1_exam_templates__template_id__syllabus_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-templates/topics/{topic_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get topic details with objectives and prerequisites
+         * @description Retrieves topic information including subtopics, LaTeX formulas, Bloom levels, and prerequisite links.
+         */
+        get: operations["get_topic_detail_api_v1_exam_templates_topics__topic_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-templates/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import complete nested curriculum blueprint (Admin/Instructor only)
+         * @description Parses and persists a full nested curriculum blueprint (Exam -> Subjects -> Topics -> Objectives & Prerequisites)
+         *     in a single atomic database transaction.
+         */
+        post: operations["import_exam_blueprint_api_v1_exam_templates_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/": {
         parameters: {
             query?: never;
@@ -228,6 +334,16 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /**
+         * BloomLevel
+         * @enum {string}
+         */
+        BloomLevel: "Remember" | "Understand" | "Apply" | "Analyze" | "Evaluate" | "Create";
+        /**
+         * ExamBoard
+         * @enum {string}
+         */
+        ExamBoard: "Cambridge International" | "College Board" | "AQA" | "IB" | "AAMC";
+        /**
          * ExamLearningSummaryResponse
          * @description Overview of all topic states for a student in a specific exam.
          */
@@ -245,10 +361,171 @@ export interface components {
             /** Topic States */
             topic_states: components["schemas"]["StudentLearningStateResponse"][];
         };
+        /** ExamTemplateImportSchema */
+        ExamTemplateImportSchema: {
+            /** Title */
+            title: string;
+            /** Code */
+            code: string;
+            /** @default Cambridge International */
+            board: components["schemas"]["ExamBoard"];
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /**
+             * Difficulty Level
+             * @default Advanced Placement / A-Level
+             */
+            difficulty_level: string;
+            /**
+             * Icon Name
+             * @default BookOpen
+             */
+            icon_name: string;
+            /**
+             * Total Duration Minutes
+             * @default 180
+             */
+            total_duration_minutes: number;
+            /**
+             * Passing Score Percentage
+             * @default 70
+             */
+            passing_score_percentage: number;
+            /**
+             * Subjects
+             * @default []
+             */
+            subjects: components["schemas"]["SubjectImportSchema"][];
+        };
+        /** ExamTemplateResponse */
+        ExamTemplateResponse: {
+            /** Title */
+            title: string;
+            /** Code */
+            code: string;
+            /** @default Cambridge International */
+            board: components["schemas"]["ExamBoard"];
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /**
+             * Difficulty Level
+             * @default Advanced Placement / A-Level
+             */
+            difficulty_level: string;
+            /**
+             * Icon Name
+             * @default BookOpen
+             */
+            icon_name: string;
+            /**
+             * Total Duration Minutes
+             * @default 180
+             */
+            total_duration_minutes: number;
+            /**
+             * Passing Score Percentage
+             * @default 70
+             */
+            passing_score_percentage: number;
+            /** Id */
+            id: string;
+            /**
+             * Subject Count
+             * @default 0
+             */
+            subject_count: number;
+            /**
+             * Topic Count
+             * @default 0
+             */
+            topic_count: number;
+            /**
+             * Objective Count
+             * @default 0
+             */
+            objective_count: number;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** LearningObjectiveImportSchema */
+        LearningObjectiveImportSchema: {
+            /**
+             * Code
+             * @description Unique syllabus code, e.g., '9702.4.1'
+             */
+            code: string;
+            /**
+             * Description
+             * @description Competency statement
+             */
+            description: string;
+            /**
+             * Formula Latex
+             * @description LaTeX formula if applicable
+             */
+            formula_latex?: string | null;
+            /** @default Understand */
+            bloom_level: components["schemas"]["BloomLevel"];
+        };
+        /** LearningObjectiveResponse */
+        LearningObjectiveResponse: {
+            /**
+             * Code
+             * @description Unique syllabus code, e.g., '9702.4.1'
+             */
+            code: string;
+            /**
+             * Description
+             * @description Competency statement
+             */
+            description: string;
+            /**
+             * Formula Latex
+             * @description LaTeX formula if applicable
+             */
+            formula_latex?: string | null;
+            /** @default Understand */
+            bloom_level: components["schemas"]["BloomLevel"];
+            /** Id */
+            id: string;
+            /** Topic Id */
+            topic_id: string;
+            /** Subtopic Id */
+            subtopic_id?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /**
          * LearningState
@@ -257,6 +534,21 @@ export interface components {
          * @enum {string}
          */
         LearningState: "not_started" | "calibration" | "foundation" | "practicing" | "assessment" | "diagnosis" | "repair" | "mastery" | "revision";
+        /** SectionImportSchema */
+        SectionImportSchema: {
+            /** Title */
+            title: string;
+            /**
+             * Order
+             * @default 0
+             */
+            order: number;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+        };
         /**
          * StateTransitionLogResponse
          * @description Public response schema for immutable audit log records.
@@ -362,6 +654,93 @@ export interface components {
              */
             updated_at: string;
         };
+        /** SubjectDetailResponse */
+        SubjectDetailResponse: {
+            /** Title */
+            title: string;
+            /**
+             * Order
+             * @default 0
+             */
+            order: number;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Id */
+            id: string;
+            /** Exam Template Id */
+            exam_template_id: string;
+            /**
+             * Topics
+             * @default []
+             */
+            topics: components["schemas"]["TopicDetailResponse"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** SubjectImportSchema */
+        SubjectImportSchema: {
+            /** Title */
+            title: string;
+            /**
+             * Order
+             * @default 0
+             */
+            order: number;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /**
+             * Sections
+             * @default []
+             */
+            sections: components["schemas"]["SectionImportSchema"][];
+            /**
+             * Topics
+             * @default []
+             */
+            topics: components["schemas"]["TopicImportSchema"][];
+        };
+        /** SubtopicImportSchema */
+        SubtopicImportSchema: {
+            /** Title */
+            title: string;
+            /**
+             * Order
+             * @default 0
+             */
+            order: number;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+        };
+        /** SubtopicResponse */
+        SubtopicResponse: {
+            /** Id */
+            id: string;
+            /** Topic Id */
+            topic_id: string;
+            /** Title */
+            title: string;
+            /** Order */
+            order: number;
+            /** Description */
+            description: string;
+        };
         /**
          * TokenResponse
          * @description OAuth2 Bearer token response.
@@ -375,6 +754,139 @@ export interface components {
              */
             token_type: string;
             user: components["schemas"]["UserResponse"];
+        };
+        /** TopicDetailResponse */
+        TopicDetailResponse: {
+            /** Title */
+            title: string;
+            /**
+             * Order
+             * @default 0
+             */
+            order: number;
+            /** @default intermediate */
+            difficulty: components["schemas"]["TopicDifficulty"];
+            /**
+             * Estimated Hours
+             * @default 4
+             */
+            estimated_hours: number;
+            /**
+             * Importance Weight
+             * @default 1
+             */
+            importance_weight: number;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Id */
+            id: string;
+            /** Subject Id */
+            subject_id: string;
+            /** Section Id */
+            section_id?: string | null;
+            /**
+             * Subtopics
+             * @default []
+             */
+            subtopics: components["schemas"]["SubtopicResponse"][];
+            /**
+             * Objectives
+             * @default []
+             */
+            objectives: components["schemas"]["LearningObjectiveResponse"][];
+            /**
+             * Prerequisites
+             * @default []
+             */
+            prerequisites: components["schemas"]["TopicPrerequisiteResponse"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * TopicDifficulty
+         * @enum {string}
+         */
+        TopicDifficulty: "foundational" | "intermediate" | "advanced";
+        /** TopicImportSchema */
+        TopicImportSchema: {
+            /** Title */
+            title: string;
+            /**
+             * Order
+             * @default 0
+             */
+            order: number;
+            /** @default intermediate */
+            difficulty: components["schemas"]["TopicDifficulty"];
+            /**
+             * Estimated Hours
+             * @default 4
+             */
+            estimated_hours: number;
+            /**
+             * Importance Weight
+             * @default 1
+             */
+            importance_weight: number;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Code */
+            code?: string | null;
+            /**
+             * Subtopics
+             * @default []
+             */
+            subtopics: components["schemas"]["SubtopicImportSchema"][];
+            /**
+             * Objectives
+             * @default []
+             */
+            objectives: components["schemas"]["LearningObjectiveImportSchema"][];
+            /**
+             * Prerequisites
+             * @default []
+             */
+            prerequisites: components["schemas"]["TopicPrerequisiteImportSchema"][];
+        };
+        /** TopicPrerequisiteImportSchema */
+        TopicPrerequisiteImportSchema: {
+            /** Prerequisite Topic Code Or Title */
+            prerequisite_topic_code_or_title: string;
+            /**
+             * Is Mandatory
+             * @default true
+             */
+            is_mandatory: boolean;
+        };
+        /** TopicPrerequisiteResponse */
+        TopicPrerequisiteResponse: {
+            /** Id */
+            id: string;
+            /** Topic Id */
+            topic_id: string;
+            /** Prerequisite Topic Id */
+            prerequisite_topic_id: string;
+            /** Prerequisite Topic Title */
+            prerequisite_topic_title?: string | null;
+            /**
+             * Is Mandatory
+             * @default true
+             */
+            is_mandatory: boolean;
         };
         /**
          * UserCreate
@@ -740,6 +1252,181 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ExamLearningSummaryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_exam_templates_api_v1_exam_templates_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamTemplateResponse"][];
+                };
+            };
+        };
+    };
+    get_exam_template_api_v1_exam_templates__template_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamTemplateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_exam_template_api_v1_exam_templates__template_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_syllabus_tree_api_v1_exam_templates__template_id__syllabus_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectDetailResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_topic_detail_api_v1_exam_templates_topics__topic_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                topic_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_exam_blueprint_api_v1_exam_templates_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExamTemplateImportSchema"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamTemplateResponse"];
                 };
             };
             /** @description Validation Error */
