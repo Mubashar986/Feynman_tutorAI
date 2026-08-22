@@ -9,6 +9,7 @@ import {
   UserCheck,
   FolderTree,
   BarChart3,
+  Network,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -22,6 +23,7 @@ import { ExamCatalogGrid } from "@/components/curriculum/ExamCatalogGrid";
 import { SyllabusTreeExplorer } from "@/components/curriculum/SyllabusTreeExplorer";
 import { ExamPlayer } from "@/components/exam/ExamPlayer";
 import { AnalyticsDashboard } from "@/components/analytics/AnalyticsDashboard";
+import { DAGVisualizer } from "@/components/dag/DAGVisualizer";
 import { useCurriculumStore } from "@/stores/curriculumStore";
 import { SocraticTutorDrawer } from "@/components/tutor/SocraticTutorDrawer";
 import { FloatingTutorButton } from "@/components/tutor/FloatingTutorButton";
@@ -31,7 +33,9 @@ export function App() {
   const [isDark, setIsDark] = React.useState<boolean>(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = React.useState<boolean>(false);
   const [authView, setAuthView] = React.useState<"login" | "register">("login");
-  const [activeTab, setActiveTab] = React.useState<"catalog" | "syllabus" | "solver" | "analytics">("syllabus");
+  const [activeTab, setActiveTab] = React.useState<
+    "catalog" | "syllabus" | "solver" | "analytics" | "dag"
+  >("syllabus");
 
   const { user, isAuthenticated } = useAuthStore();
   const { activeExamId } = useCurriculumStore();
@@ -107,6 +111,16 @@ export function App() {
               >
                 <BarChart3 className="h-3.5 w-3.5 text-emerald-500" /> Analytics & Errors
               </button>
+              <button
+                onClick={() => setActiveTab("dag")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+                  activeTab === "dag"
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Network className="h-3.5 w-3.5 text-indigo-500" /> Knowledge DAG
+              </button>
             </div>
 
             <div className="flex items-center gap-3">
@@ -142,27 +156,33 @@ export function App() {
         <div className="flex md:hidden border-b bg-muted/20 px-2 py-2 justify-center gap-1 text-[11px] overflow-x-auto">
           <button
             onClick={() => setActiveTab("catalog")}
-            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "catalog" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+            className={`px-2 py-1 rounded-md shrink-0 ${activeTab === "catalog" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
           >
             Catalog
           </button>
           <button
             onClick={() => setActiveTab("syllabus")}
-            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "syllabus" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+            className={`px-2 py-1 rounded-md shrink-0 ${activeTab === "syllabus" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
           >
             Syllabus
           </button>
           <button
             onClick={() => setActiveTab("solver")}
-            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "solver" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+            className={`px-2 py-1 rounded-md shrink-0 ${activeTab === "solver" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
           >
             Exam Player
           </button>
           <button
             onClick={() => setActiveTab("analytics")}
-            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "analytics" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+            className={`px-2 py-1 rounded-md shrink-0 ${activeTab === "analytics" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
           >
             Analytics
+          </button>
+          <button
+            onClick={() => setActiveTab("dag")}
+            className={`px-2 py-1 rounded-md shrink-0 ${activeTab === "dag" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+          >
+            DAG
           </button>
         </div>
 
@@ -194,7 +214,7 @@ export function App() {
                   <UserCheck className="h-3.5 w-3.5" /> Authenticated Session Active
                 </span>
               ) : (
-                "Task 5.3: Adaptive Mastery Engine & Knowledge Tracing"
+                "Task 7.4: Interactive Misconception DAG Visualizer"
               )}
             </div>
 
@@ -207,7 +227,7 @@ export function App() {
             </h2>
 
             <p className="max-w-3xl text-muted-foreground leading-relaxed text-sm sm:text-base">
-              Inspect multi-axis mastery radar profiles, review diagnosed misconceptions in your Error Bank, and simulate real proctored exams.
+              Inspect multi-axis mastery radar profiles, explore prerequisite dependency DAGs, review diagnosed misconceptions, and simulate real proctored exams.
             </p>
           </section>
 
@@ -284,6 +304,13 @@ export function App() {
               >
                 <AnalyticsDashboard />
               </RequireAuth>
+            </section>
+          )}
+
+          {/* TAB 5: Interactive Misconception DAG */}
+          {activeTab === "dag" && (
+            <section className="space-y-6">
+              <DAGVisualizer />
             </section>
           )}
         </main>

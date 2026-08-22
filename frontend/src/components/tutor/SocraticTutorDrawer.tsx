@@ -191,6 +191,7 @@ export const SocraticTutorDrawer: React.FC = () => {
                 type="submit"
                 size="icon"
                 variant="tutor"
+                onClick={handleSend}
                 disabled={!inputVal.trim() || isStreaming}
                 className="absolute right-1.5 h-8 w-8 rounded-lg"
                 aria-label="Send Message"

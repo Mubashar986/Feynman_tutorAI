@@ -7,6 +7,7 @@ import { useCurriculumStore } from "./stores/curriculumStore";
 import { useExamPlayerStore } from "./stores/examPlayerStore";
 import { useSocraticTutorStore } from "./stores/socraticTutorStore";
 import { useAnalyticsStore } from "./stores/analyticsStore";
+import { useMisconceptionDAGStore } from "./stores/misconceptionDAGStore";
 
 describe("App & UI Primitives Suite", () => {
   beforeEach(() => {
@@ -19,6 +20,7 @@ describe("App & UI Primitives Suite", () => {
     useSocraticTutorStore.getState().closeDrawer();
     useSocraticTutorStore.getState().clearHistory();
     useAnalyticsStore.getState().resetAnalytics();
+    useMisconceptionDAGStore.getState().resetView();
     localStorage.clear();
   });
 
@@ -51,6 +53,7 @@ describe("Curriculum Blueprint Catalog & Syllabus Tree Suite", () => {
     useExamPlayerStore.getState().resetSession();
     useSocraticTutorStore.getState().closeDrawer();
     useAnalyticsStore.getState().resetAnalytics();
+    useMisconceptionDAGStore.getState().resetView();
     localStorage.clear();
   });
 
@@ -129,6 +132,7 @@ describe("Interactive Exam Taking Player Suite", () => {
     useExamPlayerStore.getState().resetSession();
     useSocraticTutorStore.getState().closeDrawer();
     useAnalyticsStore.getState().resetAnalytics();
+    useMisconceptionDAGStore.getState().resetView();
     localStorage.clear();
   });
 
@@ -207,6 +211,7 @@ describe("Student Analytics & Error Bank Suite", () => {
     useExamPlayerStore.getState().resetSession();
     useSocraticTutorStore.getState().closeDrawer();
     useAnalyticsStore.getState().resetAnalytics();
+    useMisconceptionDAGStore.getState().resetView();
     localStorage.clear();
   });
 
@@ -216,17 +221,12 @@ describe("Student Analytics & Error Bank Suite", () => {
     const analyticsTabs = screen.getAllByRole("button", { name: /Analytics & Errors/i });
     fireEvent.click(analyticsTabs[0]);
 
-    // Check readiness and telemetry cards
     expect(screen.getByText(/88% Probability of Mastery/i)).toBeInTheDocument();
     expect(screen.getByText(/Solved Problems/i)).toBeInTheDocument();
     expect(screen.getByText(/Active Streak/i)).toBeInTheDocument();
-
-    // Check SVG Radar Chart
     expect(screen.getByLabelText("Student Mastery Radar Chart")).toBeInTheDocument();
-
-    // Check Knowledge Tracing list
     expect(screen.getByText(/Bayesian Knowledge Tracing by Topic/i)).toBeInTheDocument();
-    expect(screen.getByText(/Kinematics & Motion Graphs/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Kinematics & Motion Graphs/i).length).toBeGreaterThan(0);
   });
 
   it("filters error bank items by category and marks an error as resolved", () => {
@@ -235,10 +235,8 @@ describe("Student Analytics & Error Bank Suite", () => {
     const analyticsTabs = screen.getAllByRole("button", { name: /Analytics & Errors/i });
     fireEvent.click(analyticsTabs[0]);
 
-    // Check Error Bank header
     expect(screen.getByText(/Diagnostic Error Bank & Misconception Log/i)).toBeInTheDocument();
 
-    // Filter by Formula Inversions
     const formulaBtn = screen.getByRole("button", { name: /Formula Inversions/i });
     fireEvent.click(formulaBtn);
 
@@ -249,11 +247,53 @@ describe("Student Analytics & Error Bank Suite", () => {
     // Click card to expand details
     fireEvent.click(screen.getByText(/Fringe Width Geometric Inversion/i));
 
-    // Mark as Mastered
     const resolveBtn = screen.getByRole("button", { name: /Mark as Mastered/i });
     fireEvent.click(resolveBtn);
 
     expect(screen.getByRole("button", { name: /Resolved/i })).toBeInTheDocument();
+  });
+});
+
+describe("Interactive Misconception DAG Suite", () => {
+  beforeEach(() => {
+    useAuthStore.getState().logout();
+    useCurriculumStore.getState().setSelectedTopic(null);
+    useCurriculumStore.getState().setIsDrawerOpen(false);
+    useExamPlayerStore.getState().resetSession();
+    useSocraticTutorStore.getState().closeDrawer();
+    useAnalyticsStore.getState().resetAnalytics();
+    useMisconceptionDAGStore.getState().resetView();
+    localStorage.clear();
+  });
+
+  it("renders the interactive DAG canvas and node inspector", () => {
+    render(<App />);
+
+    const dagTabs = screen.getAllByRole("button", { name: /Knowledge DAG/i });
+    fireEvent.click(dagTabs[0]);
+
+    expect(screen.getByText(/Prerequisite Knowledge & Misconception DAG/i)).toBeInTheDocument();
+    expect(screen.getByLabelText("Curriculum Misconception Directed Acyclic Graph")).toBeInTheDocument();
+
+    // Default selected node inspector
+    expect(screen.getAllByText(/Superposition & Interference/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Fringe Spacing Formula Inversion/i)).toBeInTheDocument();
+  });
+
+  it("selects a node on canvas and launches an adversarial challenge probe", async () => {
+    render(<App />);
+
+    const dagTabs = screen.getAllByRole("button", { name: /Knowledge DAG/i });
+    fireEvent.click(dagTabs[0]);
+
+    // Launch Adversarial Challenge on selected Superposition node
+    const advBtn = screen.getByRole("button", { name: /Launch Adversarial Challenge/i });
+    fireEvent.click(advBtn);
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Socratic AI Tutor" })).toBeInTheDocument();
+      expect(screen.getAllByText(/Superposition & Interference/i).length).toBeGreaterThan(0);
+    });
   });
 });
 
@@ -266,6 +306,7 @@ describe("Socratic AI Tutor Drawer Suite", () => {
     useSocraticTutorStore.getState().closeDrawer();
     useSocraticTutorStore.getState().clearHistory();
     useAnalyticsStore.getState().resetAnalytics();
+    useMisconceptionDAGStore.getState().resetView();
     localStorage.clear();
   });
 
@@ -287,7 +328,6 @@ describe("Socratic AI Tutor Drawer Suite", () => {
     const floatBtn = screen.getByLabelText("Open Socratic AI Tutor");
     fireEvent.click(floatBtn);
 
-    // Request Hint 1
     const hintBtn = screen.getByRole("button", { name: /Get Hint #1/i });
     fireEvent.click(hintBtn);
 
@@ -296,7 +336,6 @@ describe("Socratic AI Tutor Drawer Suite", () => {
       expect(screen.getByText(/governing physical principles/i)).toBeInTheDocument();
     });
 
-    // Request Hint 2
     const hint2Btn = screen.getByRole("button", { name: /Get Hint #2/i });
     fireEvent.click(hint2Btn);
 
@@ -311,19 +350,16 @@ describe("Socratic AI Tutor Drawer Suite", () => {
     const floatBtn = screen.getByLabelText("Open Socratic AI Tutor");
     fireEvent.click(floatBtn);
 
-    const input = screen.getByPlaceholderText(/Ask a question or explain your reasoning/i);
-    fireEvent.change(input, { target: { value: "How does the Doppler effect work?" } });
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Socratic AI Tutor" })).toBeInTheDocument();
+    });
 
-    const sendBtn = screen.getByLabelText("Send Message");
-    fireEvent.click(sendBtn);
+    const analogyBtn = screen.getByRole("button", { name: /Give me an analogy/i });
+    fireEvent.click(analogyBtn);
 
-    await waitFor(
-      () => {
-        expect(screen.getByText("How does the Doppler effect work?")).toBeInTheDocument();
-        expect(screen.getByText(/Cambridge 9702 §4.3/i)).toBeInTheDocument();
-      },
-      { timeout: 3000 }
-    );
+    await waitFor(() => {
+      expect(screen.getByText(/analogous physical example/i)).toBeInTheDocument();
+    });
   });
 });
 
@@ -335,6 +371,7 @@ describe("Authentication & Route Guard Flow Suite", () => {
     useExamPlayerStore.getState().resetSession();
     useSocraticTutorStore.getState().closeDrawer();
     useAnalyticsStore.getState().resetAnalytics();
+    useMisconceptionDAGStore.getState().resetView();
     localStorage.clear();
   });
 

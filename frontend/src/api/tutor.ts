@@ -71,7 +71,7 @@ export const socraticClient = {
       fullResponse =
         "Wait! A common misconception is assuming that when an object momentarily stops at the top of its trajectory ($v = 0$), its acceleration must also be zero. Is that true? Remember that gravity $g = 9.81\\text{ m/s}^2$ never turns off!";
       citations = [SAMPLE_CITATIONS.mechanics];
-    } else if (lower.includes("doppler") || context?.topicTitle.includes("Doppler")) {
+    } else if (lower.includes("doppler") || context?.topicTitle?.includes("Doppler")) {
       thoughts = "Formulating Socratic question on Doppler frequency shift.";
       fullResponse =
         "Think about what happens to the wave crests emitted by the siren. Because the ambulance is chasing its own wavefronts, the wavelength $\\lambda' = \\frac{v - v_s}{f_s}$ gets compressed. What does this tell you about the observed frequency $f_o = \\frac{v}{\\lambda'}$?";
