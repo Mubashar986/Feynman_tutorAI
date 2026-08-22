@@ -8,6 +8,7 @@ import { useExamPlayerStore } from "./stores/examPlayerStore";
 import { useSocraticTutorStore } from "./stores/socraticTutorStore";
 import { useAnalyticsStore } from "./stores/analyticsStore";
 import { useMisconceptionDAGStore } from "./stores/misconceptionDAGStore";
+import { useExamSimulationStore } from "./stores/examSimulationStore";
 
 describe("App & UI Primitives Suite", () => {
   beforeEach(() => {
@@ -21,6 +22,7 @@ describe("App & UI Primitives Suite", () => {
     useSocraticTutorStore.getState().clearHistory();
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
+    useExamSimulationStore.getState().resetSimulation();
     localStorage.clear();
   });
 
@@ -54,6 +56,7 @@ describe("Curriculum Blueprint Catalog & Syllabus Tree Suite", () => {
     useSocraticTutorStore.getState().closeDrawer();
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
+    useExamSimulationStore.getState().resetSimulation();
     localStorage.clear();
   });
 
@@ -133,6 +136,7 @@ describe("Interactive Exam Taking Player Suite", () => {
     useSocraticTutorStore.getState().closeDrawer();
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
+    useExamSimulationStore.getState().resetSimulation();
     localStorage.clear();
   });
 
@@ -212,6 +216,7 @@ describe("Student Analytics & Error Bank Suite", () => {
     useSocraticTutorStore.getState().closeDrawer();
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
+    useExamSimulationStore.getState().resetSimulation();
     localStorage.clear();
   });
 
@@ -263,6 +268,7 @@ describe("Interactive Misconception DAG Suite", () => {
     useSocraticTutorStore.getState().closeDrawer();
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
+    useExamSimulationStore.getState().resetSimulation();
     localStorage.clear();
   });
 
@@ -297,6 +303,73 @@ describe("Interactive Misconception DAG Suite", () => {
   });
 });
 
+describe("Full-Length Exam Readiness Simulation Suite", () => {
+  beforeEach(() => {
+    useAuthStore.getState().setAuth(
+      {
+        id: "student_alex",
+        email: "alex@feynman.ai",
+        fullName: "Alex Rivera",
+        role: "student",
+        targetExam: "Cambridge A-Level Physics",
+      },
+      "demo_jwt_token"
+    );
+    useCurriculumStore.getState().setSelectedTopic(null);
+    useCurriculumStore.getState().setIsDrawerOpen(false);
+    useExamPlayerStore.getState().resetSession();
+    useSocraticTutorStore.getState().closeDrawer();
+    useAnalyticsStore.getState().resetAnalytics();
+    useMisconceptionDAGStore.getState().resetView();
+    useExamSimulationStore.getState().resetSimulation();
+    localStorage.clear();
+  });
+
+  it("renders simulation launcher, blueprint selector, and topic weights", () => {
+    render(<App />);
+
+    const simTabs = screen.getAllByRole("button", { name: /Exam Simulation/i });
+    fireEvent.click(simTabs[0]);
+
+    expect(screen.getByText(/Full-Length Exam Simulation Engine/i)).toBeInTheDocument();
+    expect(screen.getByText(/Configure Simulation Mode/i)).toBeInTheDocument();
+    expect(screen.getByText(/Blueprint Topic Weighting Breakdown/i)).toBeInTheDocument();
+
+    // Switch blueprint to AP Calculus BC
+    const apBlueprintCard = screen.getByText(/AP Calculus BC Full Simulation Exam/i);
+    fireEvent.click(apBlueprintCard);
+
+    expect(screen.getByText("105 Minutes")).toBeInTheDocument();
+    expect(screen.getByText("45 Questions")).toBeInTheDocument();
+  });
+
+  it("views calibrated diagnostic score report and print export", () => {
+    render(<App />);
+
+    const simTabs = screen.getAllByRole("button", { name: /Exam Simulation/i });
+    fireEvent.click(simTabs[0]);
+
+    const sampleReportBtn = screen.getByRole("button", { name: /View Sample Diagnostic Report/i });
+    fireEvent.click(sampleReportBtn);
+
+    // Check report header
+    expect(screen.getByText(/Calibrated Readiness Certificate/i)).toBeInTheDocument();
+    expect(screen.getByText(/Predicted Exam Grade:/i)).toBeInTheDocument();
+    expect(screen.getByText("87.5%")).toBeInTheDocument();
+
+    // Check pacing telemetry
+    expect(screen.getByText("68s")).toBeInTheDocument();
+    expect(screen.getByText("Optimal")).toBeInTheDocument();
+
+    // Check print button and back button
+    expect(screen.getByRole("button", { name: /Export \/ Print Diagnostic Report/i })).toBeInTheDocument();
+    const backBtn = screen.getByRole("button", { name: /Back to Blueprint Launcher/i });
+    fireEvent.click(backBtn);
+
+    expect(screen.getByText(/Full-Length Exam Simulation Engine/i)).toBeInTheDocument();
+  });
+});
+
 describe("Socratic AI Tutor Drawer Suite", () => {
   beforeEach(() => {
     useAuthStore.getState().logout();
@@ -307,6 +380,7 @@ describe("Socratic AI Tutor Drawer Suite", () => {
     useSocraticTutorStore.getState().clearHistory();
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
+    useExamSimulationStore.getState().resetSimulation();
     localStorage.clear();
   });
 
@@ -372,6 +446,7 @@ describe("Authentication & Route Guard Flow Suite", () => {
     useSocraticTutorStore.getState().closeDrawer();
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
+    useExamSimulationStore.getState().resetSimulation();
     localStorage.clear();
   });
 

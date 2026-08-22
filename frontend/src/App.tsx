@@ -10,6 +10,7 @@ import {
   FolderTree,
   BarChart3,
   Network,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -24,6 +25,7 @@ import { SyllabusTreeExplorer } from "@/components/curriculum/SyllabusTreeExplor
 import { ExamPlayer } from "@/components/exam/ExamPlayer";
 import { AnalyticsDashboard } from "@/components/analytics/AnalyticsDashboard";
 import { DAGVisualizer } from "@/components/dag/DAGVisualizer";
+import { ExamSimulationView } from "@/components/simulation/ExamSimulationView";
 import { useCurriculumStore } from "@/stores/curriculumStore";
 import { SocraticTutorDrawer } from "@/components/tutor/SocraticTutorDrawer";
 import { FloatingTutorButton } from "@/components/tutor/FloatingTutorButton";
@@ -34,7 +36,7 @@ export function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = React.useState<boolean>(false);
   const [authView, setAuthView] = React.useState<"login" | "register">("login");
   const [activeTab, setActiveTab] = React.useState<
-    "catalog" | "syllabus" | "solver" | "analytics" | "dag"
+    "catalog" | "syllabus" | "solver" | "analytics" | "dag" | "simulation"
   >("syllabus");
 
   const { user, isAuthenticated } = useAuthStore();
@@ -121,6 +123,16 @@ export function App() {
               >
                 <Network className="h-3.5 w-3.5 text-indigo-500" /> Knowledge DAG
               </button>
+              <button
+                onClick={() => setActiveTab("simulation")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+                  activeTab === "simulation"
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <ShieldCheck className="h-3.5 w-3.5 text-amber-500" /> Exam Simulation
+              </button>
             </div>
 
             <div className="flex items-center gap-3">
@@ -156,33 +168,39 @@ export function App() {
         <div className="flex md:hidden border-b bg-muted/20 px-2 py-2 justify-center gap-1 text-[11px] overflow-x-auto">
           <button
             onClick={() => setActiveTab("catalog")}
-            className={`px-2 py-1 rounded-md shrink-0 ${activeTab === "catalog" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "catalog" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
           >
             Catalog
           </button>
           <button
             onClick={() => setActiveTab("syllabus")}
-            className={`px-2 py-1 rounded-md shrink-0 ${activeTab === "syllabus" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "syllabus" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
           >
             Syllabus
           </button>
           <button
             onClick={() => setActiveTab("solver")}
-            className={`px-2 py-1 rounded-md shrink-0 ${activeTab === "solver" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "solver" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
           >
-            Exam Player
+            Player
           </button>
           <button
             onClick={() => setActiveTab("analytics")}
-            className={`px-2 py-1 rounded-md shrink-0 ${activeTab === "analytics" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "analytics" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
           >
             Analytics
           </button>
           <button
             onClick={() => setActiveTab("dag")}
-            className={`px-2 py-1 rounded-md shrink-0 ${activeTab === "dag" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "dag" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
           >
             DAG
+          </button>
+          <button
+            onClick={() => setActiveTab("simulation")}
+            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "simulation" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+          >
+            Simulate
           </button>
         </div>
 
@@ -214,7 +232,7 @@ export function App() {
                   <UserCheck className="h-3.5 w-3.5" /> Authenticated Session Active
                 </span>
               ) : (
-                "Task 7.4: Interactive Misconception DAG Visualizer"
+                "Task 8.3: Full-Length Exam Readiness Simulation & Score Reports"
               )}
             </div>
 
@@ -227,7 +245,7 @@ export function App() {
             </h2>
 
             <p className="max-w-3xl text-muted-foreground leading-relaxed text-sm sm:text-base">
-              Inspect multi-axis mastery radar profiles, explore prerequisite dependency DAGs, review diagnosed misconceptions, and simulate real proctored exams.
+              Launch full-length proctored mock exams, review calibrated readiness score certifications, and inspect pacing chronometry.
             </p>
           </section>
 
@@ -311,6 +329,25 @@ export function App() {
           {activeTab === "dag" && (
             <section className="space-y-6">
               <DAGVisualizer />
+            </section>
+          )}
+
+          {/* TAB 6: Exam Simulation & Score Reports (Protected by RequireAuth) */}
+          {activeTab === "simulation" && (
+            <section className="space-y-6">
+              <RequireAuth
+                allowedRoles={["student", "content_admin", "sys_admin"]}
+                onPromptLogin={() => {
+                  setAuthView("login");
+                  setIsAuthModalOpen(true);
+                }}
+              >
+                <ExamSimulationView
+                  onStartExamSession={() => {
+                    setActiveTab("solver");
+                  }}
+                />
+              </RequireAuth>
             </section>
           )}
         </main>
