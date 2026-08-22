@@ -162,8 +162,27 @@ Regression Risk: LOW
 Related WBS: Task 0.5
 Related Artifacts: `task_0_5_design.md`
 Fix: Replaced Unicode emoji with ASCII-safe status prefix `[SUCCESS]` in `export_openapi.py`.
-Verification: Executed `py backend/scripts/export_openapi.py` and `py -m pytest backend/tests/test_openapi_export.py -v`. Schema exported successfully (3 paths) and test passed 100% with 0 errors.
-Regression Verification: Zero impact on exported JSON file content (JSON dump continues to use UTF-8).
-Resolution: Replaced console emoji with ASCII-safe prefix.
+## ISSUE-0007 — ModuleNotFoundError: No module named 'aiofiles' during test collection
+
+Status: RESOLVED
+Severity: LOW
+Detected: 2026-08-23
+Detected During: Task 3.1 Implementation Verification
+Architectural Domain: Backend / Storage
+Component: `backend/app/core/storage/local.py`
+Symptom: `ModuleNotFoundError: No module named 'aiofiles'` when running pytest on backend test suite.
+Reproduction: `py -3.14 -m pytest backend/tests/`
+Evidence: Pytest import failure trace on `backend/app/core/storage/local.py:5`.
+Root Cause: `import aiofiles` was used for file I/O when `aiofiles` is not installed in the standard Python 3.14 environment.
+Contributing Factors: Unintentional import of third-party library when native standard library `asyncio.to_thread` with built-in `open` / `Path` provides non-blocking, zero-dependency async file I/O natively.
+Affected Scope: `backend/app/core/storage/local.py`.
+Regression Risk: LOW
+Related WBS: Task 3.1
+Related Artifacts: `task_3_1_design.md`
+Fix: Replaced `aiofiles` with standard library `asyncio.to_thread` and native `Path.write_bytes` / `Path.read_bytes` / `os.remove`.
+Verification: `py -3.14 -m pytest backend/tests/ -v` passed with 100% pass rate.
+Regression Verification: Zero side effects on storage sandbox or file saving.
+Resolution: Replaced third-party `aiofiles` with standard library primitives.
 Remaining Risk: None.
-Resolved On: 2026-08-22
+Resolved On: 2026-08-23
+

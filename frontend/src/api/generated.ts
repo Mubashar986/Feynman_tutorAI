@@ -416,6 +416,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all uploaded source documents
+         * @description Returns a list of all processed curriculum source documents, optionally filtered by exam or topic.
+         */
+        get: operations["list_documents_api_v1_documents_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/{document_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get document metadata by ID
+         * @description Retrieves document ingestion status, token counts, and chunk statistics.
+         */
+        get: operations["get_document_api_v1_documents__document_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a source document and its chunks (Instructor/Admin only)
+         * @description Permanently deletes a document, removes its raw file from storage, and cascades deletions to all chunks.
+         */
+        delete: operations["delete_document_api_v1_documents__document_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/{document_id}/chunks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get semantic chunks and heading breadcrumbs for a document
+         * @description Returns the segmented text chunks, heading breadcrumbs, and token metrics generated from the document.
+         */
+        get: operations["get_document_chunks_api_v1_documents__document_id__chunks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload and chunk a source document (Instructor/Admin only)
+         * @description Uploads a textbook, syllabus guide, or notes file (PDF, Markdown, TXT), validates security,
+         *     segments it into semantic chunks with LaTeX protection, and saves to relational storage.
+         */
+        post: operations["upload_document_api_v1_documents_upload_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/": {
         parameters: {
             query?: never;
@@ -457,6 +542,17 @@ export interface components {
          * @enum {string}
          */
         BloomLevel: "Remember" | "Understand" | "Apply" | "Analyze" | "Evaluate" | "Create";
+        /** Body_upload_document_api_v1_documents_upload_post */
+        Body_upload_document_api_v1_documents_upload_post: {
+            /** File */
+            file: string;
+            /** Exam Template Id */
+            exam_template_id?: string | null;
+            /** Topic Id */
+            topic_id?: string | null;
+            /** Title */
+            title?: string | null;
+        };
         /** DAGEdgeResponse */
         DAGEdgeResponse: {
             /** Id */
@@ -569,6 +665,96 @@ export interface components {
              */
             max_depth_level: number;
         };
+        /** DocumentChunkResponse */
+        DocumentChunkResponse: {
+            /** Chunk Index */
+            chunk_index: number;
+            /**
+             * Page Number
+             * @default 1
+             */
+            page_number: number | null;
+            /** Content */
+            content: string;
+            /** Clean Content */
+            clean_content: string;
+            /** Token Count */
+            token_count: number;
+            /**
+             * Heading Breadcrumbs
+             * @default []
+             */
+            heading_breadcrumbs: string[];
+            /** Id */
+            id: string;
+            /** Document Id */
+            document_id: string;
+            /** Topic Id */
+            topic_id?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** DocumentResponse */
+        DocumentResponse: {
+            /** Title */
+            title: string;
+            /** Original Filename */
+            original_filename: string;
+            /** @default text */
+            file_type: components["schemas"]["DocumentType"];
+            /**
+             * File Size Bytes
+             * @default 0
+             */
+            file_size_bytes: number;
+            /** @default pending */
+            status: components["schemas"]["DocumentStatus"];
+            /** Exam Template Id */
+            exam_template_id?: string | null;
+            /** Topic Id */
+            topic_id?: string | null;
+            /** Id */
+            id: string;
+            /** Sha256 Hash */
+            sha256_hash: string;
+            /**
+             * Chunk Count
+             * @default 0
+             */
+            chunk_count: number;
+            /**
+             * Total Tokens
+             * @default 0
+             */
+            total_tokens: number;
+            /** Uploaded By User Id */
+            uploaded_by_user_id?: string | null;
+            /** Error Message */
+            error_message?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * DocumentStatus
+         * @enum {string}
+         */
+        DocumentStatus: "pending" | "processing" | "chunked" | "indexed" | "failed";
+        /**
+         * DocumentType
+         * @enum {string}
+         */
+        DocumentType: "pdf" | "markdown" | "text" | "json";
         /**
          * ExamBoard
          * @enum {string}
@@ -1903,6 +2089,162 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DAGValidationResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_documents_api_v1_documents_get: {
+        parameters: {
+            query?: {
+                exam_template_id?: string | null;
+                topic_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_document_api_v1_documents__document_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_document_api_v1_documents__document_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_document_chunks_api_v1_documents__document_id__chunks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentChunkResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_document_api_v1_documents_upload_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_document_api_v1_documents_upload_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentResponse"];
                 };
             };
             /** @description Validation Error */

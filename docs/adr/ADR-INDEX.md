@@ -23,7 +23,7 @@ Generate each using [ADR-PROMPT-TEMPLATE.md](./ADR-PROMPT-TEMPLATE.md) in this f
 | **ADR-006** | LLM provider selection + abstraction layer (Multi-Provider Gateway) | §27, FR-023 | **ACCEPTED** | [ADR-006-llm-provider-abstraction.md](./ADR-006-llm-provider-abstraction.md) |
 | **ADR-007** | Embedding provider (Gateway with FastEmbed / Gemini / OpenAI) | §27, FR-008 | **ACCEPTED** | [ADR-006-llm-provider-abstraction.md](./ADR-006-llm-provider-abstraction.md) |
 | **ADR-008** | Frontend framework (React 18+ / Vite / TS / Tailwind / Shadcn UI) | §27, §17 | **ACCEPTED** | [ADR-008-frontend-framework-and-ui-stack.md](./ADR-008-frontend-framework-and-ui-stack.md) |
-| ADR-009 | Object storage provider (Local / S3 / MinIO) | §27 | PENDING | To be resolved in Epic 3 |
+| **ADR-009** | Object storage provider (LocalStorageProvider with S3 adapter) | §27, §5.3 | **ACCEPTED** | [ADR-009-object-storage.md](./ADR-009-object-storage.md) |
 | ADR-010 | Deployment platform | §27 | PENDING | To be resolved in Epic 0.2 |
 | **ADR-011** | Authentication provider (FastAPI OAuth2 Bearer + PyJWT + bcrypt) | §27, FR-021 | **ACCEPTED** | [ADR-011-auth-and-rbac.md](./ADR-011-auth-and-rbac.md) |
 | ADR-012 | IRT / adaptive-testing implementation | §27 | PENDING | To be resolved in Epic 5 |
@@ -37,6 +37,7 @@ Generate each using [ADR-PROMPT-TEMPLATE.md](./ADR-PROMPT-TEMPLATE.md) in this f
 | ADR-015 | Repository/service boundary — modular monolith | §28 | PENDING | To be resolved in Epic 0.2 |
 | **ADR-016** | Learning-state machine implementation | §13, FR-001 | **ACCEPTED** | [ADR-016-learning-state-machine.md](./ADR-016-learning-state-machine.md) |
 | ADR-017 | Structured-output validation framework for LLM outputs | FR-010 | **ACCEPTED** | [ADR-006-llm-provider-abstraction.md](./ADR-006-llm-provider-abstraction.md) |
-| ADR-018 | RAG chunking/embedding parameters | FR-005, FR-008 | PENDING | To be resolved in Epic 3 |
+| **ADR-018** | RAG chunking & formula preservation parameters | FR-005, FR-008 | **ACCEPTED** | [ADR-018-rag-chunking-strategy.md](./ADR-018-rag-chunking-strategy.md) |
 | ADR-019 | Frontend HTTP & Data Fetching Strategy (TanStack Query v5) | Frontend Track | **ACCEPTED** | [ADR-008-frontend-framework-and-ui-stack.md](./ADR-008-frontend-framework-and-ui-stack.md) |
 | ADR-020 | Frontend State Management Strategy (Zustand) | Frontend Track | **ACCEPTED** | [ADR-008-frontend-framework-and-ui-stack.md](./ADR-008-frontend-framework-and-ui-stack.md) |
+

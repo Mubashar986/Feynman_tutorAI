@@ -64,3 +64,18 @@ This file records all formally accepted architectural and technical decisions go
 * **Status:** ACCEPTED (2026-08-23)
 * **Record:** [docs/adr/ADR-016-learning-state-machine.md](file:///c:/Users/Abdul%20Jabbar%20Metlo/Feynman_tutorAI/docs/adr/ADR-016-learning-state-machine.md)
 * **Summary:** Decoupled, pure-Python domain service with explicit Pydantic/Enum states (`NOT_STARTED`, `CALIBRATION`, `FOUNDATION`, `PRACTICING`, `ASSESSMENT`, `DIAGNOSIS`, `REPAIR`, `MASTERY`, `REVISION`), deterministic transition matrix (`VALID_TRANSITIONS`), precondition guard predicates, and atomic async SQLModel database transactions persisting current `StudentLearningState` and an append-only `StateTransitionLog` with structured JSON evidence.
+
+---
+
+## DECISION-009: Pluggable Object Storage Provider Strategy
+* **Status:** ACCEPTED (2026-08-23)
+* **Record:** [docs/adr/ADR-009-object-storage.md](file:///c:/Users/Abdul%20Jabbar%20Metlo/Feynman_tutorAI/docs/adr/ADR-009-object-storage.md)
+* **Summary:** Pluggable `StorageProvider` abstract base class with a default `LocalStorageProvider` for zero-setup development (sandboxed under `data/uploads/` with SHA-256 filenames and path traversal guards) and production S3 adapter.
+
+---
+
+## DECISION-018: RAG Document Chunking, Heading Hierarchy & Formula Preservation Strategy
+* **Status:** ACCEPTED (2026-08-23)
+* **Record:** [docs/adr/ADR-018-rag-chunking-strategy.md](file:///c:/Users/Abdul%20Jabbar%20Metlo/Feynman_tutorAI/docs/adr/ADR-018-rag-chunking-strategy.md)
+* **Summary:** `SemanticRecursiveChunker` with atomic equation masking (`$$...$$`, `\(...\)`), markdown heading breadcrumbs stack, target 512-token (~2,048 chars) window, and 15% (~75 tokens) sliding overlap. Persisted to `documents` and `document_chunks` SQLModel tables.
+

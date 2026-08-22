@@ -3,6 +3,7 @@ from backend.app.api.v1.endpoints import health
 from backend.app.auth import auth_router
 from backend.app.learning_state import learning_state_router
 from backend.app.curriculum import curriculum_router
+from backend.app.rag import documents_router
 
 api_router = APIRouter()
 
@@ -17,4 +18,8 @@ api_router.include_router(learning_state_router, prefix="", tags=["Learning Stat
 
 # Exam Templates & Curriculum routes
 api_router.include_router(curriculum_router, prefix="", tags=["Exam Templates & Curriculum"])
+
+# Vector RAG & Resource Ingestion routes
+api_router.include_router(documents_router, prefix="", tags=["Vector RAG & Resource Ingestion"])
+
 
