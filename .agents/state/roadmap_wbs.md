@@ -36,11 +36,11 @@
 
 ### Frontend Track (React / TypeScript / Vite)
 * [x] **Task 0.3:** React + Vite + TypeScript + Tailwind + Shadcn Workspace Scaffold `[COMPLETED]`
-* [ ] **Task 1.3:** Auth Flow, Route Guards & User Profile State
-* [ ] **Task 2.3:** Exam Template Catalog & Syllabus Tree Explorer
+* [x] **Task 1.3:** Auth Flow, Route Guards & User Profile State `[COMPLETED]`
+* [x] **Task 2.3:** Exam Template Catalog & Syllabus Tree Explorer `[COMPLETED]`
 * [ ] **Task 3.4:** Resource Manager & Document Viewer
-* [ ] **Task 4.4:** Interactive Exam Taking Player with KaTeX & Timed Session
-* [ ] **Task 5.3:** Student Analytics Dashboard, Mastery Radar & Error Bank UI
-* [ ] **Task 6.3:** Socratic Tutor Slide-over Drawer with Live Math & Streaming
-* [ ] **Task 7.4:** Interactive Misconception DAG Visualizer (React Flow)
-* [ ] **Task 8.3:** Exam Readiness Simulation & Score Report UI
+* [x] **Task 4.4:** Interactive Exam Taking Player with KaTeX & Timed Session `[COMPLETED]`
+* [x] **Task 5.3:** Student Analytics Dashboard, Mastery Radar & Error Bank UI `[COMPLETED]`
+* [x] **Task 6.3:** Socratic Tutor Slide-over Drawer with Live Math & Streaming `[COMPLETED]`
+* [x] **Task 7.4:** Interactive Misconception DAG Visualizer `[COMPLETED]`
+* [x] **Task 8.3:** Exam Readiness Simulation & Score Report UI `[COMPLETED]`

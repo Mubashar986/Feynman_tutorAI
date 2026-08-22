@@ -1,12 +1,12 @@
 # Current Task State
 
-**WBS Task ID:** Task 0.5
-**Task Name:** OpenAPI Contract Generation & TypeScript Sync Protocol
-**Epic:** Epic 0 — Project Architecture Foundations & Environment Setup
-**Track:** Shared Track (Backend Lead & Frontend Developer)
-**Status:** COMPLETED
-**Current Stage:** Stage 4 (Testing & Verification - COMPLETED)
-**Dependencies:** Task 0.2 (COMPLETED), Task 0.3 (COMPLETED)
+**WBS Task ID:** Task 1.1
+**Task Name:** Server-Side RBAC, User Models & JWT Auth Service
+**Epic:** Epic 1 — Authentication, Multi-Tenant Isolation & Learning State
+**Track:** Backend Track (Backend Lead)
+**Status:** READY_TO_START
+**Current Stage:** Stage 0 (Roadmap & WBS Planner - READY)
+**Dependencies:** Task 0.2 (COMPLETED), Task 0.5 (COMPLETED)
 **Blockers:** none
 
-Next action: Merge Task 0.5 into main, then proceed to Task 1.1 (Server-Side RBAC & JWT Auth Service) or QA Frontend PR for Task 1.3.
+Next action: Begin Stage 1 (Conceptual Understanding) for Task 1.1.
