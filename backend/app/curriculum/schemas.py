@@ -219,3 +219,105 @@ class ExamTemplateDetailResponse(ExamTemplateResponse):
 
 class ExamTemplateImportSchema(ExamTemplateBase):
     subjects: List[SubjectImportSchema] = []
+
+
+# ==============================================================================
+# 5. Curriculum DAG & Prerequisite Engine Schemas
+# ==============================================================================
+
+class DAGNodeResponse(BaseModel):
+    id: str
+    title: str
+    subject_id: str
+    difficulty: str
+    estimated_hours: float
+    importance_weight: float
+    in_degree: int
+    out_degree: int
+    level: int
+    prerequisite_ids: List[str] = []
+    dependent_ids: List[str] = []
+
+
+class DAGEdgeResponse(BaseModel):
+    id: str
+    source: str  # Prerequisite topic ID
+    target: str  # Dependent topic ID
+    is_mandatory: bool = True
+
+
+class DAGGraphResponse(BaseModel):
+    exam_template_id: str
+    exam_title: str
+    is_acyclic: bool
+    cycle_path: Optional[List[str]] = None
+    total_nodes: int
+    total_edges: int
+    root_topic_ids: List[str] = []
+    terminal_topic_ids: List[str] = []
+    nodes: List[DAGNodeResponse] = []
+    edges: List[DAGEdgeResponse] = []
+
+
+class DAGValidationResponse(BaseModel):
+    exam_template_id: str
+    exam_title: str
+    is_valid: bool
+    has_cycles: bool
+    cycle_path: Optional[List[str]] = None
+    total_topics: int
+    total_prerequisite_edges: int
+    root_topic_ids: List[str] = []
+    terminal_topic_ids: List[str] = []
+    max_depth_level: int = 0
+
+
+class LearningPathNodeResponse(BaseModel):
+    sequence_number: int
+    topic_id: str
+    title: str
+    subject_id: str
+    difficulty: str
+    estimated_hours: float
+    level: int
+    prerequisite_ids: List[str] = []
+
+
+class LearningPathResponse(BaseModel):
+    exam_template_id: str
+    exam_title: str
+    total_topics: int
+    learning_path: List[LearningPathNodeResponse] = []
+
+
+class TopicUnlockStatusResponse(BaseModel):
+    topic_id: str
+    title: str
+    subject_id: str
+    difficulty: str
+    level: int
+    current_learning_state: str
+    unlock_status: str  # "locked" | "unlocked" | "mastered"
+    is_unlocked: bool
+    missing_prerequisite_ids: List[str] = []
+    missing_prerequisite_titles: List[str] = []
+
+
+class BlockerNodeResponse(BaseModel):
+    topic_id: str
+    title: str
+    difficulty: str
+    level: int
+    current_state: str
+    is_direct_prerequisite: bool
+
+
+class TopicBlockerReportResponse(BaseModel):
+    target_topic_id: str
+    target_topic_title: str
+    exam_template_id: str
+    student_id: str
+    is_unlocked: bool
+    total_unmastered_ancestors: int
+    blockers: List[BlockerNodeResponse] = []
+

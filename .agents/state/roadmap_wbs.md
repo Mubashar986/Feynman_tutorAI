@@ -17,8 +17,8 @@
 * [x] **Task 1.1:** Server-Side RBAC, User Models & JWT Authentication Service `[COMPLETED]`
 * [x] **Task 1.2:** Student Learning State Machine & Auditable Event Log `[COMPLETED]`
 * [x] **Task 2.1:** Exam Template Data Models & Syllabus Parser `[COMPLETED]`
-* [ ] **Task 2.2:** Topic DAG & Prerequisite Validation Engine `[READY]`
-* [ ] **Task 3.1:** Document Ingestion Pipeline & Text Chunking Engine
+* [x] **Task 2.2:** Topic DAG & Prerequisite Validation Engine `[COMPLETED]`
+* [ ] **Task 3.1:** Document Ingestion Pipeline & Text Chunking Engine `[READY]`
 * [ ] **Task 3.2:** Qdrant Vector Store Adapter & Hybrid Indexer
 * [ ] **Task 3.3:** Grounded Retrieval & Source Provenance Formatter
 * [ ] **Task 4.1:** Question Bank Schema & Multi-Type Data Models

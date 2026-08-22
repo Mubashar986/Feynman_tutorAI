@@ -1,16 +1,23 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from backend.app.core.database import get_db
-from backend.app.auth.dependencies import require_role
-from backend.app.auth.models import UserRole
+from backend.app.auth.dependencies import get_current_user, require_role
+from backend.app.auth.models import User, UserRole
+from backend.app.learning_state.router import resolve_student_id
+from backend.app.curriculum.dag import TopicDAGService
 from backend.app.curriculum.schemas import (
+    DAGGraphResponse,
+    DAGValidationResponse,
     ExamTemplateDetailResponse,
     ExamTemplateImportSchema,
     ExamTemplateResponse,
+    LearningPathResponse,
     SubjectDetailResponse,
+    TopicBlockerReportResponse,
     TopicDetailResponse,
+    TopicUnlockStatusResponse,
 )
 from backend.app.curriculum.service import (
     CurriculumService,
@@ -18,6 +25,7 @@ from backend.app.curriculum.service import (
 )
 
 router = APIRouter(prefix="/exam-templates", tags=["Exam Templates & Curriculum"])
+
 
 
 @router.get(
@@ -134,3 +142,100 @@ async def delete_exam_template(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Exam template '{template_id}' not found",
         )
+
+
+# ==============================================================================
+# Curriculum DAG & Prerequisite Engine Endpoints (PRD §5.1, §8, FR-003)
+# ==============================================================================
+
+@router.get(
+    "/{template_id}/dag",
+    response_model=DAGGraphResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get complete topic dependency graph with depth levels and connectivity",
+)
+async def get_exam_dag(
+    template_id: str,
+    session: AsyncSession = Depends(get_db),
+) -> DAGGraphResponse:
+    """
+    Returns the visual Directed Acyclic Graph (DAG) for an exam template including node depth levels,
+    in-degrees, out-degrees, and mandatory prerequisite edges for DAG visualization.
+    """
+    return await TopicDAGService.get_dag_graph(session, template_id)
+
+
+@router.get(
+    "/{template_id}/learning-path",
+    response_model=LearningPathResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get canonical topologically sorted recommended learning sequence",
+)
+async def get_learning_path(
+    template_id: str,
+    session: AsyncSession = Depends(get_db),
+) -> LearningPathResponse:
+    """
+    Computes a linear topological sequence of topics guaranteeing that all prerequisites are completed
+    prior to dependent topics.
+    """
+    return await TopicDAGService.get_learning_path(session, template_id)
+
+
+@router.get(
+    "/{template_id}/unlocked-topics",
+    response_model=List[TopicUnlockStatusResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Get unlocked vs locked topic statuses for a student",
+)
+async def get_unlocked_topics(
+    template_id: str,
+    student_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> List[TopicUnlockStatusResponse]:
+    """
+    Evaluates which topics are currently LOCKED, UNLOCKED, or MASTERED for the given student
+    based on their recorded learning state history.
+    """
+    target_student_id = resolve_student_id(current_user, student_id)
+    return await TopicDAGService.get_student_unlocked_topics(session, template_id, target_student_id)
+
+
+@router.get(
+    "/{template_id}/topics/{topic_id}/blockers",
+    response_model=TopicBlockerReportResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get ancestral prerequisite blockers for a struggling student on a topic",
+)
+async def get_topic_prerequisite_blockers(
+    template_id: str,
+    topic_id: str,
+    student_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> TopicBlockerReportResponse:
+    """
+    Performs reverse graph reachability analysis to extract all unmastered ancestral prerequisites
+    preventing a student from mastering the target topic.
+    """
+    target_student_id = resolve_student_id(current_user, student_id)
+    return await TopicDAGService.get_topic_blocker_report(session, template_id, topic_id, target_student_id)
+
+
+@router.post(
+    "/{template_id}/validate-dag",
+    response_model=DAGValidationResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Audit curriculum DAG integrity and detect circular dependencies (Admin/Instructor)",
+    dependencies=[Depends(require_role([UserRole.INSTRUCTOR, UserRole.ADMIN]))],
+)
+async def validate_exam_dag(
+    template_id: str,
+    session: AsyncSession = Depends(get_db),
+) -> DAGValidationResponse:
+    """
+    Audits the exam template's topic prerequisite graph for cycles, connectivity, and depth levels.
+    """
+    return await TopicDAGService.validate_exam_dag(session, template_id)
+

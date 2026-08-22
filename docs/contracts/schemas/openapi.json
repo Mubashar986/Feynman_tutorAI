@@ -727,6 +727,286 @@
         ]
       }
     },
+    "/api/v1/exam-templates/{template_id}/dag": {
+      "get": {
+        "tags": [
+          "Exam Templates & Curriculum",
+          "Exam Templates & Curriculum"
+        ],
+        "summary": "Get complete topic dependency graph with depth levels and connectivity",
+        "description": "Returns the visual Directed Acyclic Graph (DAG) for an exam template including node depth levels,\nin-degrees, out-degrees, and mandatory prerequisite edges for DAG visualization.",
+        "operationId": "get_exam_dag_api_v1_exam_templates__template_id__dag_get",
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DAGGraphResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/exam-templates/{template_id}/learning-path": {
+      "get": {
+        "tags": [
+          "Exam Templates & Curriculum",
+          "Exam Templates & Curriculum"
+        ],
+        "summary": "Get canonical topologically sorted recommended learning sequence",
+        "description": "Computes a linear topological sequence of topics guaranteeing that all prerequisites are completed\nprior to dependent topics.",
+        "operationId": "get_learning_path_api_v1_exam_templates__template_id__learning_path_get",
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearningPathResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/exam-templates/{template_id}/unlocked-topics": {
+      "get": {
+        "tags": [
+          "Exam Templates & Curriculum",
+          "Exam Templates & Curriculum"
+        ],
+        "summary": "Get unlocked vs locked topic statuses for a student",
+        "description": "Evaluates which topics are currently LOCKED, UNLOCKED, or MASTERED for the given student\nbased on their recorded learning state history.",
+        "operationId": "get_unlocked_topics_api_v1_exam_templates__template_id__unlocked_topics_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Template Id"
+            }
+          },
+          {
+            "name": "student_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Student Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TopicUnlockStatusResponse"
+                  },
+                  "title": "Response Get Unlocked Topics Api V1 Exam Templates  Template Id  Unlocked Topics Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/exam-templates/{template_id}/topics/{topic_id}/blockers": {
+      "get": {
+        "tags": [
+          "Exam Templates & Curriculum",
+          "Exam Templates & Curriculum"
+        ],
+        "summary": "Get ancestral prerequisite blockers for a struggling student on a topic",
+        "description": "Performs reverse graph reachability analysis to extract all unmastered ancestral prerequisites\npreventing a student from mastering the target topic.",
+        "operationId": "get_topic_prerequisite_blockers_api_v1_exam_templates__template_id__topics__topic_id__blockers_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Template Id"
+            }
+          },
+          {
+            "name": "topic_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Topic Id"
+            }
+          },
+          {
+            "name": "student_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Student Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicBlockerReportResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/exam-templates/{template_id}/validate-dag": {
+      "post": {
+        "tags": [
+          "Exam Templates & Curriculum",
+          "Exam Templates & Curriculum"
+        ],
+        "summary": "Audit curriculum DAG integrity and detect circular dependencies (Admin/Instructor)",
+        "description": "Audits the exam template's topic prerequisite graph for cycles, connectivity, and depth levels.",
+        "operationId": "validate_exam_dag_api_v1_exam_templates__template_id__validate_dag_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DAGValidationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -749,6 +1029,44 @@
   },
   "components": {
     "schemas": {
+      "BlockerNodeResponse": {
+        "properties": {
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "difficulty": {
+            "type": "string",
+            "title": "Difficulty"
+          },
+          "level": {
+            "type": "integer",
+            "title": "Level"
+          },
+          "current_state": {
+            "type": "string",
+            "title": "Current State"
+          },
+          "is_direct_prerequisite": {
+            "type": "boolean",
+            "title": "Is Direct Prerequisite"
+          }
+        },
+        "type": "object",
+        "required": [
+          "topic_id",
+          "title",
+          "difficulty",
+          "level",
+          "current_state",
+          "is_direct_prerequisite"
+        ],
+        "title": "BlockerNodeResponse"
+      },
       "BloomLevel": {
         "type": "string",
         "enum": [
@@ -760,6 +1078,255 @@
           "Create"
         ],
         "title": "BloomLevel"
+      },
+      "DAGEdgeResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          },
+          "is_mandatory": {
+            "type": "boolean",
+            "title": "Is Mandatory",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "target"
+        ],
+        "title": "DAGEdgeResponse"
+      },
+      "DAGGraphResponse": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "exam_title": {
+            "type": "string",
+            "title": "Exam Title"
+          },
+          "is_acyclic": {
+            "type": "boolean",
+            "title": "Is Acyclic"
+          },
+          "cycle_path": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cycle Path"
+          },
+          "total_nodes": {
+            "type": "integer",
+            "title": "Total Nodes"
+          },
+          "total_edges": {
+            "type": "integer",
+            "title": "Total Edges"
+          },
+          "root_topic_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Root Topic Ids",
+            "default": []
+          },
+          "terminal_topic_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Terminal Topic Ids",
+            "default": []
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/DAGNodeResponse"
+            },
+            "type": "array",
+            "title": "Nodes",
+            "default": []
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/DAGEdgeResponse"
+            },
+            "type": "array",
+            "title": "Edges",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id",
+          "exam_title",
+          "is_acyclic",
+          "total_nodes",
+          "total_edges"
+        ],
+        "title": "DAGGraphResponse"
+      },
+      "DAGNodeResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "subject_id": {
+            "type": "string",
+            "title": "Subject Id"
+          },
+          "difficulty": {
+            "type": "string",
+            "title": "Difficulty"
+          },
+          "estimated_hours": {
+            "type": "number",
+            "title": "Estimated Hours"
+          },
+          "importance_weight": {
+            "type": "number",
+            "title": "Importance Weight"
+          },
+          "in_degree": {
+            "type": "integer",
+            "title": "In Degree"
+          },
+          "out_degree": {
+            "type": "integer",
+            "title": "Out Degree"
+          },
+          "level": {
+            "type": "integer",
+            "title": "Level"
+          },
+          "prerequisite_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Prerequisite Ids",
+            "default": []
+          },
+          "dependent_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Dependent Ids",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "subject_id",
+          "difficulty",
+          "estimated_hours",
+          "importance_weight",
+          "in_degree",
+          "out_degree",
+          "level"
+        ],
+        "title": "DAGNodeResponse"
+      },
+      "DAGValidationResponse": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "exam_title": {
+            "type": "string",
+            "title": "Exam Title"
+          },
+          "is_valid": {
+            "type": "boolean",
+            "title": "Is Valid"
+          },
+          "has_cycles": {
+            "type": "boolean",
+            "title": "Has Cycles"
+          },
+          "cycle_path": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cycle Path"
+          },
+          "total_topics": {
+            "type": "integer",
+            "title": "Total Topics"
+          },
+          "total_prerequisite_edges": {
+            "type": "integer",
+            "title": "Total Prerequisite Edges"
+          },
+          "root_topic_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Root Topic Ids",
+            "default": []
+          },
+          "terminal_topic_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Terminal Topic Ids",
+            "default": []
+          },
+          "max_depth_level": {
+            "type": "integer",
+            "title": "Max Depth Level",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id",
+          "exam_title",
+          "is_valid",
+          "has_cycles",
+          "total_topics",
+          "total_prerequisite_edges"
+        ],
+        "title": "DAGValidationResponse"
       },
       "ExamBoard": {
         "type": "string",
@@ -1070,6 +1637,88 @@
           "updated_at"
         ],
         "title": "LearningObjectiveResponse"
+      },
+      "LearningPathNodeResponse": {
+        "properties": {
+          "sequence_number": {
+            "type": "integer",
+            "title": "Sequence Number"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "subject_id": {
+            "type": "string",
+            "title": "Subject Id"
+          },
+          "difficulty": {
+            "type": "string",
+            "title": "Difficulty"
+          },
+          "estimated_hours": {
+            "type": "number",
+            "title": "Estimated Hours"
+          },
+          "level": {
+            "type": "integer",
+            "title": "Level"
+          },
+          "prerequisite_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Prerequisite Ids",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "sequence_number",
+          "topic_id",
+          "title",
+          "subject_id",
+          "difficulty",
+          "estimated_hours",
+          "level"
+        ],
+        "title": "LearningPathNodeResponse"
+      },
+      "LearningPathResponse": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "exam_title": {
+            "type": "string",
+            "title": "Exam Title"
+          },
+          "total_topics": {
+            "type": "integer",
+            "title": "Total Topics"
+          },
+          "learning_path": {
+            "items": {
+              "$ref": "#/components/schemas/LearningPathNodeResponse"
+            },
+            "type": "array",
+            "title": "Learning Path",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id",
+          "exam_title",
+          "total_topics"
+        ],
+        "title": "LearningPathResponse"
       },
       "LearningState": {
         "type": "string",
@@ -1472,6 +2121,52 @@
         "title": "TokenResponse",
         "description": "OAuth2 Bearer token response."
       },
+      "TopicBlockerReportResponse": {
+        "properties": {
+          "target_topic_id": {
+            "type": "string",
+            "title": "Target Topic Id"
+          },
+          "target_topic_title": {
+            "type": "string",
+            "title": "Target Topic Title"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "is_unlocked": {
+            "type": "boolean",
+            "title": "Is Unlocked"
+          },
+          "total_unmastered_ancestors": {
+            "type": "integer",
+            "title": "Total Unmastered Ancestors"
+          },
+          "blockers": {
+            "items": {
+              "$ref": "#/components/schemas/BlockerNodeResponse"
+            },
+            "type": "array",
+            "title": "Blockers",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "target_topic_id",
+          "target_topic_title",
+          "exam_template_id",
+          "student_id",
+          "is_unlocked",
+          "total_unmastered_ancestors"
+        ],
+        "title": "TopicBlockerReportResponse"
+      },
       "TopicDetailResponse": {
         "properties": {
           "title": {
@@ -1703,6 +2398,70 @@
           "prerequisite_topic_id"
         ],
         "title": "TopicPrerequisiteResponse"
+      },
+      "TopicUnlockStatusResponse": {
+        "properties": {
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "subject_id": {
+            "type": "string",
+            "title": "Subject Id"
+          },
+          "difficulty": {
+            "type": "string",
+            "title": "Difficulty"
+          },
+          "level": {
+            "type": "integer",
+            "title": "Level"
+          },
+          "current_learning_state": {
+            "type": "string",
+            "title": "Current Learning State"
+          },
+          "unlock_status": {
+            "type": "string",
+            "title": "Unlock Status"
+          },
+          "is_unlocked": {
+            "type": "boolean",
+            "title": "Is Unlocked"
+          },
+          "missing_prerequisite_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing Prerequisite Ids",
+            "default": []
+          },
+          "missing_prerequisite_titles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing Prerequisite Titles",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "topic_id",
+          "title",
+          "subject_id",
+          "difficulty",
+          "level",
+          "current_learning_state",
+          "unlock_status",
+          "is_unlocked"
+        ],
+        "title": "TopicUnlockStatusResponse"
       },
       "UserCreate": {
         "properties": {

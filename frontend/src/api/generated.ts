@@ -312,6 +312,110 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/exam-templates/{template_id}/dag": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get complete topic dependency graph with depth levels and connectivity
+         * @description Returns the visual Directed Acyclic Graph (DAG) for an exam template including node depth levels,
+         *     in-degrees, out-degrees, and mandatory prerequisite edges for DAG visualization.
+         */
+        get: operations["get_exam_dag_api_v1_exam_templates__template_id__dag_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-templates/{template_id}/learning-path": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get canonical topologically sorted recommended learning sequence
+         * @description Computes a linear topological sequence of topics guaranteeing that all prerequisites are completed
+         *     prior to dependent topics.
+         */
+        get: operations["get_learning_path_api_v1_exam_templates__template_id__learning_path_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-templates/{template_id}/unlocked-topics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get unlocked vs locked topic statuses for a student
+         * @description Evaluates which topics are currently LOCKED, UNLOCKED, or MASTERED for the given student
+         *     based on their recorded learning state history.
+         */
+        get: operations["get_unlocked_topics_api_v1_exam_templates__template_id__unlocked_topics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-templates/{template_id}/topics/{topic_id}/blockers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get ancestral prerequisite blockers for a struggling student on a topic
+         * @description Performs reverse graph reachability analysis to extract all unmastered ancestral prerequisites
+         *     preventing a student from mastering the target topic.
+         */
+        get: operations["get_topic_prerequisite_blockers_api_v1_exam_templates__template_id__topics__topic_id__blockers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-templates/{template_id}/validate-dag": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Audit curriculum DAG integrity and detect circular dependencies (Admin/Instructor)
+         * @description Audits the exam template's topic prerequisite graph for cycles, connectivity, and depth levels.
+         */
+        post: operations["validate_exam_dag_api_v1_exam_templates__template_id__validate_dag_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/": {
         parameters: {
             query?: never;
@@ -333,11 +437,138 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** BlockerNodeResponse */
+        BlockerNodeResponse: {
+            /** Topic Id */
+            topic_id: string;
+            /** Title */
+            title: string;
+            /** Difficulty */
+            difficulty: string;
+            /** Level */
+            level: number;
+            /** Current State */
+            current_state: string;
+            /** Is Direct Prerequisite */
+            is_direct_prerequisite: boolean;
+        };
         /**
          * BloomLevel
          * @enum {string}
          */
         BloomLevel: "Remember" | "Understand" | "Apply" | "Analyze" | "Evaluate" | "Create";
+        /** DAGEdgeResponse */
+        DAGEdgeResponse: {
+            /** Id */
+            id: string;
+            /** Source */
+            source: string;
+            /** Target */
+            target: string;
+            /**
+             * Is Mandatory
+             * @default true
+             */
+            is_mandatory: boolean;
+        };
+        /** DAGGraphResponse */
+        DAGGraphResponse: {
+            /** Exam Template Id */
+            exam_template_id: string;
+            /** Exam Title */
+            exam_title: string;
+            /** Is Acyclic */
+            is_acyclic: boolean;
+            /** Cycle Path */
+            cycle_path?: string[] | null;
+            /** Total Nodes */
+            total_nodes: number;
+            /** Total Edges */
+            total_edges: number;
+            /**
+             * Root Topic Ids
+             * @default []
+             */
+            root_topic_ids: string[];
+            /**
+             * Terminal Topic Ids
+             * @default []
+             */
+            terminal_topic_ids: string[];
+            /**
+             * Nodes
+             * @default []
+             */
+            nodes: components["schemas"]["DAGNodeResponse"][];
+            /**
+             * Edges
+             * @default []
+             */
+            edges: components["schemas"]["DAGEdgeResponse"][];
+        };
+        /** DAGNodeResponse */
+        DAGNodeResponse: {
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /** Subject Id */
+            subject_id: string;
+            /** Difficulty */
+            difficulty: string;
+            /** Estimated Hours */
+            estimated_hours: number;
+            /** Importance Weight */
+            importance_weight: number;
+            /** In Degree */
+            in_degree: number;
+            /** Out Degree */
+            out_degree: number;
+            /** Level */
+            level: number;
+            /**
+             * Prerequisite Ids
+             * @default []
+             */
+            prerequisite_ids: string[];
+            /**
+             * Dependent Ids
+             * @default []
+             */
+            dependent_ids: string[];
+        };
+        /** DAGValidationResponse */
+        DAGValidationResponse: {
+            /** Exam Template Id */
+            exam_template_id: string;
+            /** Exam Title */
+            exam_title: string;
+            /** Is Valid */
+            is_valid: boolean;
+            /** Has Cycles */
+            has_cycles: boolean;
+            /** Cycle Path */
+            cycle_path?: string[] | null;
+            /** Total Topics */
+            total_topics: number;
+            /** Total Prerequisite Edges */
+            total_prerequisite_edges: number;
+            /**
+             * Root Topic Ids
+             * @default []
+             */
+            root_topic_ids: string[];
+            /**
+             * Terminal Topic Ids
+             * @default []
+             */
+            terminal_topic_ids: string[];
+            /**
+             * Max Depth Level
+             * @default 0
+             */
+            max_depth_level: number;
+        };
         /**
          * ExamBoard
          * @enum {string}
@@ -526,6 +757,42 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** LearningPathNodeResponse */
+        LearningPathNodeResponse: {
+            /** Sequence Number */
+            sequence_number: number;
+            /** Topic Id */
+            topic_id: string;
+            /** Title */
+            title: string;
+            /** Subject Id */
+            subject_id: string;
+            /** Difficulty */
+            difficulty: string;
+            /** Estimated Hours */
+            estimated_hours: number;
+            /** Level */
+            level: number;
+            /**
+             * Prerequisite Ids
+             * @default []
+             */
+            prerequisite_ids: string[];
+        };
+        /** LearningPathResponse */
+        LearningPathResponse: {
+            /** Exam Template Id */
+            exam_template_id: string;
+            /** Exam Title */
+            exam_title: string;
+            /** Total Topics */
+            total_topics: number;
+            /**
+             * Learning Path
+             * @default []
+             */
+            learning_path: components["schemas"]["LearningPathNodeResponse"][];
         };
         /**
          * LearningState
@@ -755,6 +1022,26 @@ export interface components {
             token_type: string;
             user: components["schemas"]["UserResponse"];
         };
+        /** TopicBlockerReportResponse */
+        TopicBlockerReportResponse: {
+            /** Target Topic Id */
+            target_topic_id: string;
+            /** Target Topic Title */
+            target_topic_title: string;
+            /** Exam Template Id */
+            exam_template_id: string;
+            /** Student Id */
+            student_id: string;
+            /** Is Unlocked */
+            is_unlocked: boolean;
+            /** Total Unmastered Ancestors */
+            total_unmastered_ancestors: number;
+            /**
+             * Blockers
+             * @default []
+             */
+            blockers: components["schemas"]["BlockerNodeResponse"][];
+        };
         /** TopicDetailResponse */
         TopicDetailResponse: {
             /** Title */
@@ -887,6 +1174,35 @@ export interface components {
              * @default true
              */
             is_mandatory: boolean;
+        };
+        /** TopicUnlockStatusResponse */
+        TopicUnlockStatusResponse: {
+            /** Topic Id */
+            topic_id: string;
+            /** Title */
+            title: string;
+            /** Subject Id */
+            subject_id: string;
+            /** Difficulty */
+            difficulty: string;
+            /** Level */
+            level: number;
+            /** Current Learning State */
+            current_learning_state: string;
+            /** Unlock Status */
+            unlock_status: string;
+            /** Is Unlocked */
+            is_unlocked: boolean;
+            /**
+             * Missing Prerequisite Ids
+             * @default []
+             */
+            missing_prerequisite_ids: string[];
+            /**
+             * Missing Prerequisite Titles
+             * @default []
+             */
+            missing_prerequisite_titles: string[];
         };
         /**
          * UserCreate
@@ -1427,6 +1743,166 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ExamTemplateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_exam_dag_api_v1_exam_templates__template_id__dag_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DAGGraphResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_learning_path_api_v1_exam_templates__template_id__learning_path_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningPathResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_unlocked_topics_api_v1_exam_templates__template_id__unlocked_topics_get: {
+        parameters: {
+            query?: {
+                student_id?: string | null;
+            };
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicUnlockStatusResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_topic_prerequisite_blockers_api_v1_exam_templates__template_id__topics__topic_id__blockers_get: {
+        parameters: {
+            query?: {
+                student_id?: string | null;
+            };
+            header?: never;
+            path: {
+                template_id: string;
+                topic_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicBlockerReportResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    validate_exam_dag_api_v1_exam_templates__template_id__validate_dag_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DAGValidationResponse"];
                 };
             };
             /** @description Validation Error */
