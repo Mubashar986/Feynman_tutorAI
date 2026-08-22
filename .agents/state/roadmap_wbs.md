@@ -20,8 +20,8 @@
 * [x] **Task 2.2:** Topic DAG & Prerequisite Validation Engine `[COMPLETED]`
 * [x] **Task 3.1:** Document Ingestion Pipeline & Text Chunking Engine `[COMPLETED]`
 * [x] **Task 3.2:** Qdrant Vector Store Adapter & Hybrid Indexer `[COMPLETED]`
-* [ ] **Task 3.3:** Grounded Retrieval & Source Provenance Formatter `[READY]`
-* [ ] **Task 4.1:** Question Bank Schema & Multi-Type Data Models
+* [x] **Task 3.3:** Grounded Retrieval & Source Provenance Formatter `[COMPLETED]`
+* [ ] **Task 4.1:** Question Bank Schema & Multi-Type Data Models `[READY]`
 * [ ] **Task 4.2:** LLM Question & Distractor Generator with Pydantic Validation
 * [ ] **Task 4.3:** Question Quality, Solvability & Duplication Validator
 * [ ] **Task 5.1:** Mastery Probability & Difficulty Calibration Engine

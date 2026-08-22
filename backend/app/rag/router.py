@@ -8,10 +8,14 @@ from backend.app.auth.models import User, UserRole
 from backend.app.rag.schemas import (
     DocumentChunkResponse,
     DocumentResponse,
+    GroundedContextResponse,
+    RetrievalQueryRequest,
+    RetrievedSourceCitation,
 )
 from backend.app.rag.service import DocumentService
 
 router = APIRouter(prefix="/documents", tags=["Vector RAG & Resource Ingestion"])
+
 
 
 @router.get(
@@ -160,4 +164,54 @@ async def index_all_exam_documents(
     """
     from backend.app.rag.indexer import VectorIndexerService
     return await VectorIndexerService.index_exam_template(session, exam_template_id)
+
+
+# ==============================================================================
+# Retrieval & Provenance Endpoints (Task 3.3)
+# ==============================================================================
+
+@router.post(
+    "/search",
+    response_model=List[RetrievedSourceCitation],
+    status_code=status.HTTP_200_OK,
+    summary="Semantic vector search across curriculum source documents",
+)
+async def search_curriculum_sources(
+    request: RetrievalQueryRequest,
+) -> List[RetrievedSourceCitation]:
+    """
+    Performs semantic vector search across curriculum chunks with topic/exam filtering and similarity thresholding.
+    """
+    from backend.app.rag.retrieval import GroundedRetrievalService
+    return await GroundedRetrievalService.search_curriculum_sources(
+        query=request.query,
+        exam_template_id=request.exam_template_id,
+        topic_id=request.topic_id,
+        limit=request.limit,
+        score_threshold=request.score_threshold,
+    )
+
+
+@router.post(
+    "/grounded-context",
+    response_model=GroundedContextResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Retrieve token-budgeted grounded context and structured citations for LLM prompting",
+)
+async def retrieve_grounded_context(
+    request: RetrievalQueryRequest,
+) -> GroundedContextResponse:
+    """
+    Retrieves relevant curriculum sources, applies greedy token budgeting, and formats a standardized prompt block.
+    """
+    from backend.app.rag.retrieval import GroundedRetrievalService
+    return await GroundedRetrievalService.retrieve_grounded_context(
+        query=request.query,
+        exam_template_id=request.exam_template_id,
+        topic_id=request.topic_id,
+        limit=request.limit,
+        score_threshold=request.score_threshold,
+        max_context_tokens=request.max_context_tokens,
+    )
+
 

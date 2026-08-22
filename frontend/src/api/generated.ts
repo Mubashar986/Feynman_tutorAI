@@ -541,6 +541,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/documents/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Semantic vector search across curriculum source documents
+         * @description Performs semantic vector search across curriculum chunks with topic/exam filtering and similarity thresholding.
+         */
+        post: operations["search_curriculum_sources_api_v1_documents_search_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/grounded-context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retrieve token-budgeted grounded context and structured citations for LLM prompting
+         * @description Retrieves relevant curriculum sources, applies greedy token budgeting, and formats a standardized prompt block.
+         */
+        post: operations["retrieve_grounded_context_api_v1_documents_grounded_context_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/": {
         parameters: {
             query?: never;
@@ -923,6 +963,28 @@ export interface components {
              */
             updated_at: string;
         };
+        /** GroundedContextResponse */
+        GroundedContextResponse: {
+            /** Query */
+            query: string;
+            /** Formatted Context */
+            formatted_context: string;
+            /**
+             * Citations
+             * @default []
+             */
+            citations: components["schemas"]["RetrievedSourceCitation"][];
+            /**
+             * Total Sources
+             * @default 0
+             */
+            total_sources: number;
+            /**
+             * Estimated Tokens
+             * @default 0
+             */
+            estimated_tokens: number;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -1027,6 +1089,71 @@ export interface components {
          * @enum {string}
          */
         LearningState: "not_started" | "calibration" | "foundation" | "practicing" | "assessment" | "diagnosis" | "repair" | "mastery" | "revision";
+        /** RetrievalQueryRequest */
+        RetrievalQueryRequest: {
+            /**
+             * Query
+             * @description The student's question or concept search text
+             */
+            query: string;
+            /**
+             * Exam Template Id
+             * @description Optional exam template scope filter
+             */
+            exam_template_id?: string | null;
+            /**
+             * Topic Id
+             * @description Optional curriculum topic scope filter
+             */
+            topic_id?: string | null;
+            /**
+             * Limit
+             * @description Maximum number of source chunks to retrieve
+             * @default 5
+             */
+            limit: number;
+            /**
+             * Score Threshold
+             * @description Minimum cosine similarity cutoff
+             * @default 0.6
+             */
+            score_threshold: number;
+            /**
+             * Max Context Tokens
+             * @description Maximum total token budget for context assembly
+             * @default 2048
+             */
+            max_context_tokens: number;
+        };
+        /** RetrievedSourceCitation */
+        RetrievedSourceCitation: {
+            /** Chunk Id */
+            chunk_id: string;
+            /** Document Id */
+            document_id: string;
+            /** Document Title */
+            document_title: string;
+            /** Exam Template Id */
+            exam_template_id?: string | null;
+            /** Topic Id */
+            topic_id?: string | null;
+            /**
+             * Page Number
+             * @default 1
+             */
+            page_number: number | null;
+            /**
+             * Heading Breadcrumbs
+             * @default []
+             */
+            heading_breadcrumbs: string[];
+            /** Similarity Score */
+            similarity_score: number;
+            /** Snippet */
+            snippet: string;
+            /** Clean Content */
+            clean_content: string;
+        };
         /** SectionImportSchema */
         SectionImportSchema: {
             /** Title */
@@ -2347,6 +2474,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_curriculum_sources_api_v1_documents_search_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RetrievalQueryRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetrievedSourceCitation"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retrieve_grounded_context_api_v1_documents_grounded_context_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RetrievalQueryRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroundedContextResponse"];
                 };
             };
             /** @description Validation Error */

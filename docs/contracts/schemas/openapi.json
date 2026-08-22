@@ -1352,6 +1352,96 @@
         }
       }
     },
+    "/api/v1/documents/search": {
+      "post": {
+        "tags": [
+          "Vector RAG & Resource Ingestion",
+          "Vector RAG & Resource Ingestion"
+        ],
+        "summary": "Semantic vector search across curriculum source documents",
+        "description": "Performs semantic vector search across curriculum chunks with topic/exam filtering and similarity thresholding.",
+        "operationId": "search_curriculum_sources_api_v1_documents_search_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetrievalQueryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RetrievedSourceCitation"
+                  },
+                  "type": "array",
+                  "title": "Response Search Curriculum Sources Api V1 Documents Search Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/documents/grounded-context": {
+      "post": {
+        "tags": [
+          "Vector RAG & Resource Ingestion",
+          "Vector RAG & Resource Ingestion"
+        ],
+        "summary": "Retrieve token-budgeted grounded context and structured citations for LLM prompting",
+        "description": "Retrieves relevant curriculum sources, applies greedy token budgeting, and formats a standardized prompt block.",
+        "operationId": "retrieve_grounded_context_api_v1_documents_grounded_context_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetrievalQueryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroundedContextResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -2115,6 +2205,42 @@
         ],
         "title": "ExamTemplateResponse"
       },
+      "GroundedContextResponse": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "formatted_context": {
+            "type": "string",
+            "title": "Formatted Context"
+          },
+          "citations": {
+            "items": {
+              "$ref": "#/components/schemas/RetrievedSourceCitation"
+            },
+            "type": "array",
+            "title": "Citations",
+            "default": []
+          },
+          "total_sources": {
+            "type": "integer",
+            "title": "Total Sources",
+            "default": 0
+          },
+          "estimated_tokens": {
+            "type": "integer",
+            "title": "Estimated Tokens",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "query",
+          "formatted_context"
+        ],
+        "title": "GroundedContextResponse"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -2330,6 +2456,148 @@
         ],
         "title": "LearningState",
         "description": "Formal Student Learning States conforming to PRD §13 & FR-001.\nControls the pedagogical progression lifecycle."
+      },
+      "RetrievalQueryRequest": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query",
+            "description": "The student's question or concept search text"
+          },
+          "exam_template_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Template Id",
+            "description": "Optional exam template scope filter"
+          },
+          "topic_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Id",
+            "description": "Optional curriculum topic scope filter"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "description": "Maximum number of source chunks to retrieve",
+            "default": 5
+          },
+          "score_threshold": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Score Threshold",
+            "description": "Minimum cosine similarity cutoff",
+            "default": 0.6
+          },
+          "max_context_tokens": {
+            "type": "integer",
+            "maximum": 8192.0,
+            "minimum": 128.0,
+            "title": "Max Context Tokens",
+            "description": "Maximum total token budget for context assembly",
+            "default": 2048
+          }
+        },
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "title": "RetrievalQueryRequest"
+      },
+      "RetrievedSourceCitation": {
+        "properties": {
+          "chunk_id": {
+            "type": "string",
+            "title": "Chunk Id"
+          },
+          "document_id": {
+            "type": "string",
+            "title": "Document Id"
+          },
+          "document_title": {
+            "type": "string",
+            "title": "Document Title"
+          },
+          "exam_template_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Id"
+          },
+          "page_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Number",
+            "default": 1
+          },
+          "heading_breadcrumbs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Heading Breadcrumbs",
+            "default": []
+          },
+          "similarity_score": {
+            "type": "number",
+            "title": "Similarity Score"
+          },
+          "snippet": {
+            "type": "string",
+            "title": "Snippet"
+          },
+          "clean_content": {
+            "type": "string",
+            "title": "Clean Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "chunk_id",
+          "document_id",
+          "document_title",
+          "similarity_score",
+          "snippet",
+          "clean_content"
+        ],
+        "title": "RetrievedSourceCitation"
       },
       "SectionImportSchema": {
         "properties": {

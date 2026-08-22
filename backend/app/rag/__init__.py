@@ -14,9 +14,13 @@ from backend.app.rag.schemas import (
     DocumentListResponse,
     DocumentChunkResponse,
     DocumentChunkListResponse,
+    RetrievalQueryRequest,
+    RetrievedSourceCitation,
+    GroundedContextResponse,
 )
 from backend.app.rag.service import DocumentService
 from backend.app.rag.indexer import VectorIndexerService
+from backend.app.rag.retrieval import GroundedRetrievalService
 from backend.app.rag.router import router as documents_router
 
 __all__ = [
@@ -31,8 +35,13 @@ __all__ = [
     "DocumentListResponse",
     "DocumentChunkResponse",
     "DocumentChunkListResponse",
+    "RetrievalQueryRequest",
+    "RetrievedSourceCitation",
+    "GroundedContextResponse",
     "DocumentService",
     "VectorIndexerService",
+    "GroundedRetrievalService",
     "documents_router",
 ]
+
 

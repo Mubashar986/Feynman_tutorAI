@@ -69,3 +69,38 @@ class DocumentDetailResponse(DocumentResponse):
 class DocumentListResponse(BaseModel):
     total: int
     documents: List[DocumentResponse] = []
+
+
+# ==============================================================================
+# 3. Grounded Retrieval & Source Provenance Schemas (Task 3.3)
+# ==============================================================================
+
+class RetrievalQueryRequest(BaseModel):
+    query: str = Field(..., description="The student's question or concept search text")
+    exam_template_id: Optional[str] = Field(None, description="Optional exam template scope filter")
+    topic_id: Optional[str] = Field(None, description="Optional curriculum topic scope filter")
+    limit: int = Field(default=5, ge=1, le=20, description="Maximum number of source chunks to retrieve")
+    score_threshold: float = Field(default=0.60, ge=0.0, le=1.0, description="Minimum cosine similarity cutoff")
+    max_context_tokens: int = Field(default=2048, ge=128, le=8192, description="Maximum total token budget for context assembly")
+
+
+class RetrievedSourceCitation(BaseModel):
+    chunk_id: str
+    document_id: str
+    document_title: str
+    exam_template_id: Optional[str] = None
+    topic_id: Optional[str] = None
+    page_number: Optional[int] = 1
+    heading_breadcrumbs: List[str] = []
+    similarity_score: float
+    snippet: str
+    clean_content: str
+
+
+class GroundedContextResponse(BaseModel):
+    query: str
+    formatted_context: str
+    citations: List[RetrievedSourceCitation] = []
+    total_sources: int = 0
+    estimated_tokens: int = 0
+
