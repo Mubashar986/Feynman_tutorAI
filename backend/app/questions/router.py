@@ -11,12 +11,15 @@ from backend.app.questions.models import (
     ValidationStatus,
 )
 from backend.app.questions.schemas import (
+    GeneratedQuestionBatchResponse,
     QuestionCreate,
     QuestionDetailResponse,
+    QuestionGenerateRequest,
     QuestionListResponse,
     QuestionUpdate,
 )
 from backend.app.questions.service import QuestionBankService
+
 
 router = APIRouter(prefix="/questions", tags=["Question Bank & Item Lab"])
 
@@ -147,3 +150,32 @@ async def delete_question(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Question '{question_id}' not found",
         )
+
+
+# ==============================================================================
+# Dynamic Item Generation Endpoint (Task 4.2)
+# ==============================================================================
+
+@router.post(
+    "/generate",
+    response_model=GeneratedQuestionBatchResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Generate curriculum-grounded questions with distractors using LLM (Instructor/Admin only)",
+)
+async def generate_questions(
+    request: QuestionGenerateRequest,
+    current_user: User = Depends(require_role([UserRole.INSTRUCTOR, UserRole.ADMIN])),
+    session: AsyncSession = Depends(get_db),
+) -> GeneratedQuestionBatchResponse:
+    """
+    Synthesizes curriculum-grounded STEM questions using the LLM Gateway,
+    steered by Bloom's Taxonomy, with diagnostic distractor rationales and KaTeX formatting.
+    All generated items are automatically staged in PENDING_VALIDATION.
+    """
+    from backend.app.questions.generator import QuestionGeneratorService
+    return await QuestionGeneratorService.generate_questions(
+        session=session,
+        request=request,
+        author_id=current_user.id,
+    )
+

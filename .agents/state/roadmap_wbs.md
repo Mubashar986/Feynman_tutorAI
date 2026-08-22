@@ -22,8 +22,8 @@
 * [x] **Task 3.2:** Qdrant Vector Store Adapter & Hybrid Indexer `[COMPLETED]`
 * [x] **Task 3.3:** Grounded Retrieval & Source Provenance Formatter `[COMPLETED]`
 * [x] **Task 4.1:** Question Bank Schema & Multi-Type Data Models `[COMPLETED]`
-* [ ] **Task 4.2:** LLM Question & Distractor Generator with Pydantic Validation `[READY]`
-* [ ] **Task 4.3:** Question Quality, Solvability & Duplication Validator
+* [x] **Task 4.2:** LLM Question & Distractor Generator with Pydantic Validation `[COMPLETED]`
+* [ ] **Task 4.3:** Question Quality, Solvability & Duplication Validator `[READY]`
 * [ ] **Task 5.1:** Mastery Probability & Difficulty Calibration Engine
 * [ ] **Task 5.2:** Error Bank & Misconception Diagnosis Engine
 * [ ] **Task 6.1:** Socratic Tutor Orchestrator with Retrieval Augmentation

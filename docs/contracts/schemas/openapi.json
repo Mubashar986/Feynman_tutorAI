@@ -1777,6 +1777,54 @@
         }
       }
     },
+    "/api/v1/questions/generate": {
+      "post": {
+        "tags": [
+          "Question Bank & Item Lab",
+          "Question Bank & Item Lab"
+        ],
+        "summary": "Generate curriculum-grounded questions with distractors using LLM (Instructor/Admin only)",
+        "description": "Synthesizes curriculum-grounded STEM questions using the LLM Gateway,\nsteered by Bloom's Taxonomy, with diagnostic distractor rationales and KaTeX formatting.\nAll generated items are automatically staged in PENDING_VALIDATION.",
+        "operationId": "generate_questions_api_v1_questions_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionGenerateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneratedQuestionBatchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -2562,6 +2610,32 @@
         ],
         "title": "ExamTemplateResponse"
       },
+      "GeneratedQuestionBatchResponse": {
+        "properties": {
+          "generated_count": {
+            "type": "integer",
+            "title": "Generated Count"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionDetailResponse"
+            },
+            "type": "array",
+            "title": "Questions",
+            "default": []
+          },
+          "grounded_sources_used": {
+            "type": "integer",
+            "title": "Grounded Sources Used",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "generated_count"
+        ],
+        "title": "GeneratedQuestionBatchResponse"
+      },
       "GroundedContextResponse": {
         "properties": {
           "query": {
@@ -3051,6 +3125,67 @@
           "updated_at"
         ],
         "title": "QuestionDetailResponse"
+      },
+      "QuestionGenerateRequest": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "learning_objective_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learning Objective Id"
+          },
+          "question_type": {
+            "$ref": "#/components/schemas/QuestionType",
+            "default": "mcq_single"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/DifficultyLevel",
+            "default": "medium"
+          },
+          "bloom_level": {
+            "$ref": "#/components/schemas/BloomTaxonomy",
+            "default": "apply"
+          },
+          "count": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Count",
+            "description": "Number of questions to synthesize",
+            "default": 1
+          },
+          "custom_prompt_guidance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Prompt Guidance",
+            "description": "Additional custom instructions for generation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id",
+          "topic_id"
+        ],
+        "title": "QuestionGenerateRequest"
       },
       "QuestionListResponse": {
         "properties": {

@@ -42,13 +42,15 @@ class GroundedRetrievalService:
 
         # 3. Search vector store
         vector_store = get_vector_store()
+        effective_threshold = None if score_threshold is not None and score_threshold <= 0.0 else score_threshold
         search_results = await vector_store.search(
             collection_name=CURRICULUM_COLLECTION_NAME,
             query_vector=query_vector,
             limit=limit,
-            score_threshold=score_threshold,
+            score_threshold=effective_threshold,
             filter_conditions=filter_conditions if filter_conditions else None,
         )
+
 
         # 4. Map to structured citations
         citations: List[RetrievedSourceCitation] = []

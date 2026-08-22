@@ -633,6 +633,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/questions/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate curriculum-grounded questions with distractors using LLM (Instructor/Admin only)
+         * @description Synthesizes curriculum-grounded STEM questions using the LLM Gateway,
+         *     steered by Bloom's Taxonomy, with diagnostic distractor rationales and KaTeX formatting.
+         *     All generated items are automatically staged in PENDING_VALIDATION.
+         */
+        post: operations["generate_questions_api_v1_questions_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/": {
         parameters: {
             query?: never;
@@ -1025,6 +1047,21 @@ export interface components {
              */
             updated_at: string;
         };
+        /** GeneratedQuestionBatchResponse */
+        GeneratedQuestionBatchResponse: {
+            /** Generated Count */
+            generated_count: number;
+            /**
+             * Questions
+             * @default []
+             */
+            questions: components["schemas"]["QuestionDetailResponse"][];
+            /**
+             * Grounded Sources Used
+             * @default 0
+             */
+            grounded_sources_used: number;
+        };
         /** GroundedContextResponse */
         GroundedContextResponse: {
             /** Query */
@@ -1272,6 +1309,32 @@ export interface components {
              * @default []
              */
             rubric_items: components["schemas"]["QuestionRubricItemResponse"][];
+        };
+        /** QuestionGenerateRequest */
+        QuestionGenerateRequest: {
+            /** Exam Template Id */
+            exam_template_id: string;
+            /** Topic Id */
+            topic_id: string;
+            /** Learning Objective Id */
+            learning_objective_id?: string | null;
+            /** @default mcq_single */
+            question_type: components["schemas"]["QuestionType"];
+            /** @default medium */
+            difficulty: components["schemas"]["DifficultyLevel"];
+            /** @default apply */
+            bloom_level: components["schemas"]["BloomTaxonomy"];
+            /**
+             * Count
+             * @description Number of questions to synthesize
+             * @default 1
+             */
+            count: number;
+            /**
+             * Custom Prompt Guidance
+             * @description Additional custom instructions for generation
+             */
+            custom_prompt_guidance?: string | null;
         };
         /** QuestionListResponse */
         QuestionListResponse: {
@@ -3045,6 +3108,39 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_questions_api_v1_questions_generate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionGenerateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GeneratedQuestionBatchResponse"];
+                };
             };
             /** @description Validation Error */
             422: {

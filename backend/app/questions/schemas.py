@@ -130,3 +130,53 @@ class QuestionDetailResponse(QuestionResponse):
 class QuestionListResponse(BaseModel):
     total: int
     questions: List[QuestionDetailResponse] = []
+
+
+# ==============================================================================
+# 4. LLM Question Generation Schemas (Task 4.2, PRD FR-004, FR-010)
+# ==============================================================================
+
+class GeneratedOptionSchema(BaseModel):
+    option_key: str = Field(..., description="Letter e.g. A, B, C, D")
+    content: str = Field(..., description="Markdown and KaTeX formatted option text")
+    is_correct: bool = Field(default=False)
+    distractor_rationale: Optional[str] = Field(None, description="Diagnostic pedagogical rationale if incorrect")
+    order: int = Field(default=0)
+
+
+class GeneratedRubricSchema(BaseModel):
+    criterion: str = Field(..., description="Scoring criterion step")
+    points: float = Field(default=1.0, ge=0.25)
+    order: int = Field(default=0)
+
+
+class GeneratedQuestionSchema(BaseModel):
+    prompt: str = Field(..., description="Question prompt with KaTeX math")
+    hint: Optional[str] = Field(None, description="Pedagogical hint")
+    explanation: str = Field(..., description="Step-by-step solution derivation")
+    estimated_time_seconds: int = Field(default=120, ge=10, le=3600)
+    points: float = Field(default=1.0, ge=0.5, le=50.0)
+    options: List[GeneratedOptionSchema] = []
+    rubric_items: List[GeneratedRubricSchema] = []
+
+
+class GeneratedQuestionBatchSchema(BaseModel):
+    questions: List[GeneratedQuestionSchema] = Field(..., min_length=1)
+
+
+class QuestionGenerateRequest(BaseModel):
+    exam_template_id: str
+    topic_id: str
+    learning_objective_id: Optional[str] = None
+    question_type: QuestionType = QuestionType.MCQ_SINGLE
+    difficulty: DifficultyLevel = DifficultyLevel.MEDIUM
+    bloom_level: BloomTaxonomy = BloomTaxonomy.APPLY
+    count: int = Field(default=1, ge=1, le=5, description="Number of questions to synthesize")
+    custom_prompt_guidance: Optional[str] = Field(None, description="Additional custom instructions for generation")
+
+
+class GeneratedQuestionBatchResponse(BaseModel):
+    generated_count: int
+    questions: List[QuestionDetailResponse] = []
+    grounded_sources_used: int = 0
+
