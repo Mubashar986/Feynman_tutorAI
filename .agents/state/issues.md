@@ -119,3 +119,27 @@ Regression Verification: Zero side effects on FastAPI application runtime or hea
 Resolution: Aligned dynamic provider promotion and explicit fallback chain overrides.
 Remaining Risk: None.
 Resolved On: 2026-08-22
+
+## ISSUE-0006 — Windows cp1252 Terminal UnicodeEncodeError on CLI Script Emoji Output
+
+Status: RESOLVED
+Severity: LOW
+Detected: 2026-08-22
+Detected During: Task 0.5 Implementation Verification (py backend/scripts/export_openapi.py)
+Architectural Domain: Cross-Platform CLI Tooling
+Component: `backend/scripts/export_openapi.py`
+Symptom: `UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>`.
+Reproduction: `py backend/scripts/export_openapi.py` on Windows PowerShell with default cp1252 encoding.
+Evidence: Task-296 execution log showing `UnicodeEncodeError` in `cp1252.py`.
+Root Cause: In Windows PowerShell environments without explicit UTF-8 code page active (`chcp 65001`), Python's default console encoding is `cp1252` (Windows-1252), which cannot encode non-Latin Unicode characters like emoji `\u2705`.
+Contributing Factors: Unencoded Unicode emoji placed in console output print statement.
+Affected Scope: `backend/scripts/export_openapi.py` CLI script.
+Regression Risk: LOW
+Related WBS: Task 0.5
+Related Artifacts: `task_0_5_design.md`
+Fix: Replaced Unicode emoji with ASCII-safe status prefix `[SUCCESS]` in `export_openapi.py`.
+Verification: Executed `py backend/scripts/export_openapi.py` and `py -m pytest backend/tests/test_openapi_export.py -v`. Schema exported successfully (3 paths) and test passed 100% with 0 errors.
+Regression Verification: Zero impact on exported JSON file content (JSON dump continues to use UTF-8).
+Resolution: Replaced console emoji with ASCII-safe prefix.
+Remaining Risk: None.
+Resolved On: 2026-08-22

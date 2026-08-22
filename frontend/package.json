@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typegen": "echo \"Task 0.5: openapi-typescript sync will be configured here\""
+    "typegen": "openapi-typescript ../docs/contracts/schemas/openapi.json -o src/api/generated.ts",
+    "codegen:api": "openapi-typescript ../docs/contracts/schemas/openapi.json -o src/api/generated.ts",
+    "verify:contract": "npm run typegen && tsc -b"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.1",
@@ -37,6 +39,7 @@
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
     "jsdom": "^24.1.1",
+    "openapi-typescript": "^7.13.0",
     "postcss": "^8.4.40",
     "tailwindcss": "^3.4.7",
     "typescript": "^5.5.3",
