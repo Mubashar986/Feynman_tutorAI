@@ -23,3 +23,54 @@ Regression Verification: Zero side effects on FastAPI application runtime or dat
 Resolution: Event loop scope aligned globally and per fixture in test configuration.
 Remaining Risk: None.
 Resolved On: 2026-08-21
+
+## ISSUE-0002 — TypeScript Compiler TS2339 Property 'env' does not exist on type 'ImportMeta'
+
+Status: RESOLVED
+Severity: LOW
+Detected: 2026-08-21
+Detected During: Task 0.3 Implementation Verification (npm run build)
+Architectural Domain: Frontend Build & Type System
+Component: `frontend/src/vite-env.d.ts` & `frontend/tsconfig.json`
+Symptom: `src/api/client.ts(6,34): error TS2339: Property 'env' does not exist on type 'ImportMeta'.`
+Reproduction: `npm run build` inside `frontend/`
+Evidence: Terminal exit code 1 on `tsc -b && vite build`.
+Root Cause: In a Vite + TypeScript project, standard ES `ImportMeta` types do not include Vite's ambient `.env` properties unless `vite/client` type definitions are referenced either via `src/vite-env.d.ts` (`/// <reference types="vite/client" />`) or via `"types": ["vite/client"]` in `tsconfig.json`.
+Contributing Factors: `vite-env.d.ts` was not created during initial file scaffolding.
+Affected Scope: `frontend/` TypeScript compilation.
+Regression Risk: LOW
+Related WBS: Task 0.3
+Related Artifacts: `task_0_3_design.md`
+Fix: Created `frontend/src/vite-env.d.ts` with `/// <reference types="vite/client" />`.
+Verification: `npm run build` executed successfully, transforming 1669 modules and generating `dist/` with 0 errors.
+Regression Verification: Zero side effects on runtime components.
+Resolution: Ambient Vite environment types registered.
+Remaining Risk: None.
+Resolved On: 2026-08-21
+
+## ISSUE-0003 — Vitest TestingLibraryElementError in App.test.tsx option button selector
+
+Status: RESOLVED
+Severity: LOW
+Detected: 2026-08-21
+Detected During: Task 0.3 Implementation Verification (npm run test)
+Architectural Domain: Frontend Test Harness & Accessibility
+Component: `frontend/src/App.tsx` & `frontend/src/App.test.tsx`
+Symptom: `TestingLibraryElementError: Unable to find an element with the text: Option A.`
+Reproduction: `npm run test` inside `frontend/`
+Evidence: Vitest runner output on task-102.
+Root Cause: In `App.tsx`, the option buttons rendered `{opt.id}` ("A") inside an inner span without an explicit `aria-label="Option A"`, while `App.test.tsx` searched for text `"Option A"`.
+Contributing Factors: Lack of explicit accessibility `aria-label` attribute on option button elements.
+Affected Scope: `frontend/src/App.tsx` accessibility and `frontend/src/App.test.tsx` testing.
+Regression Risk: LOW
+Related WBS: Task 0.3
+Related Artifacts: `task_0_3_design.md`
+Fix: Added `aria-label={opt.label}` to option buttons in `src/App.tsx` and updated `src/App.test.tsx` to use `screen.getByLabelText("Option A")`.
+Verification: `npm run test` passed 100% across all 6 test cases in 2.25s.
+Regression Verification: Zero regression on button rendering or theme behavior.
+Resolution: Added explicit aria labels and synchronized testing library queries.
+Remaining Risk: None.
+Resolved On: 2026-08-21
+
+
+
