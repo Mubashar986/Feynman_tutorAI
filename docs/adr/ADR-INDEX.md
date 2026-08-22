@@ -25,7 +25,7 @@ Generate each using [ADR-PROMPT-TEMPLATE.md](./ADR-PROMPT-TEMPLATE.md) in this f
 | **ADR-008** | Frontend framework (React 18+ / Vite / TS / Tailwind / Shadcn UI) | §27, §17 | **ACCEPTED** | [ADR-008-frontend-framework-and-ui-stack.md](./ADR-008-frontend-framework-and-ui-stack.md) |
 | ADR-009 | Object storage provider (Local / S3 / MinIO) | §27 | PENDING | To be resolved in Epic 3 |
 | ADR-010 | Deployment platform | §27 | PENDING | To be resolved in Epic 0.2 |
-| ADR-011 | Authentication provider (FastAPI JWT Bearer + Argon2) | §27, FR-021 | PENDING | To be resolved in Epic 1 |
+| **ADR-011** | Authentication provider (FastAPI OAuth2 Bearer + PyJWT + bcrypt) | §27, FR-021 | **ACCEPTED** | [ADR-011-auth-and-rbac.md](./ADR-011-auth-and-rbac.md) |
 | ADR-012 | IRT / adaptive-testing implementation | §27 | PENDING | To be resolved in Epic 5 |
 | ADR-013 | Readiness-calibration methodology | §27, FR-020 | PENDING | To be resolved in Epic 8 |
 | ADR-014 | Multimodal generation provider(s) | §27, FR-016 | PENDING | To be resolved in Epic 8 |

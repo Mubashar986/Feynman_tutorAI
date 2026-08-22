@@ -4,9 +4,9 @@
 **Task Name:** Server-Side RBAC, User Models & JWT Auth Service
 **Epic:** Epic 1 — Authentication, Multi-Tenant Isolation & Learning State
 **Track:** Backend Track (Backend Lead)
-**Status:** READY_TO_START
-**Current Stage:** Stage 0 (Roadmap & WBS Planner - READY)
+**Status:** COMPLETED
+**Current Stage:** Stage 4 (Testing & Verification - COMPLETED)
 **Dependencies:** Task 0.2 (COMPLETED), Task 0.5 (COMPLETED)
 **Blockers:** none
 
-Next action: Begin Stage 1 (Conceptual Understanding) for Task 1.1.
+Next action: Merge Task 1.1 into main, then proceed to Task 1.2 (Student Learning State Machine & Auditable Event Log).
