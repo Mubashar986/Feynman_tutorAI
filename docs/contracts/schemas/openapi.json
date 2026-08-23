@@ -2897,6 +2897,237 @@
         ]
       }
     },
+    "/api/v1/teach-back/evaluate": {
+      "post": {
+        "tags": [
+          "Teach-Back Mode & Rubric Evaluator",
+          "Teach-Back Mode & Rubric Evaluator"
+        ],
+        "summary": "Evaluate student concept explanation using Feynman rubric (PRD FR-017, Cap 17)",
+        "description": "Evaluates a student explanation against multi-criterion rubrics:\nAccuracy (30%), Completeness (25%), Intuition (20%), KaTeX Rigor (15%), Prereqs (10%).\nReturns scores, identified misconceptions, and missing prerequisite gaps.",
+        "operationId": "evaluate_teach_back_api_v1_teach_back_evaluate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeachBackEvaluateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeachBackEvaluationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/teach-back/rubric/{topic_id}": {
+      "get": {
+        "tags": [
+          "Teach-Back Mode & Rubric Evaluator",
+          "Teach-Back Mode & Rubric Evaluator"
+        ],
+        "summary": "Get grounded rubric expectations and objectives for a topic",
+        "description": "Returns the syllabus learning objectives, prerequisites, and rubric criteria for a topic.",
+        "operationId": "get_topic_rubric_api_v1_teach_back_rubric__topic_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "topic_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Topic Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicRubricResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teach-back/sessions": {
+      "get": {
+        "tags": [
+          "Teach-Back Mode & Rubric Evaluator",
+          "Teach-Back Mode & Rubric Evaluator"
+        ],
+        "summary": "List past Teach-Back sessions and scores for the current student",
+        "description": "Lists historical Teach-Back explanation attempts and scores for the authenticated student.",
+        "operationId": "list_teach_back_sessions_api_v1_teach_back_sessions_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "exam_template_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional exam filter",
+              "title": "Exam Template Id"
+            },
+            "description": "Optional exam filter"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Max sessions to retrieve",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Max sessions to retrieve"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Offset for pagination",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Offset for pagination"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeachBackSessionListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teach-back/sessions/{session_id}": {
+      "get": {
+        "tags": [
+          "Teach-Back Mode & Rubric Evaluator",
+          "Teach-Back Mode & Rubric Evaluator"
+        ],
+        "summary": "Get full evaluation report for a specific Teach-Back session",
+        "description": "Retrieves full evaluation report including rubric criteria scores, strengths, and misconceptions.\nEnforces student isolation (PRD Constraint #2).",
+        "operationId": "get_session_evaluation_api_v1_teach_back_sessions__session_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeachBackEvaluationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -4167,6 +4398,17 @@
         "title": "LearningState",
         "description": "Formal Student Learning States conforming to PRD §13 & FR-001.\nControls the pedagogical progression lifecycle."
       },
+      "MasteryAssessmentLevel": {
+        "type": "string",
+        "enum": [
+          "mastered",
+          "competent",
+          "developing",
+          "needs_review"
+        ],
+        "title": "MasteryAssessmentLevel",
+        "description": "Holistic mastery tier based on multi-criterion rubric score."
+      },
       "MasteryStatus": {
         "type": "string",
         "enum": [
@@ -4304,6 +4546,44 @@
           "created_at"
         ],
         "title": "MisconceptionResponse"
+      },
+      "PrerequisiteGap": {
+        "properties": {
+          "prerequisite_topic_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prerequisite Topic Id",
+            "description": "ID of missing syllabus topic if identified"
+          },
+          "prerequisite_title": {
+            "type": "string",
+            "title": "Prerequisite Title",
+            "description": "Name of the prerequisite concept or law missing"
+          },
+          "gap_description": {
+            "type": "string",
+            "title": "Gap Description",
+            "description": "Why missing this prerequisite impacted the explanation"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity",
+            "description": "Severity level: low, medium, high",
+            "default": "medium"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prerequisite_title",
+          "gap_description"
+        ],
+        "title": "PrerequisiteGap"
       },
       "QualityScoreBreakdown": {
         "properties": {
@@ -5491,6 +5771,70 @@
         ],
         "title": "RevisionMetricsResponse"
       },
+      "RubricCriterionScore": {
+        "properties": {
+          "criterion_name": {
+            "type": "string",
+            "title": "Criterion Name",
+            "description": "Name of the rubric dimension evaluated"
+          },
+          "score": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Score",
+            "description": "Score on 1-5 integer scale"
+          },
+          "weight": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Weight",
+            "description": "Normalized weight for this criterion (e.g. 0.30)"
+          },
+          "feedback": {
+            "type": "string",
+            "title": "Feedback",
+            "description": "Specific feedback on this criterion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "criterion_name",
+          "score",
+          "weight",
+          "feedback"
+        ],
+        "title": "RubricCriterionScore"
+      },
+      "RubricDimensionDetail": {
+        "properties": {
+          "criterion_name": {
+            "type": "string",
+            "title": "Criterion Name"
+          },
+          "weight": {
+            "type": "number",
+            "title": "Weight"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "max_score": {
+            "type": "integer",
+            "title": "Max Score",
+            "default": 5
+          }
+        },
+        "type": "object",
+        "required": [
+          "criterion_name",
+          "weight",
+          "description"
+        ],
+        "title": "RubricDimensionDetail"
+      },
       "SectionImportSchema": {
         "properties": {
           "title": {
@@ -6266,6 +6610,257 @@
         ],
         "title": "SubtopicResponse"
       },
+      "TeachBackAudienceLevel": {
+        "type": "string",
+        "enum": [
+          "child_10yo",
+          "high_school_peer",
+          "undergrad_examiner"
+        ],
+        "title": "TeachBackAudienceLevel",
+        "description": "Target audience scaffolding level for the Feynman Technique."
+      },
+      "TeachBackEvaluateRequest": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id",
+            "description": "Target exam curriculum ID"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id",
+            "description": "Target topic being explained"
+          },
+          "concept_title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Concept Title",
+            "description": "Optional custom concept title"
+          },
+          "explanation": {
+            "type": "string",
+            "maxLength": 10000,
+            "minLength": 15,
+            "title": "Explanation",
+            "description": "Student explanation text or voice transcript (Feynman technique)"
+          },
+          "audience_level": {
+            "$ref": "#/components/schemas/TeachBackAudienceLevel",
+            "description": "Target audience complexity level",
+            "default": "high_school_peer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id",
+          "topic_id",
+          "explanation"
+        ],
+        "title": "TeachBackEvaluateRequest"
+      },
+      "TeachBackEvaluationResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "concept_title": {
+            "type": "string",
+            "title": "Concept Title"
+          },
+          "audience_level": {
+            "$ref": "#/components/schemas/TeachBackAudienceLevel"
+          },
+          "overall_score": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Overall Score",
+            "description": "Composite weighted score 0-100"
+          },
+          "assessment_level": {
+            "$ref": "#/components/schemas/MasteryAssessmentLevel"
+          },
+          "criteria_scores": {
+            "items": {
+              "$ref": "#/components/schemas/RubricCriterionScore"
+            },
+            "type": "array",
+            "title": "Criteria Scores",
+            "default": []
+          },
+          "strengths": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Strengths",
+            "default": []
+          },
+          "misconceptions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Misconceptions",
+            "default": []
+          },
+          "missing_elements": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing Elements",
+            "default": []
+          },
+          "prerequisite_gaps": {
+            "items": {
+              "$ref": "#/components/schemas/PrerequisiteGap"
+            },
+            "type": "array",
+            "title": "Prerequisite Gaps",
+            "default": []
+          },
+          "pedagogical_feedback": {
+            "type": "string",
+            "title": "Pedagogical Feedback"
+          },
+          "model_correction_latex": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Correction Latex"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "session_id",
+          "topic_id",
+          "concept_title",
+          "audience_level",
+          "overall_score",
+          "assessment_level",
+          "pedagogical_feedback",
+          "created_at"
+        ],
+        "title": "TeachBackEvaluationResponse"
+      },
+      "TeachBackSessionListResponse": {
+        "properties": {
+          "sessions": {
+            "items": {
+              "$ref": "#/components/schemas/TeachBackSessionResponse"
+            },
+            "type": "array",
+            "title": "Sessions",
+            "default": []
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "TeachBackSessionListResponse"
+      },
+      "TeachBackSessionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "concept_title": {
+            "type": "string",
+            "title": "Concept Title"
+          },
+          "audience_level": {
+            "$ref": "#/components/schemas/TeachBackAudienceLevel"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "latest_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Score"
+          },
+          "latest_assessment_level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MasteryAssessmentLevel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "student_id",
+          "exam_template_id",
+          "topic_id",
+          "concept_title",
+          "audience_level",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "TeachBackSessionResponse"
+      },
       "TokenResponse": {
         "properties": {
           "access_token": {
@@ -6587,6 +7182,55 @@
           "prerequisite_topic_id"
         ],
         "title": "TopicPrerequisiteResponse"
+      },
+      "TopicRubricResponse": {
+        "properties": {
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "topic_title": {
+            "type": "string",
+            "title": "Topic Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "learning_objectives": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Learning Objectives",
+            "default": []
+          },
+          "prerequisites": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Prerequisites",
+            "default": []
+          },
+          "rubric_dimensions": {
+            "items": {
+              "$ref": "#/components/schemas/RubricDimensionDetail"
+            },
+            "type": "array",
+            "title": "Rubric Dimensions",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "topic_id",
+          "topic_title",
+          "description"
+        ],
+        "title": "TopicRubricResponse"
       },
       "TopicUnlockStatusResponse": {
         "properties": {

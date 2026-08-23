@@ -60,8 +60,15 @@ async def init_db() -> None:
     import backend.app.learning_state.models  # noqa: F401
     import backend.app.curriculum.models  # noqa: F401
     import backend.app.rag.models  # noqa: F401
+    import backend.app.questions.models  # noqa: F401
+    import backend.app.mastery.models  # noqa: F401
+    import backend.app.errors.models  # noqa: F401
+    import backend.app.tutor.models  # noqa: F401
+    import backend.app.revision.models  # noqa: F401
+    import backend.app.teach_back.models  # noqa: F401
 
     async with async_engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
+
 
 

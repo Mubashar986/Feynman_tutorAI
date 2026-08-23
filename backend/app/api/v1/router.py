@@ -9,6 +9,7 @@ from backend.app.mastery import mastery_router
 from backend.app.errors import errors_router
 from backend.app.tutor import tutor_router
 from backend.app.revision import revision_router
+from backend.app.teach_back import teach_back_router
 
 api_router = APIRouter()
 
@@ -41,3 +42,6 @@ api_router.include_router(tutor_router, prefix="", tags=["Socratic AI Tutor Engi
 
 # Spaced Repetition & Revision routes
 api_router.include_router(revision_router, prefix="", tags=["Spaced Repetition & Revision"])
+
+# Teach-Back Mode & Rubric Evaluator routes
+api_router.include_router(teach_back_router, prefix="", tags=["Teach-Back Mode & Rubric Evaluator"])
