@@ -1,5 +1,6 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import StreamingResponse
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from backend.app.auth.dependencies import get_current_user
@@ -118,3 +119,35 @@ async def send_socratic_message(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e),
         )
+
+
+@router.post(
+    "/sessions/{session_id}/stream",
+    status_code=status.HTTP_200_OK,
+    summary="Stream Socratic response token-by-token via Server-Sent Events (SSE)",
+)
+async def stream_socratic_message(
+    session_id: str,
+    message_in: SocraticPromptRequest,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> StreamingResponse:
+    """
+    Streams low-latency token deltas and citation metadata via SSE (media_type='text/event-stream').
+    Anti-buffering headers ensure immediate packet delivery.
+    """
+    stream_gen = SocraticTutorService.stream_socratic_message(
+        session=session,
+        student_id=current_user.id,
+        session_id=session_id,
+        message_in=message_in,
+    )
+    return StreamingResponse(
+        stream_gen,
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )

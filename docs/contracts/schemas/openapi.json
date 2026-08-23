@@ -2594,6 +2594,63 @@
         }
       }
     },
+    "/api/v1/tutor/sessions/{session_id}/stream": {
+      "post": {
+        "tags": [
+          "Socratic AI Tutor Engine",
+          "Socratic AI Tutor Engine"
+        ],
+        "summary": "Stream Socratic response token-by-token via Server-Sent Events (SSE)",
+        "description": "Streams low-latency token deltas and citation metadata via SSE (media_type='text/event-stream').\nAnti-buffering headers ensure immediate packet delivery.",
+        "operationId": "stream_socratic_message_api_v1_tutor_sessions__session_id__stream_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocraticPromptRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [

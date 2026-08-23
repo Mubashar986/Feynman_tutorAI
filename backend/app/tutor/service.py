@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, AsyncIterator, Dict, List, Optional
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -326,3 +326,159 @@ class SocraticTutorService:
             message=msg_response,
             citations=citations_data,
         )
+
+    @classmethod
+    async def stream_socratic_message(
+        cls,
+        session: AsyncSession,
+        student_id: str,
+        session_id: str,
+        message_in: SocraticPromptRequest,
+        mock_chunks: Optional[List[str]] = None,
+    ) -> AsyncIterator[str]:
+        """
+        Streams a Socratic response token-by-token using Server-Sent Events (SSE) (PRD §14, §17, FR-008).
+        Emits:
+          1. event: citations -> source references
+          2. event: delta -> token chunks
+          3. event: done -> message metadata & session status
+          4. event: error -> on exception
+        Automatically buffers tokens and persists the dialogue turn into the database.
+        """
+        try:
+            # 1. Validate Session
+            stmt = select(TutorSession).where(
+                TutorSession.id == session_id,
+                TutorSession.student_id == student_id,
+            )
+            res = await session.exec(stmt)
+            tutor_sess = res.first()
+            if not tutor_sess:
+                yield f"event: error\ndata: {json.dumps({'error': f'Tutor session {session_id} not found'})}\n\n"
+                return
+
+            # 2. Retrieve Grounded Context
+            rag_query = f"{message_in.message}"
+            rag_result = await GroundedRetrievalService.retrieve_grounded_context(
+                query=rag_query,
+                exam_template_id=tutor_sess.exam_template_id,
+                topic_id=tutor_sess.topic_id,
+                limit=3,
+            )
+            grounded_sources = rag_result.formatted_context if rag_result.formatted_context else "No specific textbook chunk retrieved."
+            citations_data = [c.model_dump() for c in rag_result.citations]
+
+            # 3. Emit Citations Event First
+            yield f"event: citations\ndata: {json.dumps(citations_data)}\n\n"
+
+            # 4. Retrieve Student Mastery State
+            mastery = await MasteryEngineService.get_topic_mastery(
+                session=session,
+                student_id=student_id,
+                topic_id=tutor_sess.topic_id,
+            )
+            mastery_prob = mastery.mastery_probability if mastery else 0.10
+            mastery_status = mastery.status.value if mastery else "novice"
+
+            # 5. Retrieve Active Misconceptions
+            errors_resp = await ErrorBankService.list_student_errors(
+                session=session,
+                student_id=student_id,
+                topic_id=tutor_sess.topic_id,
+                repair_status=RepairStatus.ACTIVE,
+                limit=2,
+            )
+            misconception_guidance = "No active misconceptions recorded for this topic."
+            if errors_resp.errors:
+                misc_items = [f"- {e.distractor_rationale or e.error_category.value}" for e in errors_resp.errors]
+                misconception_guidance = "ACTIVE MISCONCEPTIONS TO ADDRESS SOCRATICALLY:\n" + "\n".join(misc_items)
+
+            # 6. Question Context
+            question_context = ""
+            if tutor_sess.question_id:
+                question = await QuestionBankService.get_question(session, tutor_sess.question_id)
+                if question:
+                    question_context = f"\n--- CURRENT QUESTION CONTEXT ---\nPrompt: {question.prompt}\nExplanation: {question.explanation}\n"
+
+            # 7. Build Multi-Turn History
+            history_stmt = (
+                select(TutorMessage)
+                .where(TutorMessage.session_id == session_id)
+                .order_by(TutorMessage.created_at.desc())
+                .limit(6)
+            )
+            history_res = await session.exec(history_stmt)
+            recent_messages = list(reversed(list(history_res.all())))
+
+            llm_messages: List[LLMMessage] = []
+            hint_name, hint_tier, hint_inst = cls._format_hint_instructions(message_in.hint_level)
+
+            system_prompt = cls.SYSTEM_PROMPT_TEMPLATE.format(
+                hint_level_name=hint_name,
+                hint_tier=hint_tier,
+                hint_level_instruction=hint_inst,
+                mastery_probability=mastery_prob,
+                mastery_status=mastery_status,
+                misconception_guidance=misconception_guidance,
+                grounded_sources=grounded_sources,
+                question_context=question_context,
+            )
+            llm_messages.append(LLMMessage(role="system", content=system_prompt))
+
+            for m in recent_messages:
+                role_str = "user" if m.role == TutorRole.USER else "assistant"
+                llm_messages.append(LLMMessage(role=role_str, content=m.content))
+
+            llm_messages.append(LLMMessage(role="user", content=message_in.message))
+
+            accumulated_tokens: List[str] = []
+
+            # 8. Stream Token Generator
+            if mock_chunks is not None:
+                for chunk_text in mock_chunks:
+                    accumulated_tokens.append(chunk_text)
+                    yield f"event: delta\ndata: {json.dumps({'text': chunk_text})}\n\n"
+            else:
+                gateway = LLMGateway()
+                token_stream = gateway.stream_text(
+                    messages=llm_messages,
+                    temperature=0.3,
+                    max_tokens=600,
+                )
+                async for chunk in token_stream:
+                    if chunk.text:
+                        accumulated_tokens.append(chunk.text)
+                        yield f"event: delta\ndata: {json.dumps({'text': chunk.text})}\n\n"
+
+            # 9. Persistence & Done Event
+            full_content = "".join(accumulated_tokens).strip()
+            if not full_content:
+                full_content = "What fundamental physics law do you think applies here?"
+
+            user_msg = TutorMessage(
+                session_id=session_id,
+                role=TutorRole.USER,
+                content=message_in.message,
+                hint_level=message_in.hint_level,
+            )
+            session.add(user_msg)
+
+            assistant_msg = TutorMessage(
+                session_id=session_id,
+                role=TutorRole.ASSISTANT,
+                content=full_content,
+                hint_level=message_in.hint_level,
+                citations_json=json.dumps(citations_data),
+            )
+            session.add(assistant_msg)
+
+            tutor_sess.updated_at = datetime.now(timezone.utc)
+            session.add(tutor_sess)
+            await session.flush()
+            await session.refresh(assistant_msg)
+
+            yield f"event: done\ndata: {json.dumps({'message_id': assistant_msg.id, 'session_id': session_id, 'topic_id': tutor_sess.topic_id})}\n\n"
+
+        except Exception as e:
+            logger.error(f"Error during Socratic SSE streaming: {e}", exc_info=True)
+            yield f"event: error\ndata: {json.dumps({'error': str(e)})}\n\n"
