@@ -1825,6 +1825,103 @@
         ]
       }
     },
+    "/api/v1/questions/batch-validate": {
+      "post": {
+        "tags": [
+          "Question Bank & Item Lab",
+          "Question Bank & Item Lab"
+        ],
+        "summary": "Batch validate pending questions with blind solving, deduplication, and quality audit (Instructor/Admin only)",
+        "description": "Executes the multi-gate validation pipeline on questions staged in PENDING_VALIDATION.",
+        "operationId": "batch_validate_questions_api_v1_questions_batch_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchValidationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchValidationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/questions/{question_id}/validate": {
+      "post": {
+        "tags": [
+          "Question Bank & Item Lab",
+          "Question Bank & Item Lab"
+        ],
+        "summary": "Validate a question item for solvability, duplicates, and quality (Instructor/Admin only)",
+        "description": "Executes the 3-Gate Validation Pipeline on a single Question item:\n1. Blind Solver Gate (solvability + agreement).\n2. Vector Deduplication Gate (cosine similarity < 0.90).\n3. Pedagogical Quality Audit (KaTeX, clarity, distractors, derivation).\nPromotes question to VALIDATED, FLAGGED, or REJECTED.",
+        "operationId": "validate_single_question_api_v1_questions__question_id__validate_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Question Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionValidationReportResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -1847,6 +1944,78 @@
   },
   "components": {
     "schemas": {
+      "BatchValidationRequest": {
+        "properties": {
+          "topic_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Id"
+          },
+          "exam_template_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Template Id"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "description": "Max questions to validate in batch",
+            "default": 20
+          }
+        },
+        "type": "object",
+        "title": "BatchValidationRequest"
+      },
+      "BatchValidationResponse": {
+        "properties": {
+          "total_processed": {
+            "type": "integer",
+            "title": "Total Processed"
+          },
+          "validated_count": {
+            "type": "integer",
+            "title": "Validated Count"
+          },
+          "rejected_count": {
+            "type": "integer",
+            "title": "Rejected Count"
+          },
+          "flagged_count": {
+            "type": "integer",
+            "title": "Flagged Count"
+          },
+          "reports": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionValidationReportResponse"
+            },
+            "type": "array",
+            "title": "Reports",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_processed",
+          "validated_count",
+          "rejected_count",
+          "flagged_count"
+        ],
+        "title": "BatchValidationResponse"
+      },
       "BlockerNodeResponse": {
         "properties": {
           "topic_id": {
@@ -2418,6 +2587,29 @@
         ],
         "title": "DocumentType"
       },
+      "DuplicateMatchInfo": {
+        "properties": {
+          "matched_question_id": {
+            "type": "string",
+            "title": "Matched Question Id"
+          },
+          "similarity_score": {
+            "type": "number",
+            "title": "Similarity Score"
+          },
+          "matched_prompt_snippet": {
+            "type": "string",
+            "title": "Matched Prompt Snippet"
+          }
+        },
+        "type": "object",
+        "required": [
+          "matched_question_id",
+          "similarity_score",
+          "matched_prompt_snippet"
+        ],
+        "title": "DuplicateMatchInfo"
+      },
       "ExamBoard": {
         "type": "string",
         "enum": [
@@ -2887,6 +3079,49 @@
         ],
         "title": "LearningState",
         "description": "Formal Student Learning States conforming to PRD §13 & FR-001.\nControls the pedagogical progression lifecycle."
+      },
+      "QualityScoreBreakdown": {
+        "properties": {
+          "katex_score": {
+            "type": "integer",
+            "maximum": 25.0,
+            "minimum": 0.0,
+            "title": "Katex Score"
+          },
+          "clarity_score": {
+            "type": "integer",
+            "maximum": 25.0,
+            "minimum": 0.0,
+            "title": "Clarity Score"
+          },
+          "distractor_score": {
+            "type": "integer",
+            "maximum": 25.0,
+            "minimum": 0.0,
+            "title": "Distractor Score"
+          },
+          "derivation_score": {
+            "type": "integer",
+            "maximum": 25.0,
+            "minimum": 0.0,
+            "title": "Derivation Score"
+          },
+          "total_score": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Total Score"
+          }
+        },
+        "type": "object",
+        "required": [
+          "katex_score",
+          "clarity_score",
+          "distractor_score",
+          "derivation_score",
+          "total_score"
+        ],
+        "title": "QualityScoreBreakdown"
       },
       "QuestionCreate": {
         "properties": {
@@ -3508,6 +3743,91 @@
         },
         "type": "object",
         "title": "QuestionUpdate"
+      },
+      "QuestionValidationReportResponse": {
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "validation_status": {
+            "$ref": "#/components/schemas/ValidationStatus"
+          },
+          "is_solvable": {
+            "type": "boolean",
+            "title": "Is Solvable"
+          },
+          "solver_agrees": {
+            "type": "boolean",
+            "title": "Solver Agrees"
+          },
+          "solver_derived_answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Solver Derived Answer"
+          },
+          "solver_critique": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Solver Critique"
+          },
+          "max_similarity_score": {
+            "type": "number",
+            "title": "Max Similarity Score",
+            "default": 0.0
+          },
+          "duplicate_matches": {
+            "items": {
+              "$ref": "#/components/schemas/DuplicateMatchInfo"
+            },
+            "type": "array",
+            "title": "Duplicate Matches",
+            "default": []
+          },
+          "quality_scores": {
+            "$ref": "#/components/schemas/QualityScoreBreakdown"
+          },
+          "critique": {
+            "type": "string",
+            "title": "Critique"
+          },
+          "suggested_improvements": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Suggested Improvements",
+            "default": []
+          },
+          "validated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Validated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question_id",
+          "validation_status",
+          "is_solvable",
+          "solver_agrees",
+          "quality_scores",
+          "critique",
+          "validated_at"
+        ],
+        "title": "QuestionValidationReportResponse"
       },
       "RetrievalQueryRequest": {
         "properties": {

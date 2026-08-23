@@ -23,9 +23,17 @@ from backend.app.questions.schemas import (
     QuestionRubricItemCreate,
     QuestionRubricItemResponse,
     QuestionUpdate,
+    BlindSolveSchema,
+    QualityAuditSchema,
+    QualityScoreBreakdown,
+    DuplicateMatchInfo,
+    QuestionValidationReportResponse,
+    BatchValidationRequest,
+    BatchValidationResponse,
 )
 from backend.app.questions.service import QuestionBankService
 from backend.app.questions.generator import QuestionGeneratorService
+from backend.app.questions.validator import QuestionValidationService
 from backend.app.questions.router import router as questions_router
 
 __all__ = [
@@ -51,8 +59,16 @@ __all__ = [
     "GeneratedQuestionBatchSchema",
     "QuestionGenerateRequest",
     "GeneratedQuestionBatchResponse",
+    "BlindSolveSchema",
+    "QualityAuditSchema",
+    "QualityScoreBreakdown",
+    "DuplicateMatchInfo",
+    "QuestionValidationReportResponse",
+    "BatchValidationRequest",
+    "BatchValidationResponse",
     "QuestionBankService",
     "QuestionGeneratorService",
+    "QuestionValidationService",
     "questions_router",
 ]
 

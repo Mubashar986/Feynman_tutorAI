@@ -11,12 +11,15 @@ from backend.app.questions.models import (
     ValidationStatus,
 )
 from backend.app.questions.schemas import (
+    BatchValidationRequest,
+    BatchValidationResponse,
     GeneratedQuestionBatchResponse,
     QuestionCreate,
     QuestionDetailResponse,
     QuestionGenerateRequest,
     QuestionListResponse,
     QuestionUpdate,
+    QuestionValidationReportResponse,
 )
 from backend.app.questions.service import QuestionBankService
 
@@ -178,4 +181,62 @@ async def generate_questions(
         request=request,
         author_id=current_user.id,
     )
+
+
+# ==============================================================================
+# Question Quality, Solvability & Duplication Validation Endpoints (Task 4.3)
+# ==============================================================================
+
+@router.post(
+    "/batch-validate",
+    response_model=BatchValidationResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Batch validate pending questions with blind solving, deduplication, and quality audit (Instructor/Admin only)",
+    dependencies=[Depends(require_role([UserRole.INSTRUCTOR, UserRole.ADMIN]))],
+)
+async def batch_validate_questions(
+    request: BatchValidationRequest,
+    session: AsyncSession = Depends(get_db),
+) -> BatchValidationResponse:
+    """
+    Executes the multi-gate validation pipeline on questions staged in PENDING_VALIDATION.
+    """
+    from backend.app.questions.validator import QuestionValidationService
+    return await QuestionValidationService.batch_validate(
+        session=session,
+        topic_id=request.topic_id,
+        exam_template_id=request.exam_template_id,
+        limit=request.limit,
+    )
+
+
+@router.post(
+    "/{question_id}/validate",
+    response_model=QuestionValidationReportResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Validate a question item for solvability, duplicates, and quality (Instructor/Admin only)",
+    dependencies=[Depends(require_role([UserRole.INSTRUCTOR, UserRole.ADMIN]))],
+)
+async def validate_single_question(
+    question_id: str,
+    session: AsyncSession = Depends(get_db),
+) -> QuestionValidationReportResponse:
+    """
+    Executes the 3-Gate Validation Pipeline on a single Question item:
+    1. Blind Solver Gate (solvability + agreement).
+    2. Vector Deduplication Gate (cosine similarity < 0.90).
+    3. Pedagogical Quality Audit (KaTeX, clarity, distractors, derivation).
+    Promotes question to VALIDATED, FLAGGED, or REJECTED.
+    """
+    from backend.app.questions.validator import QuestionValidationService
+    try:
+        return await QuestionValidationService.validate_question(
+            session=session,
+            question_id=question_id,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        )
 

@@ -180,3 +180,68 @@ class GeneratedQuestionBatchResponse(BaseModel):
     questions: List[QuestionDetailResponse] = []
     grounded_sources_used: int = 0
 
+
+# ==============================================================================
+# 5. Question Quality, Solvability & Duplication Validation Schemas (Task 4.3)
+# ==============================================================================
+
+class BlindSolveSchema(BaseModel):
+    is_solvable: bool = Field(..., description="Whether the question is mathematically and logically solvable")
+    derived_solution: str = Field(..., description="Step-by-step mathematical or reasoning derivation")
+    derived_answer: str = Field(..., description="Final computed answer text or value")
+    matched_option_key: Optional[str] = Field(None, description="The option letter (e.g. A, B, C, D) corresponding to the derived answer, if MCQ")
+    confidence_score: float = Field(default=1.0, ge=0.0, le=1.0, description="Solver's confidence in its derived answer")
+    critique: Optional[str] = Field(None, description="Critique of any ambiguity or missing information in the prompt")
+
+
+class QualityAuditSchema(BaseModel):
+    katex_score: int = Field(..., ge=0, le=25, description="Score for LaTeX/KaTeX equation formatting and delimiter integrity (0-25)")
+    clarity_score: int = Field(..., ge=0, le=25, description="Score for pedagogical clarity, precision, and Bloom alignment (0-25)")
+    distractor_score: int = Field(..., ge=0, le=25, description="Score for distractor plausibility and diagnostic misconception rationales (0-25)")
+    derivation_score: int = Field(..., ge=0, le=25, description="Score for thoroughness and accuracy of step-by-step solution derivation (0-25)")
+    overall_critique: str = Field(..., description="Analytical review feedback and pedagogical strengths/weaknesses")
+    suggested_improvements: List[str] = Field(default_factory=list, description="Specific revision suggestions if any")
+
+
+class QualityScoreBreakdown(BaseModel):
+    katex_score: int = Field(..., ge=0, le=25)
+    clarity_score: int = Field(..., ge=0, le=25)
+    distractor_score: int = Field(..., ge=0, le=25)
+    derivation_score: int = Field(..., ge=0, le=25)
+    total_score: int = Field(..., ge=0, le=100)
+
+
+class DuplicateMatchInfo(BaseModel):
+    matched_question_id: str
+    similarity_score: float
+    matched_prompt_snippet: str
+
+
+class QuestionValidationReportResponse(BaseModel):
+    question_id: str
+    validation_status: ValidationStatus
+    is_solvable: bool
+    solver_agrees: bool
+    solver_derived_answer: Optional[str] = None
+    solver_critique: Optional[str] = None
+    max_similarity_score: float = 0.0
+    duplicate_matches: List[DuplicateMatchInfo] = []
+    quality_scores: QualityScoreBreakdown
+    critique: str
+    suggested_improvements: List[str] = []
+    validated_at: datetime
+
+
+class BatchValidationRequest(BaseModel):
+    topic_id: Optional[str] = None
+    exam_template_id: Optional[str] = None
+    limit: int = Field(default=20, ge=1, le=100, description="Max questions to validate in batch")
+
+
+class BatchValidationResponse(BaseModel):
+    total_processed: int
+    validated_count: int
+    rejected_count: int
+    flagged_count: int
+    reports: List[QuestionValidationReportResponse] = []
+
