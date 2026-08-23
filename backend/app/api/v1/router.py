@@ -5,6 +5,7 @@ from backend.app.learning_state import learning_state_router
 from backend.app.curriculum import curriculum_router
 from backend.app.rag import documents_router
 from backend.app.questions import questions_router
+from backend.app.mastery import mastery_router
 
 api_router = APIRouter()
 
@@ -25,6 +26,9 @@ api_router.include_router(documents_router, prefix="", tags=["Vector RAG & Resou
 
 # Question Bank & Item Lab routes
 api_router.include_router(questions_router, prefix="", tags=["Question Bank & Item Lab"])
+
+# Student Mastery & Difficulty Calibration routes
+api_router.include_router(mastery_router, prefix="", tags=["Student Mastery & Difficulty Calibration"])
 
 
 

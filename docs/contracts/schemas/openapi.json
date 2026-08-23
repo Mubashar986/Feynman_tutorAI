@@ -1922,6 +1922,152 @@
         }
       }
     },
+    "/api/v1/mastery/record-attempt": {
+      "post": {
+        "tags": [
+          "Student Mastery & Difficulty Calibration",
+          "Student Mastery & Difficulty Calibration"
+        ],
+        "summary": "Record question attempt and update topic mastery via Bayesian Knowledge Tracing",
+        "description": "Submits a student's answer to a question, executes the BKT probabilistic update,\nadapts the next item difficulty, and records telemetry.",
+        "operationId": "record_question_attempt_api_v1_mastery_record_attempt_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordAttemptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MasteryUpdateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/mastery/topics/{topic_id}": {
+      "get": {
+        "tags": [
+          "Student Mastery & Difficulty Calibration",
+          "Student Mastery & Difficulty Calibration"
+        ],
+        "summary": "Get student mastery profile for a specific topic",
+        "description": "Retrieves the authenticated student's mastery probability, status tier, and streak on a topic.",
+        "operationId": "get_topic_mastery_api_v1_mastery_topics__topic_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "topic_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Topic Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentTopicMasteryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mastery/exams/{exam_template_id}": {
+      "get": {
+        "tags": [
+          "Student Mastery & Difficulty Calibration",
+          "Student Mastery & Difficulty Calibration"
+        ],
+        "summary": "List all topic masteries for the current student in an exam syllabus",
+        "description": "Returns an overview of all topic masteries across an entire exam curriculum.",
+        "operationId": "list_exam_topic_masteries_api_v1_mastery_exams__exam_template_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "exam_template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Exam Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicMasteryListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -3080,6 +3226,94 @@
         "title": "LearningState",
         "description": "Formal Student Learning States conforming to PRD §13 & FR-001.\nControls the pedagogical progression lifecycle."
       },
+      "MasteryStatus": {
+        "type": "string",
+        "enum": [
+          "novice",
+          "practicing",
+          "proficient",
+          "mastered"
+        ],
+        "title": "MasteryStatus",
+        "description": "Pedagogical topic mastery status levels."
+      },
+      "MasteryUpdateResponse": {
+        "properties": {
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct"
+          },
+          "prior_mastery_probability": {
+            "type": "number",
+            "title": "Prior Mastery Probability"
+          },
+          "posterior_mastery_probability": {
+            "type": "number",
+            "title": "Posterior Mastery Probability"
+          },
+          "status": {
+            "$ref": "#/components/schemas/MasteryStatus"
+          },
+          "current_difficulty": {
+            "$ref": "#/components/schemas/DifficultyLevel"
+          },
+          "total_attempts": {
+            "type": "integer",
+            "title": "Total Attempts"
+          },
+          "correct_attempts": {
+            "type": "integer",
+            "title": "Correct Attempts"
+          },
+          "current_streak": {
+            "type": "integer",
+            "title": "Current Streak"
+          },
+          "best_streak": {
+            "type": "integer",
+            "title": "Best Streak"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "student_id",
+          "exam_template_id",
+          "topic_id",
+          "question_id",
+          "is_correct",
+          "prior_mastery_probability",
+          "posterior_mastery_probability",
+          "status",
+          "current_difficulty",
+          "total_attempts",
+          "correct_attempts",
+          "current_streak",
+          "best_streak",
+          "updated_at"
+        ],
+        "title": "MasteryUpdateResponse"
+      },
       "QualityScoreBreakdown": {
         "properties": {
           "katex_score": {
@@ -3829,6 +4063,51 @@
         ],
         "title": "QuestionValidationReportResponse"
       },
+      "RecordAttemptRequest": {
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "title": "Question Id",
+            "description": "ID of the question attempted"
+          },
+          "selected_option_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Option Key",
+            "description": "Selected option letter e.g. A, B, C, D"
+          },
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct",
+            "description": "Whether the student answered correctly"
+          },
+          "time_spent_seconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Spent Seconds",
+            "description": "Time spent solving the question in seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question_id",
+          "is_correct"
+        ],
+        "title": "RecordAttemptRequest"
+      },
       "RetrievalQueryRequest": {
         "properties": {
           "query": {
@@ -4184,6 +4463,85 @@
         ],
         "title": "StudentLearningStateResponse",
         "description": "Public response schema for student topic learning state."
+      },
+      "StudentTopicMasteryResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "mastery_probability": {
+            "type": "number",
+            "title": "Mastery Probability"
+          },
+          "status": {
+            "$ref": "#/components/schemas/MasteryStatus"
+          },
+          "current_difficulty": {
+            "$ref": "#/components/schemas/DifficultyLevel"
+          },
+          "total_attempts": {
+            "type": "integer",
+            "title": "Total Attempts"
+          },
+          "correct_attempts": {
+            "type": "integer",
+            "title": "Correct Attempts"
+          },
+          "current_streak": {
+            "type": "integer",
+            "title": "Current Streak"
+          },
+          "best_streak": {
+            "type": "integer",
+            "title": "Best Streak"
+          },
+          "last_attempt_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Attempt At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "student_id",
+          "exam_template_id",
+          "topic_id",
+          "mastery_probability",
+          "status",
+          "current_difficulty",
+          "total_attempts",
+          "correct_attempts",
+          "current_streak",
+          "best_streak",
+          "updated_at"
+        ],
+        "title": "StudentTopicMasteryResponse"
       },
       "SubjectDetailResponse": {
         "properties": {
@@ -4576,6 +4934,27 @@
           "title"
         ],
         "title": "TopicImportSchema"
+      },
+      "TopicMasteryListResponse": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "topic_masteries": {
+            "items": {
+              "$ref": "#/components/schemas/StudentTopicMasteryResponse"
+            },
+            "type": "array",
+            "title": "Topic Masteries",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "total"
+        ],
+        "title": "TopicMasteryListResponse"
       },
       "TopicPrerequisiteImportSchema": {
         "properties": {
