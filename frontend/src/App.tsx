@@ -11,6 +11,7 @@ import {
   BarChart3,
   Network,
   ShieldCheck,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -26,6 +27,7 @@ import { ExamPlayer } from "@/components/exam/ExamPlayer";
 import { AnalyticsDashboard } from "@/components/analytics/AnalyticsDashboard";
 import { DAGVisualizer } from "@/components/dag/DAGVisualizer";
 import { ExamSimulationView } from "@/components/simulation/ExamSimulationView";
+import { ResourceManagerView } from "@/components/resources";
 import { useCurriculumStore } from "@/stores/curriculumStore";
 import { SocraticTutorDrawer } from "@/components/tutor/SocraticTutorDrawer";
 import { FloatingTutorButton } from "@/components/tutor/FloatingTutorButton";
@@ -36,7 +38,7 @@ export function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = React.useState<boolean>(false);
   const [authView, setAuthView] = React.useState<"login" | "register">("login");
   const [activeTab, setActiveTab] = React.useState<
-    "catalog" | "syllabus" | "solver" | "analytics" | "dag" | "simulation"
+    "catalog" | "syllabus" | "resources" | "solver" | "analytics" | "dag" | "simulation"
   >("syllabus");
 
   const { user, isAuthenticated } = useAuthStore();
@@ -92,6 +94,16 @@ export function App() {
                 }`}
               >
                 <FolderTree className="h-3.5 w-3.5" /> Syllabus Tree
+              </button>
+              <button
+                onClick={() => setActiveTab("resources")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+                  activeTab === "resources"
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <BookOpen className="h-3.5 w-3.5 text-cyan-500" /> Curriculum Resources
               </button>
               <button
                 onClick={() => setActiveTab("solver")}
@@ -177,6 +189,12 @@ export function App() {
             className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "syllabus" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
           >
             Syllabus
+          </button>
+          <button
+            onClick={() => setActiveTab("resources")}
+            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "resources" ? "bg-card font-bold shadow-sm text-cyan-400" : "text-muted-foreground"}`}
+          >
+            Resources
           </button>
           <button
             onClick={() => setActiveTab("solver")}
@@ -283,6 +301,16 @@ export function App() {
                 onStartTopicPractice={(topic) => {
                   openSocraticDrawer({ topicTitle: topic.title, topicId: topic.id });
                 }}
+              />
+            </section>
+          )}
+
+          {/* TAB: Curriculum Resources & Vector Knowledge Base */}
+          {activeTab === "resources" && (
+            <section className="space-y-6">
+              <ResourceManagerView
+                examTemplateId={activeExamId}
+                userRole={user?.role || "student"}
               />
             </section>
           )}
