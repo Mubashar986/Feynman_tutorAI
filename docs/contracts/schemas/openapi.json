@@ -3944,6 +3944,118 @@
         }
       }
     },
+    "/api/v1/readiness/{exam_template_id}": {
+      "get": {
+        "tags": [
+          "Calibrated Exam Readiness & Analytics",
+          "Calibrated Exam Readiness & Analytics"
+        ],
+        "summary": "Compute current calibrated exam readiness score, pass probability & topic recommendations",
+        "description": "Synthesizes Blueprint-weighted BKT knowledge tracing, continuous Ebbinghaus retrievability,\ntimed mock exam simulation performance, and response latency pacing consistency into a\ncalibrated exam readiness score (0-100%) and logistic pass probability (PRD Cap 20, FR-020).",
+        "operationId": "get_exam_readiness_assessment_api_v1_readiness__exam_template_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "exam_template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Exam Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamReadinessReport"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/readiness/{exam_template_id}/history": {
+      "get": {
+        "tags": [
+          "Calibrated Exam Readiness & Analytics",
+          "Calibrated Exam Readiness & Analytics"
+        ],
+        "summary": "Retrieve historical readiness progression trajectory curve",
+        "description": "Retrieves chronological progression snapshots of exam readiness scores for progress charting.",
+        "operationId": "get_readiness_history_api_v1_readiness__exam_template_id__history_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "exam_template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Exam Template Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Max historical snapshots to retrieve",
+              "default": 30,
+              "title": "Limit"
+            },
+            "description": "Max historical snapshots to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessHistoryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -5342,6 +5454,95 @@
         "title": "ExamLearningSummaryResponse",
         "description": "Overview of all topic states for a student in a specific exam."
       },
+      "ExamReadinessReport": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "exam_title": {
+            "type": "string",
+            "title": "Exam Title"
+          },
+          "blueprint_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blueprint Id"
+          },
+          "overall_readiness_score": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Overall Readiness Score",
+            "description": "Composite Exam Readiness Score (0-100%)"
+          },
+          "pass_probability": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Pass Probability",
+            "description": "Calibrated sigmoid pass probability (0.0 - 1.0)"
+          },
+          "passing_percentage_threshold": {
+            "type": "number",
+            "title": "Passing Percentage Threshold",
+            "description": "Blueprint passing threshold score",
+            "default": 60.0
+          },
+          "is_ready_for_exam": {
+            "type": "boolean",
+            "title": "Is Ready For Exam",
+            "description": "True if overall readiness >= passing threshold"
+          },
+          "readiness_tier": {
+            "type": "string",
+            "title": "Readiness Tier",
+            "description": "'High Readiness' (>=80%), 'Moderate Readiness' (60-79%), or 'Needs Remediation' (<60%)"
+          },
+          "components": {
+            "$ref": "#/components/schemas/ReadinessComponentBreakdown"
+          },
+          "topic_breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/TopicReadinessDetail"
+            },
+            "type": "array",
+            "title": "Topic Breakdown"
+          },
+          "high_roi_recommendations": {
+            "items": {
+              "$ref": "#/components/schemas/HighRoiTopicRecommendation"
+            },
+            "type": "array",
+            "title": "High Roi Recommendations"
+          },
+          "calculated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Calculated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id",
+          "exam_title",
+          "overall_readiness_score",
+          "pass_probability",
+          "is_ready_for_exam",
+          "readiness_tier",
+          "components",
+          "topic_breakdown",
+          "high_roi_recommendations",
+          "calculated_at"
+        ],
+        "title": "ExamReadinessReport"
+      },
       "ExamTemplateImportSchema": {
         "properties": {
           "title": {
@@ -5569,6 +5770,54 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "HighRoiTopicRecommendation": {
+        "properties": {
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "topic_title": {
+            "type": "string",
+            "title": "Topic Title"
+          },
+          "target_weight": {
+            "type": "number",
+            "title": "Target Weight",
+            "description": "Exam blueprint weight percentage"
+          },
+          "current_mastery_pct": {
+            "type": "number",
+            "title": "Current Mastery Pct",
+            "description": "Current BKT mastery percentage"
+          },
+          "current_retention_pct": {
+            "type": "number",
+            "title": "Current Retention Pct",
+            "description": "Current memory retrievability percentage"
+          },
+          "potential_score_gain": {
+            "type": "number",
+            "title": "Potential Score Gain",
+            "description": "Estimated point gain on exam from mastering this topic"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "description": "Pedagogical justification for why this topic has highest study ROI"
+          }
+        },
+        "type": "object",
+        "required": [
+          "topic_id",
+          "topic_title",
+          "target_weight",
+          "current_mastery_pct",
+          "current_retention_pct",
+          "potential_score_gain",
+          "reason"
+        ],
+        "title": "HighRoiTopicRecommendation"
       },
       "HintLevel": {
         "type": "string",
@@ -6849,6 +7098,150 @@
           "validated_at"
         ],
         "title": "QuestionValidationReportResponse"
+      },
+      "ReadinessComponentBreakdown": {
+        "properties": {
+          "mastery_score": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Mastery Score",
+            "description": "Blueprint-weighted BKT topic mastery score (0-100%)"
+          },
+          "mastery_weight": {
+            "type": "number",
+            "title": "Mastery Weight",
+            "description": "Pillar weight in composite formula",
+            "default": 0.4
+          },
+          "retention_score": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Retention Score",
+            "description": "Continuous Ebbinghaus memory retrievability score (0-100%)"
+          },
+          "retention_weight": {
+            "type": "number",
+            "title": "Retention Weight",
+            "description": "Pillar weight in composite formula",
+            "default": 0.2
+          },
+          "simulation_score": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Simulation Score",
+            "description": "Recent timed mock exam performance score (0-100%)"
+          },
+          "simulation_weight": {
+            "type": "number",
+            "title": "Simulation Weight",
+            "description": "Pillar weight in composite formula",
+            "default": 0.25
+          },
+          "pacing_score": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Pacing Score",
+            "description": "Response latency consistency & pacing score (0-100%)"
+          },
+          "pacing_weight": {
+            "type": "number",
+            "title": "Pacing Weight",
+            "description": "Pillar weight in composite formula",
+            "default": 0.15
+          }
+        },
+        "type": "object",
+        "required": [
+          "mastery_score",
+          "retention_score",
+          "simulation_score",
+          "pacing_score"
+        ],
+        "title": "ReadinessComponentBreakdown"
+      },
+      "ReadinessHistoryItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "overall_readiness_score": {
+            "type": "number",
+            "title": "Overall Readiness Score"
+          },
+          "pass_probability": {
+            "type": "number",
+            "title": "Pass Probability"
+          },
+          "mastery_component": {
+            "type": "number",
+            "title": "Mastery Component"
+          },
+          "retention_component": {
+            "type": "number",
+            "title": "Retention Component"
+          },
+          "simulation_component": {
+            "type": "number",
+            "title": "Simulation Component"
+          },
+          "pacing_component": {
+            "type": "number",
+            "title": "Pacing Component"
+          },
+          "is_ready_for_exam": {
+            "type": "boolean",
+            "title": "Is Ready For Exam"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "overall_readiness_score",
+          "pass_probability",
+          "mastery_component",
+          "retention_component",
+          "simulation_component",
+          "pacing_component",
+          "is_ready_for_exam",
+          "created_at"
+        ],
+        "title": "ReadinessHistoryItem"
+      },
+      "ReadinessHistoryResponse": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/ReadinessHistoryItem"
+            },
+            "type": "array",
+            "title": "History"
+          },
+          "total_snapshots": {
+            "type": "integer",
+            "title": "Total Snapshots"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id",
+          "history",
+          "total_snapshots"
+        ],
+        "title": "ReadinessHistoryResponse"
       },
       "RecordAttemptRequest": {
         "properties": {
@@ -9177,6 +9570,63 @@
           "prerequisite_topic_id"
         ],
         "title": "TopicPrerequisiteResponse"
+      },
+      "TopicReadinessDetail": {
+        "properties": {
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "topic_title": {
+            "type": "string",
+            "title": "Topic Title"
+          },
+          "target_weight": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Target Weight",
+            "description": "Blueprint weight (0.0 - 1.0)"
+          },
+          "mastery_level": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Mastery Level",
+            "description": "BKT latent mastery level (0.0 - 1.0)"
+          },
+          "retention_level": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Retention Level",
+            "description": "Ebbinghaus retrievability level (0.0 - 1.0)"
+          },
+          "composite_topic_score": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Composite Topic Score",
+            "description": "Combined topic score percentage (0-100%)"
+          },
+          "marginal_roi_score": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Marginal Roi Score",
+            "description": "Marginal score gain per hour of study"
+          }
+        },
+        "type": "object",
+        "required": [
+          "topic_id",
+          "topic_title",
+          "target_weight",
+          "mastery_level",
+          "retention_level",
+          "composite_topic_score",
+          "marginal_roi_score"
+        ],
+        "title": "TopicReadinessDetail"
       },
       "TopicRubricResponse": {
         "properties": {

@@ -26,7 +26,7 @@
 * [x] **Task 7.2:** Teach-Back Mode & Rubric Evaluator Engine `[COMPLETED]`
 * [x] **Task 7.3:** Adversarial Tutor & Why-You-Are-Wrong Modes `[COMPLETED]`
 * [x] **Task 8.1:** Full Exam Simulation & Blueprint Weighting Engine `[COMPLETED]`
-* [ ] **Task 8.2:** Calibrated Exam Readiness Score Engine
+* [x] **Task 8.2:** Calibrated Exam Readiness Score Engine `[COMPLETED]`
 
 ### Frontend Track (React / TypeScript / Vite)
 * [x] **Task 0.3:** React + Vite + TypeScript + Tailwind + Shadcn Workspace Scaffold `[COMPLETED]`
