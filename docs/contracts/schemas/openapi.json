@@ -3128,6 +3128,367 @@
         }
       }
     },
+    "/api/v1/modes/adversarial/challenge": {
+      "post": {
+        "tags": [
+          "Adversarial Tutor & Diagnostic Modes",
+          "Adversarial Tutor & Diagnostic Modes"
+        ],
+        "summary": "Challenge student reasoning with an adversarial counterexample or edge case",
+        "operationId": "generate_adversarial_challenge_api_v1_modes_adversarial_challenge_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdversarialChallengeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdversarialChallengeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/modes/adversarial/defend": {
+      "post": {
+        "tags": [
+          "Adversarial Tutor & Diagnostic Modes",
+          "Adversarial Tutor & Diagnostic Modes"
+        ],
+        "summary": "Submit student defense and evaluate argument robustness against challenge",
+        "operationId": "evaluate_adversarial_defense_api_v1_modes_adversarial_defend_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdversarialDefendRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefenseEvaluationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/modes/adversarial/sessions": {
+      "get": {
+        "tags": [
+          "Adversarial Tutor & Diagnostic Modes",
+          "Adversarial Tutor & Diagnostic Modes"
+        ],
+        "summary": "List past adversarial sparring sessions for the current student",
+        "operationId": "list_adversarial_sessions_api_v1_modes_adversarial_sessions_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "exam_template_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional exam template filter",
+              "title": "Exam Template Id"
+            },
+            "description": "Optional exam template filter"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Max sessions to return",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Max sessions to return"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Pagination offset",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Pagination offset"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdversarialSessionListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/modes/adversarial/sessions/{session_id}": {
+      "get": {
+        "tags": [
+          "Adversarial Tutor & Diagnostic Modes",
+          "Adversarial Tutor & Diagnostic Modes"
+        ],
+        "summary": "Get full history of challenges and defenses for an adversarial session",
+        "operationId": "get_adversarial_session_detail_api_v1_modes_adversarial_sessions__session_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdversarialSessionDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/modes/why-wrong/diagnose": {
+      "post": {
+        "tags": [
+          "Adversarial Tutor & Diagnostic Modes",
+          "Adversarial Tutor & Diagnostic Modes"
+        ],
+        "summary": "Diagnose why an answer choice is incorrect and extract cognitive fallacy",
+        "operationId": "diagnose_incorrect_answer_api_v1_modes_why_wrong_diagnose_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WhyWrongDiagnosticRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhyWrongDiagnosticResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/modes/why-wrong/diagnostics": {
+      "get": {
+        "tags": [
+          "Adversarial Tutor & Diagnostic Modes",
+          "Adversarial Tutor & Diagnostic Modes"
+        ],
+        "summary": "List past fallacy diagnostics for the current student",
+        "operationId": "list_student_diagnostics_api_v1_modes_why_wrong_diagnostics_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "topic_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional topic filter",
+              "title": "Topic Id"
+            },
+            "description": "Optional topic filter"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Max records to return",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Max records to return"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Pagination offset",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Pagination offset"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WhyWrongDiagnosticResponse"
+                  },
+                  "title": "Response List Student Diagnostics Api V1 Modes Why Wrong Diagnostics Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -3150,6 +3511,273 @@
   },
   "components": {
     "schemas": {
+      "AdversarialChallengeRequest": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id",
+            "description": "Target exam curriculum ID"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id",
+            "description": "Target syllabus topic ID"
+          },
+          "student_thesis": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 15,
+            "title": "Student Thesis",
+            "description": "Student conceptual claim, reasoning chain, or physics law formulation to be stress-tested"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id",
+          "topic_id",
+          "student_thesis"
+        ],
+        "title": "AdversarialChallengeRequest"
+      },
+      "AdversarialChallengeResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "challenge_id": {
+            "type": "string",
+            "title": "Challenge Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "student_thesis": {
+            "type": "string",
+            "title": "Student Thesis"
+          },
+          "counterexample_title": {
+            "type": "string",
+            "title": "Counterexample Title"
+          },
+          "counterexample_scenario": {
+            "type": "string",
+            "title": "Counterexample Scenario"
+          },
+          "edge_case_condition": {
+            "type": "string",
+            "title": "Edge Case Condition"
+          },
+          "challenge_question": {
+            "type": "string",
+            "title": "Challenge Question"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "challenge_id",
+          "topic_id",
+          "student_thesis",
+          "counterexample_title",
+          "counterexample_scenario",
+          "edge_case_condition",
+          "challenge_question",
+          "created_at"
+        ],
+        "title": "AdversarialChallengeResponse"
+      },
+      "AdversarialChallengeSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "counterexample_title": {
+            "type": "string",
+            "title": "Counterexample Title"
+          },
+          "counterexample_scenario": {
+            "type": "string",
+            "title": "Counterexample Scenario"
+          },
+          "edge_case_condition": {
+            "type": "string",
+            "title": "Edge Case Condition"
+          },
+          "challenge_question": {
+            "type": "string",
+            "title": "Challenge Question"
+          },
+          "student_defense": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Defense"
+          },
+          "robustness_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Robustness Score"
+          },
+          "defense_outcome": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DefenseOutcome"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "counterexample_title",
+          "counterexample_scenario",
+          "edge_case_condition",
+          "challenge_question",
+          "created_at"
+        ],
+        "title": "AdversarialChallengeSummary"
+      },
+      "AdversarialDefendRequest": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id",
+            "description": "Active adversarial sparring session ID"
+          },
+          "challenge_id": {
+            "type": "string",
+            "title": "Challenge Id",
+            "description": "Specific challenge being responded to"
+          },
+          "student_defense": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 10,
+            "title": "Student Defense",
+            "description": "Student defense, mathematical justification, or thesis refinement"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "challenge_id",
+          "student_defense"
+        ],
+        "title": "AdversarialDefendRequest"
+      },
+      "AdversarialSessionDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "student_thesis": {
+            "type": "string",
+            "title": "Student Thesis"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AdversarialSessionStatus"
+          },
+          "challenges": {
+            "items": {
+              "$ref": "#/components/schemas/AdversarialChallengeSummary"
+            },
+            "type": "array",
+            "title": "Challenges",
+            "default": []
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "student_id",
+          "exam_template_id",
+          "topic_id",
+          "student_thesis",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "AdversarialSessionDetailResponse"
+      },
+      "AdversarialSessionListResponse": {
+        "properties": {
+          "sessions": {
+            "items": {
+              "$ref": "#/components/schemas/AdversarialSessionDetailResponse"
+            },
+            "type": "array",
+            "title": "Sessions",
+            "default": []
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "AdversarialSessionListResponse"
+      },
+      "AdversarialSessionStatus": {
+        "type": "string",
+        "enum": [
+          "challenge_active",
+          "defended",
+          "concluded"
+        ],
+        "title": "AdversarialSessionStatus",
+        "description": "Lifecycle state for an adversarial sparring debate."
+      },
       "BatchValidationRequest": {
         "properties": {
           "topic_id": {
@@ -3616,6 +4244,84 @@
           "total_prerequisite_edges"
         ],
         "title": "DAGValidationResponse"
+      },
+      "DefenseEvaluationResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "challenge_id": {
+            "type": "string",
+            "title": "Challenge Id"
+          },
+          "robustness_score": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Robustness Score"
+          },
+          "defense_outcome": {
+            "$ref": "#/components/schemas/DefenseOutcome"
+          },
+          "valid_points": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Valid Points",
+            "default": []
+          },
+          "logical_flaws": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Logical Flaws",
+            "default": []
+          },
+          "feedback": {
+            "type": "string",
+            "title": "Feedback"
+          },
+          "model_synthesis_latex": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Synthesis Latex"
+          },
+          "evaluated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Evaluated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "challenge_id",
+          "robustness_score",
+          "defense_outcome",
+          "feedback",
+          "evaluated_at"
+        ],
+        "title": "DefenseEvaluationResponse"
+      },
+      "DefenseOutcome": {
+        "type": "string",
+        "enum": [
+          "defended_successfully",
+          "valid_adaptation",
+          "partial_concession",
+          "logical_collapse"
+        ],
+        "title": "DefenseOutcome",
+        "description": "Evaluated outcome of a student's defense against an adversarial counterexample."
       },
       "DifficultyLevel": {
         "type": "string",
@@ -4108,6 +4814,20 @@
           "updated_at"
         ],
         "title": "ExamTemplateResponse"
+      },
+      "FallacyCategory": {
+        "type": "string",
+        "enum": [
+          "boundary_condition_blindness",
+          "formula_misapplication",
+          "inverse_relation_confusion",
+          "state_vs_rate_confusion",
+          "sign_vector_inversion",
+          "assumption_violation",
+          "units_dimensional_error"
+        ],
+        "title": "FallacyCategory",
+        "description": "Formal 7-Tier Cognitive Fallacy Taxonomy for STEM and Exam Problem Solving (PRD FR-019)."
       },
       "GeneratedQuestionBatchResponse": {
         "properties": {
@@ -7680,6 +8400,157 @@
           "flagged"
         ],
         "title": "ValidationStatus"
+      },
+      "WhyWrongDiagnosticRequest": {
+        "properties": {
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id",
+            "description": "Target syllabus topic ID"
+          },
+          "question_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Id",
+            "description": "Optional question bank ID"
+          },
+          "question_prompt": {
+            "type": "string",
+            "minLength": 10,
+            "title": "Question Prompt",
+            "description": "Full problem prompt or question context"
+          },
+          "selected_option_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Option Key",
+            "description": "Option letter if MCQ (e.g. 'B')"
+          },
+          "selected_answer_text": {
+            "type": "string",
+            "minLength": 3,
+            "title": "Selected Answer Text",
+            "description": "The incorrect option text or student answer"
+          },
+          "correct_answer_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correct Answer Text",
+            "description": "The correct answer text if available"
+          }
+        },
+        "type": "object",
+        "required": [
+          "topic_id",
+          "question_prompt",
+          "selected_answer_text"
+        ],
+        "title": "WhyWrongDiagnosticRequest"
+      },
+      "WhyWrongDiagnosticResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "question_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Id"
+          },
+          "selected_option_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Option Key"
+          },
+          "selected_answer_text": {
+            "type": "string",
+            "title": "Selected Answer Text"
+          },
+          "fallacy_category": {
+            "$ref": "#/components/schemas/FallacyCategory"
+          },
+          "why_incorrect_explanation": {
+            "type": "string",
+            "title": "Why Incorrect Explanation"
+          },
+          "mental_trap_description": {
+            "type": "string",
+            "title": "Mental Trap Description"
+          },
+          "recognition_rule": {
+            "type": "string",
+            "title": "Recognition Rule"
+          },
+          "repair_action_summary": {
+            "type": "string",
+            "title": "Repair Action Summary"
+          },
+          "correct_derivation_latex": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correct Derivation Latex"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "topic_id",
+          "selected_answer_text",
+          "fallacy_category",
+          "why_incorrect_explanation",
+          "mental_trap_description",
+          "recognition_rule",
+          "repair_action_summary",
+          "created_at"
+        ],
+        "title": "WhyWrongDiagnosticResponse"
       }
     },
     "securitySchemes": {
