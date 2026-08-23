@@ -22,9 +22,8 @@
 * [x] **Task 3.2:** Qdrant Vector Store Adapter & Hybrid Indexer `[COMPLETED]`
 * [x] **Task 3.3:** Grounded Retrieval & Source Provenance Formatter `[COMPLETED]`
 * [x] **Task 4.1:** Question Bank Schema & Multi-Type Data Models `[COMPLETED]`
-* [x] **Task 5.2:** Error Bank & Misconception Diagnosis Engine `[COMPLETED]`
-* [ ] **Task 6.1:** Socratic Tutor Orchestrator with Retrieval Augmentation `[READY]`
-* [ ] **Task 6.2:** Server-Sent Events (SSE) Streaming Tutor Endpoint
+* [x] **Task 6.1:** Socratic Tutor Orchestrator with Retrieval Augmentation `[COMPLETED]`
+* [ ] **Task 6.2:** Server-Sent Events (SSE) Streaming Tutor Endpoint `[READY]`
 * [ ] **Task 7.1:** Spaced Repetition Scheduling Engine (SM-2 / FSRS)
 * [ ] **Task 7.2:** Teach-Back Mode & Rubric Evaluator Engine
 * [ ] **Task 7.3:** Adversarial Tutor & Why-You-Are-Wrong Modes

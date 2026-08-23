@@ -2366,6 +2366,234 @@
         }
       }
     },
+    "/api/v1/tutor/sessions": {
+      "post": {
+        "tags": [
+          "Socratic AI Tutor Engine",
+          "Socratic AI Tutor Engine"
+        ],
+        "summary": "Create a new 1-on-1 Socratic tutoring session",
+        "description": "Initializes a new conversational session scoped to a topic or specific question.",
+        "operationId": "create_tutor_session_api_v1_tutor_sessions_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TutorSessionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TutorSessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Socratic AI Tutor Engine",
+          "Socratic AI Tutor Engine"
+        ],
+        "summary": "List all tutor sessions for the current student",
+        "description": "Returns recent active and archived Socratic tutoring dialogues.",
+        "operationId": "list_tutor_sessions_api_v1_tutor_sessions_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "topic_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional topic filter",
+              "title": "Topic Id"
+            },
+            "description": "Optional topic filter"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TutorSessionResponse"
+                  },
+                  "title": "Response List Tutor Sessions Api V1 Tutor Sessions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tutor/sessions/{session_id}": {
+      "get": {
+        "tags": [
+          "Socratic AI Tutor Engine",
+          "Socratic AI Tutor Engine"
+        ],
+        "summary": "Get full dialogue turn history for a tutor session",
+        "description": "Retrieves all chronological messages, KaTeX equations, and source citations for a session.",
+        "operationId": "get_tutor_session_history_api_v1_tutor_sessions__session_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TutorSessionDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tutor/sessions/{session_id}/message": {
+      "post": {
+        "tags": [
+          "Socratic AI Tutor Engine",
+          "Socratic AI Tutor Engine"
+        ],
+        "summary": "Send message and receive grounded Socratic guiding hint",
+        "description": "Executes a Socratic conversation turn with RAG curriculum grounding, mastery adaptation,\nand anti-leakage scaffolding.",
+        "operationId": "send_socratic_message_api_v1_tutor_sessions__session_id__message_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocraticPromptRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SocraticResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -3363,6 +3591,17 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "HintLevel": {
+        "type": "string",
+        "enum": [
+          "conceptual",
+          "strategic",
+          "step",
+          "explanation"
+        ],
+        "title": "HintLevel",
+        "description": "Socratic 4-Tier Scaffolding Hierarchy."
       },
       "LearningObjectiveImportSchema": {
         "properties": {
@@ -4692,6 +4931,58 @@
         ],
         "title": "SectionImportSchema"
       },
+      "SocraticPromptRequest": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Message",
+            "description": "Student question or response to tutor"
+          },
+          "hint_level": {
+            "$ref": "#/components/schemas/HintLevel",
+            "description": "Desired scaffolding depth",
+            "default": "conceptual"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "SocraticPromptRequest"
+      },
+      "SocraticResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "message": {
+            "$ref": "#/components/schemas/TutorMessageResponse"
+          },
+          "citations": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Citations",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "topic_id",
+          "message"
+        ],
+        "title": "SocraticResponse"
+      },
       "StateTransitionLogResponse": {
         "properties": {
           "id": {
@@ -5777,6 +6068,242 @@
           "is_unlocked"
         ],
         "title": "TopicUnlockStatusResponse"
+      },
+      "TutorMessageResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "role": {
+            "$ref": "#/components/schemas/TutorRole"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "hint_level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HintLevel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "citations": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Citations",
+            "default": []
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "session_id",
+          "role",
+          "content",
+          "created_at"
+        ],
+        "title": "TutorMessageResponse"
+      },
+      "TutorRole": {
+        "type": "string",
+        "enum": [
+          "user",
+          "assistant",
+          "system"
+        ],
+        "title": "TutorRole"
+      },
+      "TutorSessionCreate": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id",
+            "description": "Target exam curriculum ID"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id",
+            "description": "Current topic under review"
+          },
+          "question_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Id",
+            "description": "Optional question context if asking about a specific item"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 150
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Optional session title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id",
+          "topic_id"
+        ],
+        "title": "TutorSessionCreate"
+      },
+      "TutorSessionDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "question_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/TutorMessageResponse"
+            },
+            "type": "array",
+            "title": "Messages",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "student_id",
+          "exam_template_id",
+          "topic_id",
+          "title",
+          "is_active",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "TutorSessionDetailResponse"
+      },
+      "TutorSessionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "question_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "student_id",
+          "exam_template_id",
+          "topic_id",
+          "title",
+          "is_active",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "TutorSessionResponse"
       },
       "UserCreate": {
         "properties": {
