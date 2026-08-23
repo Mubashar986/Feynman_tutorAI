@@ -25,7 +25,7 @@
 * [x] **Task 7.1:** Spaced Repetition Scheduling Engine (SM-2 / FSRS) `[COMPLETED]`
 * [x] **Task 7.2:** Teach-Back Mode & Rubric Evaluator Engine `[COMPLETED]`
 * [x] **Task 7.3:** Adversarial Tutor & Why-You-Are-Wrong Modes `[COMPLETED]`
-* [ ] **Task 8.1:** Full Exam Simulation & Blueprint Weighting Engine
+* [x] **Task 8.1:** Full Exam Simulation & Blueprint Weighting Engine `[COMPLETED]`
 * [ ] **Task 8.2:** Calibrated Exam Readiness Score Engine
 
 ### Frontend Track (React / TypeScript / Vite)

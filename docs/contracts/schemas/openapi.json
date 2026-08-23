@@ -3489,6 +3489,461 @@
         }
       }
     },
+    "/api/v1/blueprints": {
+      "post": {
+        "tags": [
+          "Exam Simulation & Blueprints",
+          "Exam Simulation & Blueprints"
+        ],
+        "summary": "Create an Exam Blueprint with topic weightings (Admin / Instructor)",
+        "operationId": "create_exam_blueprint_api_v1_blueprints_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlueprintCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlueprintResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Exam Simulation & Blueprints",
+          "Exam Simulation & Blueprints"
+        ],
+        "summary": "List available Exam Blueprints",
+        "operationId": "list_exam_blueprints_api_v1_blueprints_get",
+        "parameters": [
+          {
+            "name": "exam_template_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional exam template ID filter",
+              "title": "Exam Template Id"
+            },
+            "description": "Optional exam template ID filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BlueprintResponse"
+                  },
+                  "title": "Response List Exam Blueprints Api V1 Blueprints Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/blueprints/{blueprint_id}": {
+      "get": {
+        "tags": [
+          "Exam Simulation & Blueprints",
+          "Exam Simulation & Blueprints"
+        ],
+        "summary": "Get blueprint configuration details",
+        "operationId": "get_exam_blueprint_api_v1_blueprints__blueprint_id__get",
+        "parameters": [
+          {
+            "name": "blueprint_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Blueprint Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlueprintResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulations/start": {
+      "post": {
+        "tags": [
+          "Exam Simulation & Blueprints",
+          "Exam Simulation & Blueprints"
+        ],
+        "summary": "Start a full-length timed exam simulation",
+        "operationId": "start_simulation_api_v1_simulations_start_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulationStartRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationSessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/simulations/{session_id}": {
+      "get": {
+        "tags": [
+          "Exam Simulation & Blueprints",
+          "Exam Simulation & Blueprints"
+        ],
+        "summary": "Get active simulation paper and time remaining",
+        "operationId": "get_active_simulation_api_v1_simulations__session_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationSessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulations/{session_id}/save-answer": {
+      "post": {
+        "tags": [
+          "Exam Simulation & Blueprints",
+          "Exam Simulation & Blueprints"
+        ],
+        "summary": "Auto-save an individual question answer during exam taking",
+        "operationId": "save_simulation_answer_api_v1_simulations__session_id__save_answer_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveAnswerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaveAnswerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulations/{session_id}/submit": {
+      "post": {
+        "tags": [
+          "Exam Simulation & Blueprints",
+          "Exam Simulation & Blueprints"
+        ],
+        "summary": "Submit exam paper and trigger deterministic auto-grading",
+        "operationId": "submit_simulation_api_v1_simulations__session_id__submit_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationSubmitResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulations/{session_id}/report": {
+      "get": {
+        "tags": [
+          "Exam Simulation & Blueprints",
+          "Exam Simulation & Blueprints"
+        ],
+        "summary": "View comprehensive post-exam report and topic breakdown",
+        "operationId": "get_simulation_report_api_v1_simulations__session_id__report_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationSubmitResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulations": {
+      "get": {
+        "tags": [
+          "Exam Simulation & Blueprints",
+          "Exam Simulation & Blueprints"
+        ],
+        "summary": "List past simulation sessions for current student",
+        "operationId": "list_student_simulations_api_v1_simulations_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationSessionListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -3911,6 +4366,217 @@
           "create"
         ],
         "title": "BloomTaxonomy"
+      },
+      "BlueprintCreateRequest": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id",
+            "description": "Parent exam template ID"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Code",
+            "description": "Unique blueprint code e.g. '9702_PAPER_1'"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Title",
+            "description": "Descriptive title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_minutes": {
+            "type": "integer",
+            "maximum": 360.0,
+            "minimum": 1.0,
+            "title": "Duration Minutes",
+            "description": "Time limit in minutes",
+            "default": 90
+          },
+          "total_questions": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "Total Questions",
+            "description": "Number of questions on paper",
+            "default": 40
+          },
+          "total_marks": {
+            "type": "number",
+            "minimum": 1.0,
+            "title": "Total Marks",
+            "description": "Total possible marks",
+            "default": 40.0
+          },
+          "passing_percentage": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Passing Percentage",
+            "default": 60.0
+          },
+          "topic_distributions": {
+            "items": {
+              "$ref": "#/components/schemas/BlueprintTopicWeightInput"
+            },
+            "type": "array",
+            "title": "Topic Distributions",
+            "description": "List of topic weight allocations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id",
+          "code",
+          "title"
+        ],
+        "title": "BlueprintCreateRequest"
+      },
+      "BlueprintResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_minutes": {
+            "type": "integer",
+            "title": "Duration Minutes"
+          },
+          "total_questions": {
+            "type": "integer",
+            "title": "Total Questions"
+          },
+          "total_marks": {
+            "type": "number",
+            "title": "Total Marks"
+          },
+          "passing_percentage": {
+            "type": "number",
+            "title": "Passing Percentage"
+          },
+          "topic_distributions": {
+            "items": {
+              "$ref": "#/components/schemas/BlueprintTopicDistributionResponse"
+            },
+            "type": "array",
+            "title": "Topic Distributions",
+            "default": []
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "exam_template_id",
+          "code",
+          "title",
+          "duration_minutes",
+          "total_questions",
+          "total_marks",
+          "passing_percentage",
+          "created_at"
+        ],
+        "title": "BlueprintResponse"
+      },
+      "BlueprintTopicDistributionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "topic_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Title"
+          },
+          "target_weight": {
+            "type": "number",
+            "title": "Target Weight"
+          },
+          "target_question_count": {
+            "type": "integer",
+            "title": "Target Question Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "topic_id",
+          "target_weight",
+          "target_question_count"
+        ],
+        "title": "BlueprintTopicDistributionResponse"
+      },
+      "BlueprintTopicWeightInput": {
+        "properties": {
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id",
+            "description": "Target syllabus topic ID"
+          },
+          "target_weight": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Target Weight",
+            "description": "Target proportion e.g. 0.30"
+          }
+        },
+        "type": "object",
+        "required": [
+          "topic_id",
+          "target_weight"
+        ],
+        "title": "BlueprintTopicWeightInput"
       },
       "Body_upload_document_api_v1_documents_upload_post": {
         "properties": {
@@ -5774,6 +6440,136 @@
         ],
         "title": "QuestionOptionResponse"
       },
+      "QuestionResultDetail": {
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "topic_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Title"
+          },
+          "prompt": {
+            "type": "string",
+            "title": "Prompt"
+          },
+          "question_type": {
+            "$ref": "#/components/schemas/QuestionType"
+          },
+          "selected_option_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Option Id"
+          },
+          "selected_option_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Option Key"
+          },
+          "correct_option_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correct Option Id"
+          },
+          "correct_option_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correct Option Key"
+          },
+          "student_numerical": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Numerical"
+          },
+          "correct_numerical": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correct Numerical"
+          },
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct"
+          },
+          "marks_awarded": {
+            "type": "number",
+            "title": "Marks Awarded"
+          },
+          "marks_available": {
+            "type": "number",
+            "title": "Marks Available"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question_id",
+          "topic_id",
+          "prompt",
+          "question_type",
+          "is_correct",
+          "marks_awarded",
+          "marks_available"
+        ],
+        "title": "QuestionResultDetail"
+      },
       "QuestionRubricItemCreate": {
         "properties": {
           "criterion": {
@@ -6555,6 +7351,166 @@
         ],
         "title": "RubricDimensionDetail"
       },
+      "SanitizedOption": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "option_key": {
+            "type": "string",
+            "title": "Option Key"
+          },
+          "option_text": {
+            "type": "string",
+            "title": "Option Text"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "option_key",
+          "option_text",
+          "order"
+        ],
+        "title": "SanitizedOption",
+        "description": "Sanitized option view for exam taking (strips correct answer flag)."
+      },
+      "SanitizedQuestion": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "topic_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Title"
+          },
+          "prompt": {
+            "type": "string",
+            "title": "Prompt"
+          },
+          "question_type": {
+            "$ref": "#/components/schemas/QuestionType"
+          },
+          "marks": {
+            "type": "number",
+            "title": "Marks"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/SanitizedOption"
+            },
+            "type": "array",
+            "title": "Options",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "topic_id",
+          "prompt",
+          "question_type",
+          "marks"
+        ],
+        "title": "SanitizedQuestion",
+        "description": "Sanitized question view for exam taking (strips correct answers and explanations)."
+      },
+      "SaveAnswerRequest": {
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "title": "Question Id",
+            "description": "Target question ID"
+          },
+          "selected_option_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Option Id",
+            "description": "Selected option ID for MCQ"
+          },
+          "numerical_response": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numerical Response",
+            "description": "Numerical value response"
+          },
+          "text_response": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text Response",
+            "description": "Free response or derivation text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question_id"
+        ],
+        "title": "SaveAnswerRequest"
+      },
+      "SaveAnswerResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "saved_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Saved At"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "saved"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "question_id",
+          "saved_at"
+        ],
+        "title": "SaveAnswerResponse"
+      },
       "SectionImportSchema": {
         "properties": {
           "title": {
@@ -6577,6 +7533,287 @@
           "title"
         ],
         "title": "SectionImportSchema"
+      },
+      "SimulationSessionListResponse": {
+        "properties": {
+          "simulations": {
+            "items": {
+              "$ref": "#/components/schemas/SimulationSessionSummary"
+            },
+            "type": "array",
+            "title": "Simulations",
+            "default": []
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "SimulationSessionListResponse"
+      },
+      "SimulationSessionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "blueprint_id": {
+            "type": "string",
+            "title": "Blueprint Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimulationStatus"
+          },
+          "duration_minutes": {
+            "type": "integer",
+            "title": "Duration Minutes"
+          },
+          "total_questions": {
+            "type": "integer",
+            "title": "Total Questions"
+          },
+          "total_marks": {
+            "type": "number",
+            "title": "Total Marks"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "time_remaining_seconds": {
+            "type": "integer",
+            "title": "Time Remaining Seconds"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/SanitizedQuestion"
+            },
+            "type": "array",
+            "title": "Questions",
+            "default": []
+          },
+          "saved_answers": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Saved Answers",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "blueprint_id",
+          "exam_template_id",
+          "status",
+          "duration_minutes",
+          "total_questions",
+          "total_marks",
+          "started_at",
+          "expires_at",
+          "time_remaining_seconds"
+        ],
+        "title": "SimulationSessionResponse"
+      },
+      "SimulationSessionSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "blueprint_id": {
+            "type": "string",
+            "title": "Blueprint Id"
+          },
+          "blueprint_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blueprint Title"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimulationStatus"
+          },
+          "total_marks_available": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Marks Available"
+          },
+          "earned_marks": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Earned Marks"
+          },
+          "percentage_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentage Score"
+          },
+          "is_passed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Passed"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "blueprint_id",
+          "status",
+          "started_at"
+        ],
+        "title": "SimulationSessionSummary"
+      },
+      "SimulationStartRequest": {
+        "properties": {
+          "blueprint_id": {
+            "type": "string",
+            "title": "Blueprint Id",
+            "description": "Exam blueprint to simulate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "blueprint_id"
+        ],
+        "title": "SimulationStartRequest"
+      },
+      "SimulationStatus": {
+        "type": "string",
+        "enum": [
+          "in_progress",
+          "submitted",
+          "expired",
+          "graded"
+        ],
+        "title": "SimulationStatus",
+        "description": "Lifecycle state of a timed mock exam simulation."
+      },
+      "SimulationSubmitResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "blueprint_id": {
+            "type": "string",
+            "title": "Blueprint Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimulationStatus"
+          },
+          "total_marks_available": {
+            "type": "number",
+            "title": "Total Marks Available"
+          },
+          "earned_marks": {
+            "type": "number",
+            "title": "Earned Marks"
+          },
+          "percentage_score": {
+            "type": "number",
+            "title": "Percentage Score"
+          },
+          "is_passed": {
+            "type": "boolean",
+            "title": "Is Passed"
+          },
+          "time_spent_seconds": {
+            "type": "integer",
+            "title": "Time Spent Seconds"
+          },
+          "topic_breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/TopicPerformanceSummary"
+            },
+            "type": "array",
+            "title": "Topic Breakdown",
+            "default": []
+          },
+          "question_results": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionResultDetail"
+            },
+            "type": "array",
+            "title": "Question Results",
+            "default": []
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Submitted At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "blueprint_id",
+          "status",
+          "total_marks_available",
+          "earned_marks",
+          "percentage_score",
+          "is_passed",
+          "time_spent_seconds",
+          "submitted_at"
+        ],
+        "title": "SimulationSubmitResponse"
       },
       "SocraticPromptRequest": {
         "properties": {
@@ -7845,6 +9082,44 @@
           "total"
         ],
         "title": "TopicMasteryListResponse"
+      },
+      "TopicPerformanceSummary": {
+        "properties": {
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "topic_title": {
+            "type": "string",
+            "title": "Topic Title"
+          },
+          "total_questions": {
+            "type": "integer",
+            "title": "Total Questions"
+          },
+          "total_marks": {
+            "type": "number",
+            "title": "Total Marks"
+          },
+          "earned_marks": {
+            "type": "number",
+            "title": "Earned Marks"
+          },
+          "percentage": {
+            "type": "number",
+            "title": "Percentage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "topic_id",
+          "topic_title",
+          "total_questions",
+          "total_marks",
+          "earned_marks",
+          "percentage"
+        ],
+        "title": "TopicPerformanceSummary"
       },
       "TopicPrerequisiteImportSchema": {
         "properties": {

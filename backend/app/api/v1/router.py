@@ -11,6 +11,7 @@ from backend.app.tutor import tutor_router
 from backend.app.revision import revision_router
 from backend.app.teach_back import teach_back_router
 from backend.app.advanced_modes import advanced_modes_router
+from backend.app.simulation import simulation_router
 
 api_router = APIRouter()
 
@@ -49,3 +50,6 @@ api_router.include_router(teach_back_router, prefix="", tags=["Teach-Back Mode &
 
 # Adversarial Tutor & Diagnostic Modes routes
 api_router.include_router(advanced_modes_router, prefix="", tags=["Adversarial Tutor & Diagnostic Modes"])
+
+# Exam Simulation & Blueprint Weighting routes
+api_router.include_router(simulation_router, prefix="", tags=["Exam Simulation & Blueprints"])
