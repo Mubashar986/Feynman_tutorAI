@@ -2651,6 +2651,252 @@
         }
       }
     },
+    "/api/v1/revision/due": {
+      "get": {
+        "tags": [
+          "Spaced Repetition & Revision",
+          "Spaced Repetition & Revision"
+        ],
+        "summary": "Get prioritized list of due revision flashcards (PRD FR-007)",
+        "description": "Returns flashcards due for active recall review, ranked with active Error Bank items first.",
+        "operationId": "get_due_cards_api_v1_revision_due_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "exam_template_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional exam filter",
+              "title": "Exam Template Id"
+            },
+            "description": "Optional exam filter"
+          },
+          {
+            "name": "topic_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional topic filter",
+              "title": "Topic Id"
+            },
+            "description": "Optional topic filter"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Max cards to retrieve",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Max cards to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DueCardsListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/revision/review": {
+      "post": {
+        "tags": [
+          "Spaced Repetition & Revision",
+          "Spaced Repetition & Revision"
+        ],
+        "summary": "Submit review rating and recalculate SM-2 interval",
+        "description": "Updates the card's ease factor and schedules the next review date using SM-2.",
+        "operationId": "submit_review_api_v1_revision_review_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewSubmitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewSubmitResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/revision/metrics": {
+      "get": {
+        "tags": [
+          "Spaced Repetition & Revision",
+          "Spaced Repetition & Revision"
+        ],
+        "summary": "Get summary metrics and retention rate for revision decks",
+        "description": "Calculates total cards, cards due today, learning states, and historical retention rate.",
+        "operationId": "get_revision_metrics_api_v1_revision_metrics_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "exam_template_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional exam template filter",
+              "title": "Exam Template Id"
+            },
+            "description": "Optional exam template filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionMetricsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/revision/cards/seed": {
+      "post": {
+        "tags": [
+          "Spaced Repetition & Revision",
+          "Spaced Repetition & Revision"
+        ],
+        "summary": "Seed flashcards from question bank for a syllabus",
+        "description": "Initializes flashcards for questions in the specified exam template or topic.",
+        "operationId": "seed_review_cards_api_v1_revision_cards_seed_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CardSeedRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Seed Review Cards Api V1 Revision Cards Seed Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -2853,6 +3099,43 @@
           "file"
         ],
         "title": "Body_upload_document_api_v1_documents_upload_post"
+      },
+      "CardSeedRequest": {
+        "properties": {
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id",
+            "description": "Exam template ID to seed flashcards from"
+          },
+          "topic_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Id",
+            "description": "Optional topic ID filter"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exam_template_id"
+        ],
+        "title": "CardSeedRequest"
+      },
+      "CardState": {
+        "type": "string",
+        "enum": [
+          "new",
+          "learning",
+          "review",
+          "relearning"
+        ],
+        "title": "CardState",
+        "description": "Spaced repetition lifecycle state of a learning flashcard."
       },
       "DAGEdgeResponse": {
         "properties": {
@@ -3315,6 +3598,27 @@
           "json"
         ],
         "title": "DocumentType"
+      },
+      "DueCardsListResponse": {
+        "properties": {
+          "total_due": {
+            "type": "integer",
+            "title": "Total Due"
+          },
+          "due_cards": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewCardDetailResponse"
+            },
+            "type": "array",
+            "title": "Due Cards",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_due"
+        ],
+        "title": "DueCardsListResponse"
       },
       "DuplicateMatchInfo": {
         "properties": {
@@ -4964,6 +5268,228 @@
           "clean_content"
         ],
         "title": "RetrievedSourceCitation"
+      },
+      "ReviewCardDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "card_state": {
+            "$ref": "#/components/schemas/CardState"
+          },
+          "repetitions": {
+            "type": "integer",
+            "title": "Repetitions"
+          },
+          "interval_days": {
+            "type": "number",
+            "title": "Interval Days"
+          },
+          "ease_factor": {
+            "type": "number",
+            "title": "Ease Factor"
+          },
+          "stability": {
+            "type": "number",
+            "title": "Stability"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "last_reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Reviewed At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "question_prompt": {
+            "type": "string",
+            "title": "Question Prompt"
+          },
+          "question_explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Explanation"
+          },
+          "has_active_error": {
+            "type": "boolean",
+            "title": "Has Active Error",
+            "default": false
+          },
+          "estimated_retrievability": {
+            "type": "number",
+            "title": "Estimated Retrievability",
+            "default": 1.0
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "student_id",
+          "exam_template_id",
+          "topic_id",
+          "question_id",
+          "card_state",
+          "repetitions",
+          "interval_days",
+          "ease_factor",
+          "stability",
+          "due_at",
+          "created_at",
+          "question_prompt"
+        ],
+        "title": "ReviewCardDetailResponse"
+      },
+      "ReviewRating": {
+        "type": "integer",
+        "enum": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "title": "ReviewRating",
+        "description": "Active Recall review performance rating (1 to 4 scale)."
+      },
+      "ReviewSubmitRequest": {
+        "properties": {
+          "card_id": {
+            "type": "string",
+            "title": "Card Id",
+            "description": "Unique ID of the spaced review flashcard"
+          },
+          "rating": {
+            "$ref": "#/components/schemas/ReviewRating",
+            "description": "Review rating: 1 (AGAIN), 2 (HARD), 3 (GOOD), 4 (EASY)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "card_id",
+          "rating"
+        ],
+        "title": "ReviewSubmitRequest"
+      },
+      "ReviewSubmitResponse": {
+        "properties": {
+          "card_id": {
+            "type": "string",
+            "title": "Card Id"
+          },
+          "rating": {
+            "$ref": "#/components/schemas/ReviewRating"
+          },
+          "prior_interval_days": {
+            "type": "number",
+            "title": "Prior Interval Days"
+          },
+          "new_interval_days": {
+            "type": "number",
+            "title": "New Interval Days"
+          },
+          "new_ease_factor": {
+            "type": "number",
+            "title": "New Ease Factor"
+          },
+          "new_due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "New Due At"
+          },
+          "card_state": {
+            "$ref": "#/components/schemas/CardState"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "card_id",
+          "rating",
+          "prior_interval_days",
+          "new_interval_days",
+          "new_ease_factor",
+          "new_due_at",
+          "card_state",
+          "message"
+        ],
+        "title": "ReviewSubmitResponse"
+      },
+      "RevisionMetricsResponse": {
+        "properties": {
+          "total_cards": {
+            "type": "integer",
+            "title": "Total Cards"
+          },
+          "new_cards": {
+            "type": "integer",
+            "title": "New Cards"
+          },
+          "learning_cards": {
+            "type": "integer",
+            "title": "Learning Cards"
+          },
+          "review_cards": {
+            "type": "integer",
+            "title": "Review Cards"
+          },
+          "due_today": {
+            "type": "integer",
+            "title": "Due Today"
+          },
+          "average_retention_rate": {
+            "type": "number",
+            "title": "Average Retention Rate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_cards",
+          "new_cards",
+          "learning_cards",
+          "review_cards",
+          "due_today",
+          "average_retention_rate"
+        ],
+        "title": "RevisionMetricsResponse"
       },
       "SectionImportSchema": {
         "properties": {

@@ -8,6 +8,7 @@ from backend.app.questions import questions_router
 from backend.app.mastery import mastery_router
 from backend.app.errors import errors_router
 from backend.app.tutor import tutor_router
+from backend.app.revision import revision_router
 
 api_router = APIRouter()
 
@@ -38,5 +39,5 @@ api_router.include_router(errors_router, prefix="", tags=["Error Bank & Misconce
 # Socratic AI Tutor Engine routes
 api_router.include_router(tutor_router, prefix="", tags=["Socratic AI Tutor Engine"])
 
-
-
+# Spaced Repetition & Revision routes
+api_router.include_router(revision_router, prefix="", tags=["Spaced Repetition & Revision"])

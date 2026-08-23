@@ -22,9 +22,8 @@
 * [x] **Task 3.2:** Qdrant Vector Store Adapter & Hybrid Indexer `[COMPLETED]`
 * [x] **Task 3.3:** Grounded Retrieval & Source Provenance Formatter `[COMPLETED]`
 * [x] **Task 4.1:** Question Bank Schema & Multi-Type Data Models `[COMPLETED]`
-* [x] **Task 6.2:** Server-Sent Events (SSE) Streaming Tutor Endpoint `[COMPLETED]`
-* [ ] **Task 7.1:** Spaced Repetition Scheduling Engine (SM-2 / FSRS) `[READY]`
-* [ ] **Task 7.2:** Teach-Back Mode & Rubric Evaluator Engine
+* [x] **Task 7.1:** Spaced Repetition Scheduling Engine (SM-2 / FSRS) `[COMPLETED]`
+* [ ] **Task 7.2:** Teach-Back Mode & Rubric Evaluator Engine `[READY]`
 * [ ] **Task 7.3:** Adversarial Tutor & Why-You-Are-Wrong Modes
 * [ ] **Task 8.1:** Full Exam Simulation & Blueprint Weighting Engine
 * [ ] **Task 8.2:** Calibrated Exam Readiness Score Engine
