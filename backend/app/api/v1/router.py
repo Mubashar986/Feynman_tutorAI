@@ -6,6 +6,7 @@ from backend.app.curriculum import curriculum_router
 from backend.app.rag import documents_router
 from backend.app.questions import questions_router
 from backend.app.mastery import mastery_router
+from backend.app.errors import errors_router
 
 api_router = APIRouter()
 
@@ -29,6 +30,9 @@ api_router.include_router(questions_router, prefix="", tags=["Question Bank & It
 
 # Student Mastery & Difficulty Calibration routes
 api_router.include_router(mastery_router, prefix="", tags=["Student Mastery & Difficulty Calibration"])
+
+# Error Bank & Misconception Tracking routes
+api_router.include_router(errors_router, prefix="", tags=["Error Bank & Misconception Tracking"])
 
 
 

@@ -133,8 +133,32 @@ class MasteryEngineService:
         await session.flush()
         await session.refresh(mastery)
 
-        # 6. Optional: Sync with Learning State Machine (if state reached MASTERED)
+        # 6. Diagnostic Error Bank Integration (PRD §12, FR-006, Constraint #8)
+        if not attempt_in.is_correct:
+            try:
+                from backend.app.errors.service import ErrorBankService
+                await ErrorBankService.log_error(
+                    session=session,
+                    student_id=student_id,
+                    question=question,
+                    selected_option_key=attempt_in.selected_option_key,
+                    attempt_id=attempt.id,
+                )
+            except Exception as e:
+                logger.warning(f"Error bank logging failed: {e}")
+
+        # 7. Sync with Learning State Machine & Auto-Repair Error Bank (if MASTERED)
         if new_status == MasteryStatus.MASTERED:
+            try:
+                from backend.app.errors.service import ErrorBankService
+                await ErrorBankService.auto_resolve_topic_errors(
+                    session=session,
+                    student_id=student_id,
+                    topic_id=question.topic_id,
+                )
+            except Exception as e:
+                logger.warning(f"Error bank auto-resolve failed: {e}")
+
             try:
                 from backend.app.learning_state.models import LearningState
                 from backend.app.learning_state.service import LearningStateMachineService

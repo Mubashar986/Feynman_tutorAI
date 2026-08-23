@@ -2068,6 +2068,304 @@
         }
       }
     },
+    "/api/v1/error-bank": {
+      "get": {
+        "tags": [
+          "Error Bank & Misconception Tracking",
+          "Error Bank & Misconception Tracking"
+        ],
+        "summary": "List student error bank records with category and status filters",
+        "description": "Retrieves the authenticated student's diagnostic mistake tickets and aggregate active/repaired metrics.",
+        "operationId": "list_errors_api_v1_error_bank_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "topic_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by topic ID",
+              "title": "Topic Id"
+            },
+            "description": "Filter by topic ID"
+          },
+          {
+            "name": "exam_template_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by exam template ID",
+              "title": "Exam Template Id"
+            },
+            "description": "Filter by exam template ID"
+          },
+          {
+            "name": "repair_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/RepairStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by repair status",
+              "title": "Repair Status"
+            },
+            "description": "Filter by repair status"
+          },
+          {
+            "name": "error_category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorCategory"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by error category",
+              "title": "Error Category"
+            },
+            "description": "Filter by error category"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/error-bank/{error_id}": {
+      "get": {
+        "tags": [
+          "Error Bank & Misconception Tracking",
+          "Error Bank & Misconception Tracking"
+        ],
+        "summary": "Get error record detail with distractor rationale and remediation guidance",
+        "description": "Retrieves detailed information about a student's mistake, including question prompt and misconception root.",
+        "operationId": "get_error_detail_api_v1_error_bank__error_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "error_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Error Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentErrorDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/error-bank/{error_id}/repair": {
+      "post": {
+        "tags": [
+          "Error Bank & Misconception Tracking",
+          "Error Bank & Misconception Tracking"
+        ],
+        "summary": "Mark an active error ticket as repaired",
+        "description": "Transitions an error ticket from ACTIVE/REMEDIATING to REPAIRED.",
+        "operationId": "repair_error_api_v1_error_bank__error_id__repair_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "error_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Error Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/RepairErrorRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Repair In"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentErrorLogResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/error-bank/misconceptions/topics/{topic_id}": {
+      "get": {
+        "tags": [
+          "Error Bank & Misconception Tracking",
+          "Error Bank & Misconception Tracking"
+        ],
+        "summary": "List all known misconception knowledge nodes for a topic",
+        "description": "Retrieves known cognitive misconception taxonomy entries for a curriculum topic.",
+        "operationId": "list_topic_misconceptions_api_v1_error_bank_misconceptions_topics__topic_id__get",
+        "parameters": [
+          {
+            "name": "topic_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Topic Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MisconceptionResponse"
+                  },
+                  "title": "Response List Topic Misconceptions Api V1 Error Bank Misconceptions Topics  Topic Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": [
@@ -2756,6 +3054,49 @@
         ],
         "title": "DuplicateMatchInfo"
       },
+      "ErrorCategory": {
+        "type": "string",
+        "enum": [
+          "conceptual",
+          "calculation",
+          "misread",
+          "incomplete",
+          "representational"
+        ],
+        "title": "ErrorCategory",
+        "description": "Cognitive diagnostic taxonomy categories."
+      },
+      "ErrorListResponse": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "active_count": {
+            "type": "integer",
+            "title": "Active Count"
+          },
+          "repaired_count": {
+            "type": "integer",
+            "title": "Repaired Count"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/StudentErrorDetailResponse"
+            },
+            "type": "array",
+            "title": "Errors",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "active_count",
+          "repaired_count"
+        ],
+        "title": "ErrorListResponse"
+      },
       "ExamBoard": {
         "type": "string",
         "enum": [
@@ -3313,6 +3654,56 @@
           "updated_at"
         ],
         "title": "MasteryUpdateResponse"
+      },
+      "MisconceptionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "remediation_guidance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remediation Guidance"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "topic_id",
+          "code",
+          "title",
+          "description",
+          "created_at"
+        ],
+        "title": "MisconceptionResponse"
       },
       "QualityScoreBreakdown": {
         "properties": {
@@ -4108,6 +4499,34 @@
         ],
         "title": "RecordAttemptRequest"
       },
+      "RepairErrorRequest": {
+        "properties": {
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes",
+            "description": "Optional remediation notes from student or tutor"
+          }
+        },
+        "type": "object",
+        "title": "RepairErrorRequest"
+      },
+      "RepairStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "remediating",
+          "repaired"
+        ],
+        "title": "RepairStatus",
+        "description": "Remediation lifecycle status of a student's error ticket."
+      },
       "RetrievalQueryRequest": {
         "properties": {
           "query": {
@@ -4397,6 +4816,288 @@
         ],
         "title": "StateTransitionRequest",
         "description": "Request payload for executing a verified learning state transition."
+      },
+      "StudentErrorDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "attempt_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attempt Id"
+          },
+          "misconception_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Misconception Id"
+          },
+          "error_category": {
+            "$ref": "#/components/schemas/ErrorCategory"
+          },
+          "student_answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Answer"
+          },
+          "correct_answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correct Answer"
+          },
+          "distractor_rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distractor Rationale"
+          },
+          "repair_status": {
+            "$ref": "#/components/schemas/RepairStatus"
+          },
+          "occurrence_count": {
+            "type": "integer",
+            "title": "Occurrence Count"
+          },
+          "first_detected_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "First Detected At"
+          },
+          "last_occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Occurred At"
+          },
+          "repaired_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repaired At"
+          },
+          "question_prompt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Prompt"
+          },
+          "question_explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Explanation"
+          },
+          "misconception": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MisconceptionResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "student_id",
+          "exam_template_id",
+          "topic_id",
+          "question_id",
+          "error_category",
+          "repair_status",
+          "occurrence_count",
+          "first_detected_at",
+          "last_occurred_at"
+        ],
+        "title": "StudentErrorDetailResponse"
+      },
+      "StudentErrorLogResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "student_id": {
+            "type": "string",
+            "title": "Student Id"
+          },
+          "exam_template_id": {
+            "type": "string",
+            "title": "Exam Template Id"
+          },
+          "topic_id": {
+            "type": "string",
+            "title": "Topic Id"
+          },
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "attempt_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attempt Id"
+          },
+          "misconception_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Misconception Id"
+          },
+          "error_category": {
+            "$ref": "#/components/schemas/ErrorCategory"
+          },
+          "student_answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Answer"
+          },
+          "correct_answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correct Answer"
+          },
+          "distractor_rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distractor Rationale"
+          },
+          "repair_status": {
+            "$ref": "#/components/schemas/RepairStatus"
+          },
+          "occurrence_count": {
+            "type": "integer",
+            "title": "Occurrence Count"
+          },
+          "first_detected_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "First Detected At"
+          },
+          "last_occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Occurred At"
+          },
+          "repaired_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repaired At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "student_id",
+          "exam_template_id",
+          "topic_id",
+          "question_id",
+          "error_category",
+          "repair_status",
+          "occurrence_count",
+          "first_detected_at",
+          "last_occurred_at"
+        ],
+        "title": "StudentErrorLogResponse"
       },
       "StudentLearningStateResponse": {
         "properties": {
