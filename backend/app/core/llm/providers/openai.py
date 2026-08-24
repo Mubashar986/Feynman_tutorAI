@@ -28,16 +28,18 @@ class OpenAIProvider(LLMProviderBase):
         reasoning_model: str = "gpt-4o",
         fast_model: str = "gpt-4o-mini",
         timeout_seconds: float = 60.0,
+        provider_name: str = "openai",
     ):
         self._api_key = api_key
         self.base_url = base_url.rstrip("/")
         self.reasoning_model = reasoning_model
         self.fast_model = fast_model
         self.timeout_seconds = timeout_seconds
+        self._custom_provider_name = provider_name
 
     @property
     def provider_name(self) -> str:
-        return "openai"
+        return self._custom_provider_name
 
     def is_configured(self) -> bool:
         return bool(self._api_key and self._api_key.strip())

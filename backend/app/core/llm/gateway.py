@@ -44,31 +44,56 @@ class LLMGateway:
 
     def _initialize_providers(self) -> None:
         """Initializes all concrete provider adapters from application settings."""
-        # 1. Google Gemini
+        # 1. OpenRouter (Multi-Model Gateway)
+        openrouter_key = getattr(self.settings, "OPENROUTER_API_KEY", "") or (
+            self.settings.OPENAI_API_KEY if self.settings.OPENAI_API_KEY.startswith("sk-or-") else ""
+        )
+        openrouter_model = getattr(self.settings, "OPENROUTER_MODEL", "z-ai/glm-5.2:free")
+        openrouter = OpenAIProvider(
+            api_key=openrouter_key,
+            base_url="https://openrouter.ai/api/v1",
+            reasoning_model=openrouter_model,
+            fast_model=openrouter_model,
+            provider_name="openrouter",
+        )
+        self.register_provider(openrouter)
+
+        # 2. Groq Cloud (Ultra-Fast)
+        groq_key = getattr(self.settings, "GROQ_API_KEY", "")
+        groq = OpenAIProvider(
+            api_key=groq_key,
+            base_url="https://api.groq.com/openai/v1",
+            reasoning_model="llama-3.3-70b-versatile",
+            fast_model="llama-3.3-70b-versatile",
+            provider_name="groq",
+        )
+        self.register_provider(groq)
+
+        # 3. Google Gemini
         gemini = GeminiProvider(api_key=self.settings.GEMINI_API_KEY)
         self.register_provider(gemini)
 
-        # 2. OpenAI / OpenRouter
+        # 4. Direct OpenAI
         openai = OpenAIProvider(api_key=self.settings.OPENAI_API_KEY)
         self.register_provider(openai)
 
-        # 3. Anthropic Claude
+        # 5. Anthropic Claude
         anthropic = AnthropicProvider(api_key=self.settings.ANTHROPIC_API_KEY)
         self.register_provider(anthropic)
 
-        # 4. Local Ollama
+        # 6. Local Ollama
         ollama = OllamaProvider(base_url=self.settings.OLLAMA_BASE_URL)
         self.register_provider(ollama)
 
-        # 5. Deterministic Mock Provider (always available for fallback/testing)
+        # 7. Deterministic Mock Provider (always available for fallback/testing)
         mock_provider = MockLLMProvider()
         self.register_provider(mock_provider)
 
         # Determine configured default and fallback order
-        configured_default = getattr(self.settings, "DEFAULT_LLM_PROVIDER", "gemini").lower()
+        configured_default = getattr(self.settings, "DEFAULT_LLM_PROVIDER", "openrouter").lower()
         
-        # Priority order: configured default -> Gemini -> OpenAI -> Anthropic -> Ollama -> Mock
-        candidate_order = [configured_default, "gemini", "openai", "anthropic", "ollama", "mock"]
+        # Priority order: configured default -> openrouter -> groq -> gemini -> openai -> anthropic -> ollama -> mock
+        candidate_order = [configured_default, "openrouter", "groq", "gemini", "openai", "anthropic", "ollama", "mock"]
         seen = set()
         self._fallback_order = []
         for name in candidate_order:
