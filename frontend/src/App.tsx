@@ -11,6 +11,7 @@ import {
   BarChart3,
   Network,
   ShieldCheck,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -26,6 +27,7 @@ import { ExamPlayer } from "@/components/exam/ExamPlayer";
 import { AnalyticsDashboard } from "@/components/analytics/AnalyticsDashboard";
 import { DAGVisualizer } from "@/components/dag/DAGVisualizer";
 import { ExamSimulationView } from "@/components/simulation/ExamSimulationView";
+import { ResourceManagerView } from "@/components/resources/ResourceManagerView";
 import { useCurriculumStore } from "@/stores/curriculumStore";
 import { SocraticTutorDrawer } from "@/components/tutor/SocraticTutorDrawer";
 import { FloatingTutorButton } from "@/components/tutor/FloatingTutorButton";
@@ -36,7 +38,7 @@ export function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = React.useState<boolean>(false);
   const [authView, setAuthView] = React.useState<"login" | "register">("login");
   const [activeTab, setActiveTab] = React.useState<
-    "catalog" | "syllabus" | "solver" | "analytics" | "dag" | "simulation"
+    "catalog" | "syllabus" | "solver" | "analytics" | "dag" | "simulation" | "library"
   >("syllabus");
 
   const { user, isAuthenticated } = useAuthStore();
@@ -101,7 +103,7 @@ export function App() {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Sparkles className="h-3.5 w-3.5 text-indigo-500" /> Interactive Exam Player
+                <Sparkles className="h-3.5 w-3.5 text-indigo-500" /> Exam Player
               </button>
               <button
                 onClick={() => setActiveTab("analytics")}
@@ -111,7 +113,7 @@ export function App() {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <BarChart3 className="h-3.5 w-3.5 text-emerald-500" /> Analytics & Errors
+                <BarChart3 className="h-3.5 w-3.5 text-emerald-500" /> Analytics
               </button>
               <button
                 onClick={() => setActiveTab("dag")}
@@ -121,7 +123,7 @@ export function App() {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Network className="h-3.5 w-3.5 text-indigo-500" /> Knowledge DAG
+                <Network className="h-3.5 w-3.5 text-indigo-500" /> DAG
               </button>
               <button
                 onClick={() => setActiveTab("simulation")}
@@ -131,7 +133,17 @@ export function App() {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <ShieldCheck className="h-3.5 w-3.5 text-amber-500" /> Exam Simulation
+                <ShieldCheck className="h-3.5 w-3.5 text-amber-500" /> Simulation
+              </button>
+              <button
+                onClick={() => setActiveTab("library")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+                  activeTab === "library"
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <BookOpen className="h-3.5 w-3.5 text-indigo-500" /> Library
               </button>
             </div>
 
@@ -202,6 +214,12 @@ export function App() {
           >
             Simulate
           </button>
+          <button
+            onClick={() => setActiveTab("library")}
+            className={`px-2.5 py-1 rounded-md shrink-0 ${activeTab === "library" ? "bg-card font-bold shadow-sm" : "text-muted-foreground"}`}
+          >
+            Library
+          </button>
         </div>
 
         {/* Auth Dialog Modal */}
@@ -232,7 +250,7 @@ export function App() {
                   <UserCheck className="h-3.5 w-3.5" /> Authenticated Session Active
                 </span>
               ) : (
-                "Task 8.3: Full-Length Exam Readiness Simulation & Score Reports"
+                "Task 3.4: Grounded Knowledge Retrieval & Verified Curriculum Library"
               )}
             </div>
 
@@ -245,7 +263,7 @@ export function App() {
             </h2>
 
             <p className="max-w-3xl text-muted-foreground leading-relaxed text-sm sm:text-base">
-              Launch full-length proctored mock exams, review calibrated readiness score certifications, and inspect pacing chronometry.
+              Explore verified curriculum coursebooks, formula reference sheets, and deep-linked RAG citation provenance.
             </p>
           </section>
 
@@ -348,6 +366,13 @@ export function App() {
                   }}
                 />
               </RequireAuth>
+            </section>
+          )}
+
+          {/* TAB 7: Resource Hub & Grounded Document Reader */}
+          {activeTab === "library" && (
+            <section className="space-y-6">
+              <ResourceManagerView />
             </section>
           )}
         </main>

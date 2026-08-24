@@ -22,6 +22,12 @@
 * [x] **Task 3.2:** Qdrant Vector Store Adapter & Hybrid Indexer `[COMPLETED]`
 * [x] **Task 3.3:** Grounded Retrieval & Source Provenance Formatter `[COMPLETED]`
 * [x] **Task 4.1:** Question Bank Schema & Multi-Type Data Models `[COMPLETED]`
+* [x] **Task 4.2:** LLM Question & Distractor Generator with Pydantic Validation `[COMPLETED]`
+* [x] **Task 4.3:** Question Quality, Solvability & Duplication Validator `[COMPLETED]`
+* [x] **Task 5.1:** Mastery Probability & Difficulty Calibration Engine `[COMPLETED]`
+* [x] **Task 5.2:** Error Bank & Misconception Diagnosis Engine `[COMPLETED]`
+* [x] **Task 6.1:** Socratic Tutor Orchestrator with Retrieval Augmentation `[COMPLETED]`
+* [x] **Task 6.2:** Server-Sent Events (SSE) Streaming Tutor Endpoint `[COMPLETED]`
 * [x] **Task 7.1:** Spaced Repetition Scheduling Engine (SM-2 / FSRS) `[COMPLETED]`
 * [x] **Task 7.2:** Teach-Back Mode & Rubric Evaluator Engine `[COMPLETED]`
 * [x] **Task 7.3:** Adversarial Tutor & Why-You-Are-Wrong Modes `[COMPLETED]`
@@ -32,7 +38,7 @@
 * [x] **Task 0.3:** React + Vite + TypeScript + Tailwind + Shadcn Workspace Scaffold `[COMPLETED]`
 * [x] **Task 1.3:** Auth Flow, Route Guards & User Profile State `[COMPLETED]`
 * [x] **Task 2.3:** Exam Template Catalog & Syllabus Tree Explorer `[COMPLETED]`
-* [ ] **Task 3.4:** Resource Manager & Document Viewer
+* [x] **Task 3.4:** Resource Manager & Document Viewer `[COMPLETED]`
 * [x] **Task 4.4:** Interactive Exam Taking Player with KaTeX & Timed Session `[COMPLETED]`
 * [x] **Task 5.3:** Student Analytics Dashboard, Mastery Radar & Error Bank UI `[COMPLETED]`
 * [x] **Task 6.3:** Socratic Tutor Slide-over Drawer with Live Math & Streaming `[COMPLETED]`

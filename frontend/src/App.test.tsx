@@ -9,6 +9,7 @@ import { useSocraticTutorStore } from "./stores/socraticTutorStore";
 import { useAnalyticsStore } from "./stores/analyticsStore";
 import { useMisconceptionDAGStore } from "./stores/misconceptionDAGStore";
 import { useExamSimulationStore } from "./stores/examSimulationStore";
+import { useResourceManagerStore } from "./stores/resourceManagerStore";
 
 describe("App & UI Primitives Suite", () => {
   beforeEach(() => {
@@ -23,6 +24,7 @@ describe("App & UI Primitives Suite", () => {
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
     useExamSimulationStore.getState().resetSimulation();
+    useResourceManagerStore.getState().resetView();
     localStorage.clear();
   });
 
@@ -57,6 +59,7 @@ describe("Curriculum Blueprint Catalog & Syllabus Tree Suite", () => {
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
     useExamSimulationStore.getState().resetSimulation();
+    useResourceManagerStore.getState().resetView();
     localStorage.clear();
   });
 
@@ -137,13 +140,14 @@ describe("Interactive Exam Taking Player Suite", () => {
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
     useExamSimulationStore.getState().resetSimulation();
+    useResourceManagerStore.getState().resetView();
     localStorage.clear();
   });
 
   it("renders live exam player, countdown timer, and question palette", () => {
     render(<App />);
 
-    const playerTabs = screen.getAllByRole("button", { name: /Interactive Exam Player/i });
+    const playerTabs = screen.getAllByRole("button", { name: /Exam Player/i });
     fireEvent.click(playerTabs[0]);
 
     expect(screen.getByText("Cambridge A-Level Physics Diagnostic Exam")).toBeInTheDocument();
@@ -155,7 +159,7 @@ describe("Interactive Exam Taking Player Suite", () => {
   it("allows selecting an option, flagging for review, and jumping via palette", () => {
     render(<App />);
 
-    const playerTabs = screen.getAllByRole("button", { name: /Interactive Exam Player/i });
+    const playerTabs = screen.getAllByRole("button", { name: /Exam Player/i });
     fireEvent.click(playerTabs[0]);
 
     const optionA = screen.getByLabelText("Option A");
@@ -176,7 +180,7 @@ describe("Interactive Exam Taking Player Suite", () => {
   it("submits exam and renders diagnostic score report with derivations", async () => {
     render(<App />);
 
-    const playerTabs = screen.getAllByRole("button", { name: /Interactive Exam Player/i });
+    const playerTabs = screen.getAllByRole("button", { name: /Exam Player/i });
     fireEvent.click(playerTabs[0]);
 
     fireEvent.click(screen.getByLabelText("Option A"));
@@ -217,13 +221,14 @@ describe("Student Analytics & Error Bank Suite", () => {
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
     useExamSimulationStore.getState().resetSimulation();
+    useResourceManagerStore.getState().resetView();
     localStorage.clear();
   });
 
   it("renders the analytics dashboard, telemetry cards, and SVG radar chart", () => {
     render(<App />);
 
-    const analyticsTabs = screen.getAllByRole("button", { name: /Analytics & Errors/i });
+    const analyticsTabs = screen.getAllByRole("button", { name: /Analytics/i });
     fireEvent.click(analyticsTabs[0]);
 
     expect(screen.getByText(/88% Probability of Mastery/i)).toBeInTheDocument();
@@ -237,7 +242,7 @@ describe("Student Analytics & Error Bank Suite", () => {
   it("filters error bank items by category and marks an error as resolved", () => {
     render(<App />);
 
-    const analyticsTabs = screen.getAllByRole("button", { name: /Analytics & Errors/i });
+    const analyticsTabs = screen.getAllByRole("button", { name: /Analytics/i });
     fireEvent.click(analyticsTabs[0]);
 
     expect(screen.getByText(/Diagnostic Error Bank & Misconception Log/i)).toBeInTheDocument();
@@ -269,13 +274,14 @@ describe("Interactive Misconception DAG Suite", () => {
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
     useExamSimulationStore.getState().resetSimulation();
+    useResourceManagerStore.getState().resetView();
     localStorage.clear();
   });
 
   it("renders the interactive DAG canvas and node inspector", () => {
     render(<App />);
 
-    const dagTabs = screen.getAllByRole("button", { name: /Knowledge DAG/i });
+    const dagTabs = screen.getAllByRole("button", { name: /DAG/i });
     fireEvent.click(dagTabs[0]);
 
     expect(screen.getByText(/Prerequisite Knowledge & Misconception DAG/i)).toBeInTheDocument();
@@ -289,7 +295,7 @@ describe("Interactive Misconception DAG Suite", () => {
   it("selects a node on canvas and launches an adversarial challenge probe", async () => {
     render(<App />);
 
-    const dagTabs = screen.getAllByRole("button", { name: /Knowledge DAG/i });
+    const dagTabs = screen.getAllByRole("button", { name: /DAG/i });
     fireEvent.click(dagTabs[0]);
 
     // Launch Adversarial Challenge on selected Superposition node
@@ -322,13 +328,14 @@ describe("Full-Length Exam Readiness Simulation Suite", () => {
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
     useExamSimulationStore.getState().resetSimulation();
+    useResourceManagerStore.getState().resetView();
     localStorage.clear();
   });
 
   it("renders simulation launcher, blueprint selector, and topic weights", () => {
     render(<App />);
 
-    const simTabs = screen.getAllByRole("button", { name: /Exam Simulation/i });
+    const simTabs = screen.getAllByRole("button", { name: /Simulation/i });
     fireEvent.click(simTabs[0]);
 
     expect(screen.getByText(/Full-Length Exam Simulation Engine/i)).toBeInTheDocument();
@@ -346,7 +353,7 @@ describe("Full-Length Exam Readiness Simulation Suite", () => {
   it("views calibrated diagnostic score report and print export", () => {
     render(<App />);
 
-    const simTabs = screen.getAllByRole("button", { name: /Exam Simulation/i });
+    const simTabs = screen.getAllByRole("button", { name: /Simulation/i });
     fireEvent.click(simTabs[0]);
 
     const sampleReportBtn = screen.getByRole("button", { name: /View Sample Diagnostic Report/i });
@@ -370,6 +377,47 @@ describe("Full-Length Exam Readiness Simulation Suite", () => {
   });
 });
 
+describe("Curriculum Resource Hub & Grounded Document Viewer Suite", () => {
+  beforeEach(() => {
+    useAuthStore.getState().logout();
+    useCurriculumStore.getState().setSelectedTopic(null);
+    useCurriculumStore.getState().setIsDrawerOpen(false);
+    useExamPlayerStore.getState().resetSession();
+    useSocraticTutorStore.getState().closeDrawer();
+    useAnalyticsStore.getState().resetAnalytics();
+    useMisconceptionDAGStore.getState().resetView();
+    useExamSimulationStore.getState().resetSimulation();
+    useResourceManagerStore.getState().resetView();
+    localStorage.clear();
+  });
+
+  it("renders resource catalog, chapter index, and document reader", () => {
+    render(<App />);
+
+    const libraryTabs = screen.getAllByRole("button", { name: /Library/i });
+    fireEvent.click(libraryTabs[0]);
+
+    expect(screen.getByText(/Curriculum Resource Hub & Grounded Reader/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Search textbook chapters, formulas, or syllabus codes/i)).toBeInTheDocument();
+    expect(screen.getByText(/Table of Contents/i)).toBeInTheDocument();
+    expect(screen.getByText(/Verified Curriculum Source Passage:/i)).toBeInTheDocument();
+  });
+
+  it("switches document and selects a section in the reader", () => {
+    render(<App />);
+
+    const libraryTabs = screen.getAllByRole("button", { name: /Library/i });
+    fireEvent.click(libraryTabs[0]);
+
+    // Select Formula Sheet
+    const formulaSheetCard = screen.getByText(/Cambridge International Physics Data & Formulae Sheet/i);
+    fireEvent.click(formulaSheetCard);
+
+    expect(screen.getByText(/Waves, Optics & Quantum Formulas/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Ask Socratic Tutor/i })).toBeInTheDocument();
+  });
+});
+
 describe("Socratic AI Tutor Drawer Suite", () => {
   beforeEach(() => {
     useAuthStore.getState().logout();
@@ -381,6 +429,7 @@ describe("Socratic AI Tutor Drawer Suite", () => {
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
     useExamSimulationStore.getState().resetSimulation();
+    useResourceManagerStore.getState().resetView();
     localStorage.clear();
   });
 
@@ -447,13 +496,14 @@ describe("Authentication & Route Guard Flow Suite", () => {
     useAnalyticsStore.getState().resetAnalytics();
     useMisconceptionDAGStore.getState().resetView();
     useExamSimulationStore.getState().resetSimulation();
+    useResourceManagerStore.getState().resetView();
     localStorage.clear();
   });
 
   it("shows unauthenticated state with RequireAuth prompt inside solver tab", () => {
     render(<App />);
 
-    const solverTabs = screen.getAllByRole("button", { name: /Interactive Exam Player/i });
+    const solverTabs = screen.getAllByRole("button", { name: /Exam Player/i });
     fireEvent.click(solverTabs[0]);
 
     expect(screen.getByText("Authentication Required")).toBeInTheDocument();
